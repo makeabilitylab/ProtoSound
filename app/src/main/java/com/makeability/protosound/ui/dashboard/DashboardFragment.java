@@ -6,6 +6,7 @@ import android.graphics.Color;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
+import android.net.rtp.AudioStream;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Environment;
@@ -26,10 +27,18 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.makeability.protosound.R;
+import com.makeability.protosound.utils.SoundRecorder;
 
+import java.io.BufferedInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Objects;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class DashboardFragment extends Fragment {
 
@@ -38,12 +47,14 @@ public class DashboardFragment extends Fragment {
     private static final int RECORDER_CHANNELS = AudioFormat.CHANNEL_IN_MONO;
     private static final int RECORDER_AUDIO_ENCODING = AudioFormat.ENCODING_PCM_16BIT;
     private static final int PERMISSIONS_REQUEST_CODE = 100;
-    private AudioRecord recorder = null;
+    public static final String VOICE_FILE_NAME = "audiorecord.pcm";
+    SoundRecorder.OnVoicePlaybackStateChangedListener mListener;
     private Thread recordingThread = null;
     private boolean isRecording = false;
     int BufferElements2Rec = 1024; // want to play 2048 (2K) since 2 bytes we use only 1024
     int BytesPerElement = 2; // 2 bytes in 16bit format
     String TAG = "Dashboard";
+    SoundRecorder recorder;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -61,85 +72,75 @@ public class DashboardFragment extends Fragment {
         checkRecordPermission();
 
         Button record_t1_s1 = root.findViewById(R.id.record_t1_s1);
-        record_t1_s1.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.i("Dashboard", "t1_s1 called");
-                startRecording();
-                new CountDownTimer(1000, 250) {
-                    public void onTick(long millisUntilFinished) {
-                        Log.d(TAG,"seconds remaining: " + millisUntilFinished / 250);
-                    }
+        record_t1_s1.setOnClickListener(v -> {
+            Log.i("Dashboard", "t1_s1 called");
+            startRecording();
+            Timer timer = new Timer();
+            timer.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    stopRecording();
+                    timer.cancel();
+                }
+            }, 2000);
+        });
 
-                    public void onFinish() {
-                        Log.d(TAG,"DONE");
-                    }
-                }.start();
-                stopRecording();
-            }
+        Button test_button = root.findViewById(R.id.test_button);
+        test_button.setOnClickListener(v -> {
+            startPlay();
         });
         return root;
     }
 
     private void startRecording() {
-        int minBufferSize = AudioRecord.getMinBufferSize(RECORDER_SAMPLE_RATE, RECORDER_CHANNELS, RECORDER_AUDIO_ENCODING);
-        recorder = new AudioRecord(MediaRecorder.AudioSource.MIC,
-                RECORDER_SAMPLE_RATE, RECORDER_CHANNELS,
-                RECORDER_AUDIO_ENCODING, minBufferSize);
-
+        Log.d(TAG, "startRecording: ");
+        recorder = new SoundRecorder(this.requireContext(), VOICE_FILE_NAME, mListener);
         recorder.startRecording();
-        isRecording = true;
-        recordingThread = new Thread(this::writeAudioDataToFile, "AudioRecorder Thread");
-        recordingThread.start();
-    }
-
-    private void writeAudioDataToFile() {
-        // Write the output audio in byte
-        String filePath = "/sdcard/8k16bitMono.pcm";
-
-        short sData[] = new short[BufferElements2Rec];
-
-        FileOutputStream os = null;
-        try {
-            os = new FileOutputStream(filePath);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-
-        while (isRecording) {
-            // gets the voice output from microphone to byte format
-            recorder.read(sData, 0, BufferElements2Rec);
-            System.out.println("Short wirting to file" + sData.toString());
-            try {
-                // writes the data to file from buffer stores the voice buffer
-                byte bData[] = short2byte(sData);
-
-                os.write(bData, 0, BufferElements2Rec * BytesPerElement);
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-
-        try {
-            os.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
     private void stopRecording() {
         // stops the recording activity
+        Log.d(TAG, "stopRecording: ");
         if (null != recorder) {
-            isRecording = false;
-
-
-            recorder.stop();
-            recorder.release();
-
-            recorder = null;
-            recordingThread = null;
+            recorder.stopRecording();
         }
+    }
+
+    private void startPlay() {
+        Log.d(TAG, "startPlay: ");
+        if (null != recorder) {
+            recorder.startPlay();
+        }
+    }
+
+    private byte[] getBytesFromWave(String filename) throws FileNotFoundException {
+        if (!new File(requireActivity().getFilesDir(), filename).exists()) {
+            return new byte[0];
+        }
+        FileInputStream in = requireActivity().openFileInput(filename);
+        BufferedInputStream bis = new BufferedInputStream(in);
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        byte[] bytes = new byte[1];
+        byte[] dataBuffer = new byte[1024 * 16];
+        int size = 0;
+        try {
+            while ((size = bis.read(dataBuffer)) != -1) {
+                baos.write(dataBuffer, 0, size);
+            }
+            bytes = baos.toByteArray();
+        } catch (IOException e) {
+            Log.e(TAG, "getBytesFromWave: Failed to read the sound file into a byte array", e);
+        } finally {
+            try {
+                if (in != null) {
+                    in.close();
+                }
+                if (bis != null) {
+                    bis.close();
+                }
+            } catch (IOException e) { /* ignore */}
+        }
+        return bytes;
     }
 
     private void checkRecordPermission() {
