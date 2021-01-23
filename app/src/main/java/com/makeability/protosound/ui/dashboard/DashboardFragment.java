@@ -36,6 +36,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Objects;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -89,6 +90,16 @@ public class DashboardFragment extends Fragment {
         test_button.setOnClickListener(v -> {
             startPlay();
         });
+        TextView textDashboard = root.findViewById(R.id.text_dashboard);
+        Button test_button_2 = root.findViewById(R.id.test_button_2);
+        test_button_2.setOnClickListener(v -> {
+            try {
+                getBytesFromWave(VOICE_FILE_NAME);
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+            Log.d(TAG, "onCreateView: ");
+        });
         return root;
     }
 
@@ -125,9 +136,11 @@ public class DashboardFragment extends Fragment {
         int size = 0;
         try {
             while ((size = bis.read(dataBuffer)) != -1) {
+//                Log.d(TAG, "getBytesFromWave: " + size +":"+ Arrays.toString(dataBuffer));
                 baos.write(dataBuffer, 0, size);
             }
             bytes = baos.toByteArray();
+//            Log.d(TAG, "getBytesFromWave: " + bytes.length);
         } catch (IOException e) {
             Log.e(TAG, "getBytesFromWave: Failed to read the sound file into a byte array", e);
         } finally {
@@ -137,6 +150,9 @@ public class DashboardFragment extends Fragment {
                 }
                 if (bis != null) {
                     bis.close();
+                }
+                if (baos != null) {
+                    baos.close();
                 }
             } catch (IOException e) { /* ignore */}
         }

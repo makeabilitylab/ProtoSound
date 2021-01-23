@@ -13,3 +13,5 @@
 .externalNativeBuild
 .cxx
 local.properties
+/protosound-server/venv/
+
