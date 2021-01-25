@@ -3,4 +3,23 @@
     <string name="title_home">Home</string>
     <string name="title_dashboard">Dashboard</string>
     <string name="title_notifications">Notifications</string>
+    <string name="class_1">Class 1</string>
+    <string name="protosound">ProtoSound</string>
+    <string name="play">Play</string>
+    <string name="class_2">Class 2</string>
+    <string name="class_3">Class 3</string>
+    <string name="record_11">Record 11</string>
+    <string name="record_12">Record 12</string>
+    <string name="class_4">Class 4</string>
+    <string name="class_5">Class 5</string>
+    <string name="tutorial_1">Step 1: Record 5 samples of each sound type (scroll right to see more)</string>
+    <string name="tutorial_2">Step 2: Choose 2 classes from a list of pre-defined class</string>
+    <string name="tutorial_3">Step 3: Record background noises</string>
+    <string-array name="sound_array">
+        <item>Siren</item>
+        <item>Fire Alarm</item>
+        <item>Placeholder1</item>
+        <item>Placeholder2</item>
+        <item>Placeholder3</item>
+    </string-array>
 </resources>

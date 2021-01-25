@@ -11,7 +11,7 @@ import numpy as np
 # different async modes, or leave it set to None for the application to choose
 # the best option based on installed packages.
 
-from helpers import dbFS
+# from helpers import dbFS
 from vggish_input import waveform_to_examples
 
 async_mode = None
@@ -22,7 +22,7 @@ socketio = SocketIO(app, async_mode=async_mode)
 thread = None
 thread_lock = Lock()
 
-RATE = 16000
+RATE = 44100
 
 def background_thread():
     """Example of how to send server generated events to clients."""

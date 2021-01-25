@@ -2,6 +2,7 @@ package com.makeability.protosound.ui.dashboard;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
 import android.graphics.Color;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
@@ -14,7 +15,10 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -26,8 +30,14 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.google.android.material.textfield.TextInputLayout;
+import com.makeability.protosound.MainActivity;
 import com.makeability.protosound.R;
 import com.makeability.protosound.utils.SoundRecorder;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
@@ -36,10 +46,19 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Timer;
 import java.util.TimerTask;
+
+import static com.makeability.protosound.MainActivity.TEST_E2E_LATENCY;
 
 public class DashboardFragment extends Fragment {
 
@@ -48,7 +67,7 @@ public class DashboardFragment extends Fragment {
     private static final int RECORDER_CHANNELS = AudioFormat.CHANNEL_IN_MONO;
     private static final int RECORDER_AUDIO_ENCODING = AudioFormat.ENCODING_PCM_16BIT;
     private static final int PERMISSIONS_REQUEST_CODE = 100;
-    public static final String VOICE_FILE_NAME = "audiorecord.pcm";
+    public static final String VOICE_FILE_NAME = "audiorecord_";
     SoundRecorder.OnVoicePlaybackStateChangedListener mListener;
     private Thread recordingThread = null;
     private boolean isRecording = false;
@@ -56,26 +75,71 @@ public class DashboardFragment extends Fragment {
     int BytesPerElement = 2; // 2 bytes in 16bit format
     String TAG = "Dashboard";
     SoundRecorder recorder;
+    int[] recordButtonList = {R.id.record_1, R.id.record_2, R.id.record_3, R.id.record_4,
+            R.id.record_5, R.id.record_6, R.id.record_7, R.id.record_8, R.id.record_9,
+            R.id.record_10, R.id.record_11, R.id.record_12, R.id.record_13, R.id.record_14, R.id.record_15, R.id.record_bg};
+
+    int[] playButtonList = {R.id.play_1, R.id.play_2, R.id.play_3, R.id.play_4, R.id.play_5,
+    R.id.play_6, R.id.play_7, R.id.play_8, R.id.play_9, R.id.play_10, R.id.play_11,
+            R.id.play_12, R.id.play_13, R.id.play_14, R.id.play_15, R.id.play_bg};
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         dashboardViewModel =
                 new ViewModelProvider(this).get(DashboardViewModel.class);
         View root = inflater.inflate(R.layout.fragment_dashboard, container, false);
-        final TextView textView = root.findViewById(R.id.text_dashboard);
-        dashboardViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
-            @Override
-            public void onChanged(@Nullable String s) {
-                textView.setText(s);
+//        final TextView textView = root.findViewById(R.id.text_dashboard);
+//        dashboardViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
+//            @Override
+//            public void onChanged(@Nullable String s) {
+//                textView.setText(s);
+//            }
+//        });
+
+        Map<Integer, Integer> recordPlayMap = new HashMap<>();
+        for (int i = 0; i < playButtonList.length; i++) {
+            if (!recordPlayMap.containsKey(playButtonList[i])) {
+                recordPlayMap.put(playButtonList[i], recordButtonList[i]);
             }
-        });
+        }
 
         checkRecordPermission();
 
-        Button record_t1_s1 = root.findViewById(R.id.record_t1_s1);
-        record_t1_s1.setOnClickListener(v -> {
-            Log.i("Dashboard", "t1_s1 called");
-            startRecording();
+        // setup Listener for 15 record and playback buttons
+        for (int rid : recordButtonList) {
+            Button record = root.findViewById(rid);
+            setOnClickRecord(record, rid);
+        }
+
+        for (int pid: playButtonList) {
+            Button play = root.findViewById(pid);
+            setOnClickPlay(play, recordPlayMap.get(pid));
+        }
+
+        // setup 2 Spinner drop-down lists for pre-determined sounds
+        AutoCompleteTextView spinner = (AutoCompleteTextView) root.findViewById(R.id.menu);
+        AutoCompleteTextView spinner2 = (AutoCompleteTextView) root.findViewById(R.id.menu2);
+        // Create an ArrayAdapter using the string array and a default spinner layout
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(requireActivity(),
+                R.array.sound_array, android.R.layout.simple_spinner_dropdown_item);
+        // Specify the layout to use when the list of choices appears
+//        adapter.setDropDownViewResource(android.R.layout.simple_dropdown_item_1line);
+        // Apply the adapter to the spinner
+        spinner.setAdapter(adapter);
+        spinner2.setAdapter(adapter);
+
+        Button submit = (Button) root.findViewById(R.id.submit);
+        setOnClickTestSubmit(submit, R.id.submit);
+        return root;
+    }
+
+    private void setOnClickRecord(final Button btn, final int id){
+
+        btn.setOnClickListener(v -> {
+            btn.setBackgroundColor(Color.GREEN);
+
+            Log.d(TAG, "record:"+ id + " called");
+            startRecording(id);
             Timer timer = new Timer();
             timer.schedule(new TimerTask() {
                 @Override
@@ -83,29 +147,55 @@ public class DashboardFragment extends Fragment {
                     stopRecording();
                     timer.cancel();
                 }
-            }, 2000);
+            }, 1000);
         });
-
-        Button test_button = root.findViewById(R.id.test_button);
-        test_button.setOnClickListener(v -> {
-            startPlay();
-        });
-        TextView textDashboard = root.findViewById(R.id.text_dashboard);
-        Button test_button_2 = root.findViewById(R.id.test_button_2);
-        test_button_2.setOnClickListener(v -> {
-            try {
-                getBytesFromWave(VOICE_FILE_NAME);
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            }
-            Log.d(TAG, "onCreateView: ");
-        });
-        return root;
     }
 
-    private void startRecording() {
+    private void setOnClickPlay(final Button btn, final int id){
+
+        btn.setOnClickListener(v -> {
+            Log.d(TAG, "play:" + id + " called");
+            startPlay(id);
+        });
+    }
+
+    private void setOnClickTestSubmit(final Button btn, final int id){
+
+        btn.setOnClickListener(v -> {
+            Log.d(TAG, "Test Submit to Server");
+            List<Short> test = new ArrayList<>();
+            test.add((short) 69);
+            test.add((short) 69);
+            test.add((short) 69);
+            test.add((short) 69);
+            test.add((short) 69);
+            Log.d(TAG, "setOnClickTestSubmit: " + test);
+            sendRawAudioToServer(test);
+        });
+    }
+
+    private void setOnClickSubmit(final Button btn, final int id){
+
+        btn.setOnClickListener(v -> {
+            Log.d(TAG, "Submit to Server");
+            for (int rid: recordButtonList) {
+                try {
+                    byte[] byteArray = getBytesFromWave(VOICE_FILE_NAME + rid + ".pcm");
+                    short[] shortArray = convertByteArrayToShortArray(byteArray);
+                    List<Short> soundBuffer = new ArrayList<>();
+                    for (short num : shortArray) {
+                        soundBuffer.add(num);
+                    }
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
+
+    private void startRecording(int id) {
         Log.d(TAG, "startRecording: ");
-        recorder = new SoundRecorder(this.requireContext(), VOICE_FILE_NAME, mListener);
+        recorder = new SoundRecorder(this.requireContext(), VOICE_FILE_NAME + id + ".pcm", mListener);
         recorder.startRecording();
     }
 
@@ -117,9 +207,11 @@ public class DashboardFragment extends Fragment {
         }
     }
 
-    private void startPlay() {
-        Log.d(TAG, "startPlay: ");
+    private void startPlay(int id) {
+        String audioFile = VOICE_FILE_NAME + id + ".pcm";
         if (null != recorder) {
+            recorder.changeOutputFileName(audioFile);
+            Log.d(TAG, "startPlay: ");
             recorder.startPlay();
         }
     }
@@ -140,7 +232,6 @@ public class DashboardFragment extends Fragment {
                 baos.write(dataBuffer, 0, size);
             }
             bytes = baos.toByteArray();
-//            Log.d(TAG, "getBytesFromWave: " + bytes.length);
         } catch (IOException e) {
             Log.e(TAG, "getBytesFromWave: Failed to read the sound file into a byte array", e);
         } finally {
@@ -159,15 +250,37 @@ public class DashboardFragment extends Fragment {
         return bytes;
     }
 
+    private void sendRawAudioToServer(List<Short> soundBuffer) {
+        try {
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("data", new JSONArray(soundBuffer));
+            jsonObject.put("time", "" + System.currentTimeMillis());
+            Log.i(TAG, "Send raw audio to server");
+            Log.i(TAG, "Connected: " + MainActivity.mSocket.connected());
+            MainActivity.mSocket.emit("audio_data", jsonObject);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
     private void checkRecordPermission() {
 
-        if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.RECORD_AUDIO)
+        if (ActivityCompat.checkSelfPermission(requireActivity(), Manifest.permission.RECORD_AUDIO)
                 != PackageManager.PERMISSION_GRANTED) {
 
-            ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.RECORD_AUDIO},
+            ActivityCompat.requestPermissions(requireActivity(), new String[]{Manifest.permission.RECORD_AUDIO},
                     PERMISSIONS_REQUEST_CODE);
         }
     }
+
+
+    private short[] convertByteArrayToShortArray(byte[] bytes) {
+//        Log.i(TAG, "convertByteArrayToShortArray()");
+        short[] result = new short[bytes.length / 2];
+        ByteBuffer.wrap(bytes).order(ByteOrder.LITTLE_ENDIAN).asShortBuffer().get(result);
+        return result;
+    }
+
 
     //Conversion of short to byte
     private byte[] short2byte(short[] sData) {
@@ -194,7 +307,7 @@ public class DashboardFragment extends Fragment {
                 // Permissions settings for the app in the System settings. For this sample, we
                 // simply exit to get to the important part.
                 Toast.makeText(getActivity(), "Need Audio access to start streaming and recognizing surrounding voices", Toast.LENGTH_LONG).show();
-                getActivity().finish();
+                requireActivity().finish();
             }
         }
     }

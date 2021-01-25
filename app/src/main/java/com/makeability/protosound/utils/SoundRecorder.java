@@ -33,6 +33,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.util.List;
 
 /**
@@ -49,7 +51,7 @@ public class SoundRecorder {
     private static int BUFFER_SIZE = AudioRecord
             .getMinBufferSize(RECORDING_RATE, CHANNEL_IN, FORMAT);
 
-    private final String mOutputFileName;
+    private String mOutputFileName;
     private final AudioManager mAudioManager;
     private final Handler mHandler;
     private final Context mContext;
@@ -71,6 +73,10 @@ public class SoundRecorder {
         mAudioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
         mHandler = new Handler(Looper.getMainLooper());
         mContext = context;
+    }
+
+    public void changeOutputFileName(String newFileName) {
+        this.mOutputFileName = newFileName;
     }
 
     /**
@@ -142,6 +148,14 @@ public class SoundRecorder {
         Log.d(TAG, "cleanup() is called");
         stopPlaying();
         stopRecording();
+    }
+
+
+    private short[] convertByteArrayToShortArray(byte[] bytes) {
+//        Log.i(TAG, "convertByteArrayToShortArray()");
+        short[] result = new short[bytes.length / 2];
+        ByteBuffer.wrap(bytes).order(ByteOrder.LITTLE_ENDIAN).asShortBuffer().get(result);
+        return result;
     }
 
 
