@@ -30,9 +30,12 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.github.nkzawa.emitter.Emitter;
+import com.github.nkzawa.socketio.client.Socket;
 import com.google.android.material.textfield.TextInputLayout;
 import com.makeability.protosound.MainActivity;
 import com.makeability.protosound.R;
+import com.makeability.protosound.utils.SocketUtil;
 import com.makeability.protosound.utils.SoundRecorder;
 
 import org.json.JSONArray;
@@ -63,6 +66,7 @@ import static com.makeability.protosound.MainActivity.TEST_E2E_LATENCY;
 public class DashboardFragment extends Fragment {
 
     private DashboardViewModel dashboardViewModel;
+    private Socket mSocket;
     private static final int RECORDER_SAMPLE_RATE = 44100;
     private static final int RECORDER_CHANNELS = AudioFormat.CHANNEL_IN_MONO;
     private static final int RECORDER_AUDIO_ENCODING = AudioFormat.ENCODING_PCM_16BIT;
@@ -88,14 +92,11 @@ public class DashboardFragment extends Fragment {
         dashboardViewModel =
                 new ViewModelProvider(this).get(DashboardViewModel.class);
         View root = inflater.inflate(R.layout.fragment_dashboard, container, false);
-//        final TextView textView = root.findViewById(R.id.text_dashboard);
-//        dashboardViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
-//            @Override
-//            public void onChanged(@Nullable String s) {
-//                textView.setText(s);
-//            }
-//        });
 
+//        SocketUtil socketUtil = new SocketUtil();
+//        mSocket = socketUtil.getSocket();
+//        mSocket.on("android_test", onConnect);
+//        mSocket.connect();
         Map<Integer, Integer> recordPlayMap = new HashMap<>();
         for (int i = 0; i < playButtonList.length; i++) {
             if (!recordPlayMap.containsKey(playButtonList[i])) {
@@ -164,11 +165,11 @@ public class DashboardFragment extends Fragment {
         btn.setOnClickListener(v -> {
             Log.d(TAG, "Test Submit to Server");
             List<Short> test = new ArrayList<>();
-            test.add((short) 69);
-            test.add((short) 69);
-            test.add((short) 69);
-            test.add((short) 69);
-            test.add((short) 69);
+            test.add((short) 12);
+            test.add((short) 23);
+            test.add((short) 34);
+            test.add((short) 45);
+            test.add((short) 56);
             Log.d(TAG, "setOnClickTestSubmit: " + test);
             sendRawAudioToServer(test);
         });
@@ -256,8 +257,9 @@ public class DashboardFragment extends Fragment {
             JSONObject jsonObject = new JSONObject();
             jsonObject.put("data", new JSONArray(soundBuffer));
             jsonObject.put("time", "" + System.currentTimeMillis());
-            Log.i(TAG, "Send raw audio to server");
+            Log.i(TAG, "Send raw audio to server:");
             Log.i(TAG, "Connected: " + MainActivity.mSocket.connected());
+            MainActivity.mSocket.emit("android_test");
             MainActivity.mSocket.emit("audio_data", jsonObject);
         } catch (JSONException e) {
             e.printStackTrace();
@@ -312,5 +314,37 @@ public class DashboardFragment extends Fragment {
             }
         }
     }
+
+    public Emitter.Listener onConnect = new Emitter.Listener() {
+        @Override
+        public void call(Object... args) {
+            Log.d(TAG, "Socket Connected!");
+        }
+    };
+
+    private Emitter.Listener onConnectError = new Emitter.Listener() {
+        @Override
+        public void call(Object... args) {
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+
+
+                }
+            });
+        }
+    };
+    private Emitter.Listener onDisconnect = new Emitter.Listener() {
+        @Override
+        public void call(Object... args) {
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+
+
+                }
+            });
+        }
+    };
 
 }

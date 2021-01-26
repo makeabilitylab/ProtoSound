@@ -12,6 +12,7 @@ import numpy as np
 # the best option based on installed packages.
 
 # from helpers import dbFS
+from helpers import dbFS
 from vggish_input import waveform_to_examples
 
 async_mode = None
@@ -165,4 +166,4 @@ def test_disconnect():
 
 
 if __name__ == '__main__':
-    socketio.run(app)
+    socketio.run(app, host='10.0.0.114', debug=True)
