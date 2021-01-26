@@ -186,6 +186,7 @@ public class DashboardFragment extends Fragment {
                     for (short num : shortArray) {
                         soundBuffer.add(num);
                     }
+                    sendRawAudioToServer(soundBuffer);
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
                 }

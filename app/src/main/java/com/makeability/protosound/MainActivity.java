@@ -29,6 +29,7 @@ public class MainActivity extends AppCompatActivity {
     private static final String TEST_E2E_LATENCY_SERVER = "http://128.208.49.41:8789";
     private static final String MODEL_LATENCY_SERVER = "http://128.208.49.41:8790";
     private static final String DEFAULT_SERVER = "http://128.208.49.41:8788";
+    private static final String TEST_SERVER = "http://127.0.0.1:5000";
     private static final String TAG = "MainActivity";
 
     {
@@ -38,7 +39,8 @@ public class MainActivity extends AppCompatActivity {
         } else if (TEST_MODEL_LATENCY) {
             SERVER_URL = MODEL_LATENCY_SERVER;
         } else {
-            SERVER_URL = DEFAULT_SERVER;
+//            SERVER_URL = DEFAULT_SERVER;
+            SERVER_URL = TEST_SERVER;
         }
         try {
             mSocket = IO.socket(SERVER_URL);
