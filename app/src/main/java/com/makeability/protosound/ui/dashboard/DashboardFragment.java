@@ -1,15 +1,17 @@
 package com.makeability.protosound.ui.dashboard;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.media.AudioFormat;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
@@ -22,6 +24,7 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.github.nkzawa.emitter.Emitter;
 import com.github.nkzawa.socketio.client.Socket;
+import com.google.android.material.textfield.TextInputEditText;
 import com.makeability.protosound.MainActivity;
 import com.makeability.protosound.R;
 import com.makeability.protosound.utils.SoundRecorder;
@@ -39,8 +42,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.sql.Struct;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -49,6 +52,7 @@ import java.util.TimerTask;
 
 public class DashboardFragment extends Fragment {
 
+    private String TAG = "Dashboard";
     private static final boolean TEST = true;
     private DashboardViewModel dashboardViewModel;
     private Socket mSocket;
@@ -62,7 +66,7 @@ public class DashboardFragment extends Fragment {
     private boolean isRecording = false;
     int BufferElements2Rec = 1024; // want to play 2048 (2K) since 2 bytes we use only 1024
     int BytesPerElement = 2; // 2 bytes in 16bit format
-    String TAG = "Dashboard";
+    String[] labelList = {"", "", "", "", ""};
     SoundRecorder recorder;
     int[] recordButtonList = {R.id.record_1, R.id.record_2, R.id.record_3, R.id.record_4,
             R.id.record_5, R.id.record_6, R.id.record_7, R.id.record_8, R.id.record_9,
@@ -78,10 +82,6 @@ public class DashboardFragment extends Fragment {
                 new ViewModelProvider(this).get(DashboardViewModel.class);
         View root = inflater.inflate(R.layout.fragment_dashboard, container, false);
 
-//        SocketUtil socketUtil = new SocketUtil();
-//        mSocket = socketUtil.getSocket();
-//        mSocket.on("android_test", onConnect);
-//        mSocket.connect();
         Map<Integer, Integer> recordPlayMap = new HashMap<>();
         for (int i = 0; i < playButtonList.length; i++) {
             if (!recordPlayMap.containsKey(playButtonList[i])) {
@@ -114,16 +114,72 @@ public class DashboardFragment extends Fragment {
         spinner.setAdapter(adapter);
         spinner2.setAdapter(adapter);
 
+        // Set Listener for spinner
+        setOnItemClickListener(spinner, 4);
+        setOnItemClickListener(spinner2, 5);
+
+        // Setup 3 edit texts for 3 classes
+        TextInputEditText field_1 = (TextInputEditText) root.findViewById(R.id.class_1);
+        TextInputEditText field_2 = (TextInputEditText) root.findViewById(R.id.class_2);
+        TextInputEditText field_3 = (TextInputEditText) root.findViewById(R.id.class_3);
+        setOnClickText(field_1, 1);
+        setOnClickText(field_2, 2);
+        setOnClickText(field_3, 3);
         Button submit = (Button) root.findViewById(R.id.submit);
-        setOnClickTestSubmit(submit, R.id.record_1);
+        setOnClickSubmit(submit, R.id.record_1);
         return root;
     }
+
+    private void setOnClickText(TextInputEditText field, int id) {
+        field.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                String errMsg = "";
+                if (id == 1) {
+                    errMsg = "1st";
+                } else if (id == 2) {
+                    errMsg = "2nd";
+                } else {
+                    errMsg = "3rd";
+                }
+                String labelName = s.toString();
+                if (labelName.isEmpty()) {
+                    field.setError("Please enter a name for your " + errMsg + " class.");
+                }
+                Log.d(TAG, "EditText: " + labelName);
+                labelList[id - 1] = labelName;
+            }
+        });
+    }
+
+    private void setOnItemClickListener(final AutoCompleteTextView spinner, int spinner_id) {
+        spinner.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                String selection = (String)parent.getItemAtPosition(position);
+                Log.d(TAG, "spinner " + spinner_id + ": " + selection);
+                labelList[spinner_id - 1] = selection;
+            }
+        });
+    }
+
+
 
     private void setOnClickRecord(final Button btn, final int id){
 
         btn.setOnClickListener(v -> {
             btn.setBackgroundColor(Color.GREEN);
-
+            Toast.makeText(requireActivity(), "Recording.." , Toast.LENGTH_SHORT).show();
             Log.d(TAG, "record:"+ id + " called");
             startRecording(id);
             Timer timer = new Timer();
@@ -133,7 +189,7 @@ public class DashboardFragment extends Fragment {
                     stopRecording();
                     timer.cancel();
                 }
-            }, 2000);
+            }, 1000);
         });
     }
 
@@ -141,6 +197,7 @@ public class DashboardFragment extends Fragment {
 
         btn.setOnClickListener(v -> {
             Log.d(TAG, "play:" + id + " called");
+            Toast.makeText(requireActivity(), "Playing.." , Toast.LENGTH_SHORT).show();
             startPlay(id);
         });
     }
@@ -157,45 +214,37 @@ public class DashboardFragment extends Fragment {
             test.add((short) 45);
             test.add((short) 56);
             Log.d(TAG, "setOnClickTestSubmit: " + test);
-//            sendRawAudioToServer(test);
+//            sendRawAudioToServer(test, i);
+        });
+    }
+
+    private void setOnClickSubmit(final Button btn, final int id){
+
+        btn.setOnClickListener(v -> {
+            Log.d(TAG, "Submit to Server");
             try {
-                if (!checkAllFileExisted()) {
-                    Toast.makeText(requireActivity(), "There are still one of more unrecorded samples", Toast.LENGTH_SHORT).show();
+                if (!checkAllFieldsExisted()) {
                     return;
                 }
-                byte[] byteArray = getBytesFromPCM(VOICE_FILE_NAME + rid + ".pcm");
-                short[] shortArray = convertByteArrayToShortArray(byteArray);
-                int[] intArray = convertByteArrayToUnsignedByteArray(byteArray);
-                List<Short> soundBuffer = new ArrayList<>();
-                for (short num : shortArray) {
-                    soundBuffer.add(num);
+                JSONObject soundPackage = new JSONObject();
+
+                for (int i = 0; i < recordButtonList.length; i++) {
+                    byte[] byteArray = getBytesFromPCM(VOICE_FILE_NAME + recordButtonList[i] + ".pcm");
+                    short[] shortArray = convertByteArrayToShortArray(byteArray);
+                    List<Short> soundBuffer = new ArrayList<>();
+                    for (short num : shortArray) {
+                        soundBuffer.add(num);
+                    }
+                    soundPackage.put("data_" + i, soundBuffer);
                 }
-                sendRawAudioToServer(soundBuffer);
-            } catch (FileNotFoundException e) {
+                List<String> labels = new ArrayList<>(Arrays.asList(labelList));
+                soundPackage.put("label", labels);
+                MainActivity.mSocket.emit("submit_audio", soundPackage);
+            } catch (FileNotFoundException | JSONException e) {
                 e.printStackTrace();
             }
         });
     }
-
-//    private void setOnClickSubmit(final Button btn, final int id){
-//
-//        btn.setOnClickListener(v -> {
-//            Log.d(TAG, "Submit to Server");
-//            for (int rid: recordButtonList) {
-//                try {
-//                    byte[] byteArray = getBytesFromPCM(VOICE_FILE_NAME + rid + ".pcm");
-//                    short[] shortArray = convertByteArrayToShortArray(byteArray);
-//                    List<Byte> soundBuffer = new ArrayList<>();
-//                    for (byte num : byteArray) {
-//                        soundBuffer.add(num);
-//                    }
-//                    sendRawAudioToServer(soundBuffer);
-//                } catch (FileNotFoundException e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//        });
-//    }
 
     private void startRecording(int id) {
         Log.d(TAG, "startRecording: ");
@@ -220,10 +269,19 @@ public class DashboardFragment extends Fragment {
         }
     }
 
-    private boolean checkAllFileExisted() {
+    private boolean checkAllFieldsExisted() {
         for (int rid : recordButtonList) {
             String filename = VOICE_FILE_NAME + rid + ".pcm";
             if (!new File(requireActivity().getFilesDir(), filename).exists()) {
+                Log.d(TAG, "File not exist: " + filename);
+                Toast.makeText(requireActivity(), "Missing one or more record samples", Toast.LENGTH_SHORT).show();
+                return false;
+            }
+        }
+        for (int i = 0; i < labelList.length; i++) {
+            if (labelList[i].isEmpty()) {
+                Log.d(TAG, "Label not exist: " + i);
+                Toast.makeText(requireActivity(), "Missing one or more labels", Toast.LENGTH_SHORT).show();
                 return false;
             }
         }
@@ -264,9 +322,10 @@ public class DashboardFragment extends Fragment {
         return bytes;
     }
 
-    private void sendRawAudioToServer(List<Short> soundBuffer) {
+    private void sendRawAudioToServer(List<Short> soundBuffer, int id) {
         try {
             JSONObject jsonObject = new JSONObject();
+
             jsonObject.put("data", new JSONArray(soundBuffer));
             jsonObject.put("time", "" + System.currentTimeMillis());
             Log.i(TAG, "Send raw audio to server:");

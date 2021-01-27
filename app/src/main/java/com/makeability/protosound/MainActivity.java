@@ -148,10 +148,6 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
-//        MainActivity.mSocket.emit("android_test");
-//        MainActivity.mSocket.emit("audio_data", jsonObject);
-
-
         setContentView(R.layout.activity_main);
         BottomNavigationView navView = findViewById(R.id.nav_view);
         // Passing each menu ID as a set of Ids because each

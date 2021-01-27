@@ -97,6 +97,7 @@ def personalize_model(model, batch, ways, shot, device=None):
     labels = labels.to(device, dtype=torch.long)
     support_embeddings = model(data)
     mean_support_embeddings = support_embeddings.reshape(ways, shot, -1).mean(dim=1)
+
     return mean_support_embeddings
 
 
