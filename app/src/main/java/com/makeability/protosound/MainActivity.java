@@ -7,6 +7,8 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
+import android.net.Network;
+import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -51,15 +53,15 @@ import static com.makeability.protosound.utils.Constants.PREDICTION_CHANNEL_ID;
 
 public class MainActivity extends AppCompatActivity {
 
-    public static Socket mSocket;
-    private static final String DEBUG_TAG = "NetworkStatusExample";
-    public static final boolean TEST_MODEL_LATENCY = false;
-    public static final boolean TEST_E2E_LATENCY = false;
-    private static final String TEST_E2E_LATENCY_SERVER = "http://128.208.49.41:8789";
-    private static final String MODEL_LATENCY_SERVER = "http://128.208.49.41:8790";
-    private static final String DEFAULT_SERVER = "http://128.208.49.41:8788";
-    private static final String TEST_SERVER = "http://128.208.49.41:5000";
-    private static final String TAG = "MainActivity";
+  public static Socket mSocket;
+  private static final String DEBUG_TAG = "NetworkStatusExample";
+  public static final boolean TEST_MODEL_LATENCY = false;
+  public static final boolean TEST_E2E_LATENCY = false;
+  private static final String TEST_E2E_LATENCY_SERVER = "http://128.208.49.41:8789";
+  private static final String MODEL_LATENCY_SERVER = "http://128.208.49.41:8790";
+  private static final String DEFAULT_SERVER = "http://128.208.49.41:8788";
+  private static final String TEST_SERVER = "http://128.208.49.41:5000";
+  private static final String TAG = "MainActivity";
 	public static boolean notificationChannelIsCreated = false;
 	private String db = "";
 	private Map<String, Long> soundLastTime = new HashMap<>();
@@ -114,8 +116,9 @@ public class MainActivity extends AppCompatActivity {
         Log.i(TAG, "onCreate");
 //         connect socketIO
         mSocket.connect();
+        // receiver
         mSocket.on("audio_data", onNewMessage);
-        mSocket.on("android_test", onTestMessage);
+        mSocket.on("android_test_2", onTestMessage);
 
 
         // The server will return an audio_label to the phone with label
@@ -145,8 +148,8 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
-        MainActivity.mSocket.emit("android_test");
-        MainActivity.mSocket.emit("audio_data", jsonObject);
+//        MainActivity.mSocket.emit("android_test");
+//        MainActivity.mSocket.emit("audio_data", jsonObject);
 
 
         setContentView(R.layout.activity_main);
@@ -160,6 +163,7 @@ public class MainActivity extends AppCompatActivity {
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
         NavigationUI.setupWithNavController(navView, navController);
 
+        checkNetworkConnection();
     }
 
 
@@ -196,9 +200,28 @@ public class MainActivity extends AppCompatActivity {
 
 
     private Emitter.Listener onTestMessage = args -> {
+        System.out.println(args[0]);
         Log.i(TAG, "Received socket event");
     };
 
+    private void checkNetworkConnection() {
+        ConnectivityManager connMgr =
+                (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
+        boolean isWifiConn = false;
+        boolean isMobileConn = false;
+        for (Network network : connMgr.getAllNetworks()) {
+            NetworkInfo networkInfo = connMgr.getNetworkInfo(network);
+            if (networkInfo.getType() == ConnectivityManager.TYPE_WIFI) {
+                isWifiConn |= networkInfo.isConnected();
+            }
+            if (networkInfo.getType() == ConnectivityManager.TYPE_MOBILE) {
+                isMobileConn |= networkInfo.isConnected();
+            }
+        }
+        Log.d(DEBUG_TAG, "Wifi connected: " + isWifiConn);
+        Log.d(DEBUG_TAG, "Mobile connected: " + isMobileConn);
+    }
+  
 	private void createNotificationChannel() {
 		// Create the NotificationChannel, but only on API 26+ because
 		// the NotificationChannel class is new and not in the support library
