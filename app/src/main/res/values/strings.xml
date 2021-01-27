@@ -12,9 +12,22 @@
     <string name="record_12">Record 12</string>
     <string name="class_4">Class 4</string>
     <string name="class_5">Class 5</string>
-    <string name="tutorial_1">Step 1: Record 5 samples of each sound type (scroll right to see more)</string>
+    <string name="tutorial_1">Step 1: Pick a name for your class and record 5 samples of each sound class (scroll right to see more)</string>
     <string name="tutorial_2">Step 2: Choose 2 classes from a list of pre-defined class</string>
     <string name="tutorial_3">Step 3: Record background noises</string>
+    <string name="record_1">Record 1</string>
+    <string name="record_2">Record 2</string>
+    <string name="record_3">Record 3</string>
+    <string name="record_4">Record 4</string>
+    <string name="record_5">Record 5</string>
+    <string name="record_15">Record 15</string>
+    <string name="record_14">Record 14</string>
+    <string name="record_13">Record 13</string>
+    <string name="record_6">Record 6</string>
+    <string name="record_7">Record 7</string>
+    <string name="record_8">Record 8</string>
+    <string name="record_9">Record 9</string>
+    <string name="record_10">Record 10</string>
     <string-array name="sound_array">
         <item>Siren</item>
         <item>Fire Alarm</item>
@@ -22,4 +35,8 @@
         <item>Placeholder2</item>
         <item>Placeholder3</item>
     </string-array>
+    <string name="hint1"><i>Class 1 name:</i></string>
+    <string name="hint2"><i>Class 2 name:</i></string>
+    <string name="hint3"><i>Class 3 name:</i></string>
+
 </resources>

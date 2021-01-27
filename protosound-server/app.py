@@ -45,7 +45,6 @@ def submit_audio(json_data):
     write(file_name, sample_rate, data)
 
 
-
 @socketio.on('audio_data')
 def handle_source(json_data):
     data = str(json_data['data'])

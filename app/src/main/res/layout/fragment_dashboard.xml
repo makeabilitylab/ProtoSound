@@ -57,13 +57,21 @@
                     <TableRow
                         android:layout_width="match_parent"
                         android:layout_height="match_parent">
-
-                        <TextView
-                            android:id="@+id/text_dashboard1"
+                        <com.google.android.material.textfield.TextInputLayout
                             android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:text="@string/class_1"
-                            android:textSize="@dimen/_20ssp" />
+                            android:layout_height="wrap_content"
+                            android:hint="@string/hint1"
+                            >
+
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/class_1"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:imeOptions="actionDone"
+                                android:inputType="text"
+                                android:singleLine="true" />
+
+                        </com.google.android.material.textfield.TextInputLayout>
                     </TableRow>
 
                     <TableRow
@@ -75,35 +83,35 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="16dp"
-                            android:text="Record 1" />
+                            android:text="@string/record_1" />
 
                         <Button
                             android:id="@+id/record_2"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="16dp"
-                            android:text="Record 2" />
+                            android:text="@string/record_2" />
 
                         <Button
                             android:id="@+id/record_3"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="16dp"
-                            android:text="Record 3" />
+                            android:text="@string/record_3" />
 
                         <Button
                             android:id="@+id/record_4"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="16dp"
-                            android:text="Record 4" />
+                            android:text="@string/record_4" />
 
                         <Button
                             android:id="@+id/record_5"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="16dp"
-                            android:text="Record 5" />
+                            android:text="@string/record_5" />
 
                     </TableRow>
 
@@ -151,13 +159,20 @@
                     <TableRow
                         android:layout_width="match_parent"
                         android:layout_height="match_parent">
-
-                        <TextView
-                            android:id="@+id/text_dashboard2"
+                        <com.google.android.material.textfield.TextInputLayout
                             android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:text="@string/class_2"
-                            android:textSize="@dimen/_20ssp" />
+                            android:layout_height="wrap_content"
+                            android:hint="@string/hint2">
+
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/class_2"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:imeOptions="actionDone"
+                                android:inputType="text"
+                                android:singleLine="true" />
+
+                        </com.google.android.material.textfield.TextInputLayout>
                     </TableRow>
 
                     <TableRow
@@ -169,35 +184,35 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="16dp"
-                            android:text="Record 6" />
+                            android:text="@string/record_1" />
 
                         <Button
                             android:id="@+id/record_7"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="16dp"
-                            android:text="Record 7" />
+                            android:text="@string/record_2" />
 
                         <Button
                             android:id="@+id/record_8"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="16dp"
-                            android:text="Record 8" />
+                            android:text="@string/record_3" />
 
                         <Button
                             android:id="@+id/record_9"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="16dp"
-                            android:text="Record 9" />
+                            android:text="@string/record_4" />
 
                         <Button
                             android:id="@+id/record_10"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="16dp"
-                            android:text="Record 10" />
+                            android:text="@string/record_5" />
 
                     </TableRow>
 
@@ -245,13 +260,20 @@
                     <TableRow
                         android:layout_width="match_parent"
                         android:layout_height="match_parent">
-
-                        <TextView
-                            android:id="@+id/text_dashboard3"
+                        <com.google.android.material.textfield.TextInputLayout
                             android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:text="@string/class_3"
-                            android:textSize="@dimen/_20ssp" />
+                            android:layout_height="wrap_content"
+                            android:hint="@string/hint3">
+
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/class_3"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:imeOptions="actionDone"
+                                android:inputType="text"
+                                android:singleLine="true" />
+
+                        </com.google.android.material.textfield.TextInputLayout>
                     </TableRow>
 
                     <TableRow
@@ -263,35 +285,35 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="16dp"
-                            android:text="@string/record_11" />
+                            android:text="@string/record_1" />
 
                         <Button
                             android:id="@+id/record_12"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="16dp"
-                            android:text="@string/record_12" />
+                            android:text="@string/record_2" />
 
                         <Button
                             android:id="@+id/record_13"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="16dp"
-                            android:text="Record 13" />
+                            android:text="@string/record_3" />
 
                         <Button
                             android:id="@+id/record_14"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="16dp"
-                            android:text="Record 14" />
+                            android:text="@string/record_4" />
 
                         <Button
                             android:id="@+id/record_15"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="16dp"
-                            android:text="Record 15" />
+                            android:text="@string/record_5" />
 
                     </TableRow>
 
