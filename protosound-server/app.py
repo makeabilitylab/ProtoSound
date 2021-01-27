@@ -6,6 +6,7 @@ from flask_socketio import SocketIO, emit, join_room, leave_room, \
     close_room, rooms, disconnect
 from scipy.io.wavfile import write
 import numpy as np
+from main import personalize_model, predict_query
 
 # Set this variable to "threading", "eventlet" or "gevent" to test the
 # different async modes, or leave it set to None for the application to choose
@@ -24,6 +25,31 @@ thread = None
 thread_lock = Lock()
 
 RATE = 44100
+# VARIABLES
+WAYS = 5
+SHOTS = 5
+DATA_PATH = 'meta-test-data'  # DIRECTORY OF 25 SAMPLES
+DATA_CSV_PATH = ''
+MODEL_PATH = 'model/protosound_10_classes.pt'
+
+
+# GET DEVICE
+if torch.cuda.is_available():
+    device = torch.device('cuda:0')
+else:
+    device = torch.device('cpu')
+
+
+# GET MODEL
+protosound_model = torch.load(MODEL_PATH, map_location=device)
+protosound_model = protosound_model.to(device)
+classes_prototypes = None # TODO: Replace this variable once the training is done
+support_data = None
+
+
+"""
+    Flask SocketIO functions
+"""
 
 def background_thread():
     """Example of how to send server generated events to clients."""
@@ -42,24 +68,24 @@ def submit_audio(json_data):
     file_name = json_data['file_name']
     print('writing_file', sample_rate, type(sample_rate))
     print('data', data)
-    write(file_name, sample_rate, data)
+    write(DATA_PATH + '/' + file_name, sample_rate, data)
 
 
 
 @socketio.on('audio_data')
 def handle_source(json_data):
-    data = str(json_data['data'])
-    data = data[1:-1]
-    global graph
-    np_wav = np.fromstring(data, dtype=np.int16, sep=',')
-    # Make predictions
+    sample_rate = int(json_data['sample_rate'])
+    data = (np.asarray(json_data['data'])).astype(int)
+    PREDICTION_QUERY_FILE_NAME = 'query'
+    # Write the prediction query file
+    QUERY_FILE = DATA_PATH + '/' + PREDICTION_QUERY_FILE_NAME + '.wav'
+    write(DATA_PATH + '/' + PREDICTION_QUERY_FILE_NAME, sample_rate, data)
+    # Make prediction
+    output = predict_query(protosound_model, QUERY_FILE, classes_prototypes, support_data.i2c, device=device)
     print('Making prediction...')
-    # pred = model.predict(x)
-    # Send a hard code prediction for now
-    print('Prediction: Speech (50%)')
     socketio.emit('audio_label',
                   {
-                      'label': 'Unrecognized Sound',
+                      'label': str(output),
                       'accuracy': '1.0',
                       'db': '1.0'
                   })
