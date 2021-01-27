@@ -51,114 +51,23 @@ def handle_source(json_data):
     data = str(json_data['data'])
     data = data[1:-1]
     global graph
-    np_wav = np.fromstring(data, dtype=np.int16, sep=',') / \
-        32768.0  # Convert to [-1.0, +1.0]
-    # Compute RMS and convert to dB
-    print('Successfully convert to NP rep', np_wav)
-    rms = np.sqrt(np.mean(np_wav**2))
-    db = dbFS(rms)
-    print('Db...', db)
+    np_wav = np.fromstring(data, dtype=np.int16, sep=',')
     # Make predictions
     print('Making prediction...')
-    x = waveform_to_examples(np_wav, RATE)
-    predictions = []
-    if x.shape[0] != 0:
-        x = x.reshape(len(x), 96, 64, 1)
-    print('Successfully reshape x', x.shape)
     # pred = model.predict(x)
-    # predictions.append(pred)
-
+    # Send a hard code prediction for now
     print('Prediction: Speech (50%)')
     socketio.emit('audio_label',
                   {
                       'label': 'Unrecognized Sound',
-                      'accuracy': '1.0'
+                      'accuracy': '1.0',
+                      'db': '1.0'
                   })
 
 
 @app.route('/')
 def index():
     return render_template('index.html', async_mode=socketio.async_mode)
-
-
-@socketio.event
-def my_event(message):
-    session['receive_count'] = session.get('receive_count', 0) + 1
-    emit('my_response',
-         {'data': message['data'], 'count': session['receive_count']})
-
-
-@socketio.event
-def my_broadcast_event(message):
-    session['receive_count'] = session.get('receive_count', 0) + 1
-    emit('my_response',
-         {'data': message['data'], 'count': session['receive_count']},
-         broadcast=True)
-
-
-@socketio.event
-def join(message):
-    join_room(message['room'])
-    session['receive_count'] = session.get('receive_count', 0) + 1
-    emit('my_response',
-         {'data': 'In rooms: ' + ', '.join(rooms()),
-          'count': session['receive_count']})
-
-
-@socketio.event
-def leave(message):
-    leave_room(message['room'])
-    session['receive_count'] = session.get('receive_count', 0) + 1
-    emit('my_response',
-         {'data': 'In rooms: ' + ', '.join(rooms()),
-          'count': session['receive_count']})
-
-
-@socketio.on('close_room')
-def on_close_room(message):
-    session['receive_count'] = session.get('receive_count', 0) + 1
-    emit('my_response', {'data': 'Room ' + message['room'] + ' is closing.',
-                         'count': session['receive_count']},
-         to=message['room'])
-    close_room(message['room'])
-
-
-@socketio.event
-def my_room_event(message):
-    session['receive_count'] = session.get('receive_count', 0) + 1
-    emit('my_response',
-         {'data': message['data'], 'count': session['receive_count']},
-         to=message['room'])
-
-
-@socketio.event
-def disconnect_request():
-    @copy_current_request_context
-    def can_disconnect():
-        disconnect()
-
-    session['receive_count'] = session.get('receive_count', 0) + 1
-    # for this emit we use a callback function
-    # when the callback function is invoked we know that the message has been
-    # received and it is safe to disconnect
-    emit('my_response',
-         {'data': 'Disconnected!', 'count': session['receive_count']},
-         callback=can_disconnect)
-
-
-@socketio.event
-def my_ping():
-    emit('my_pong')
-
-
-@socketio.event
-def connect():
-    global thread
-    with thread_lock:
-        if thread is None:
-            thread = socketio.start_background_task(background_thread)
-    emit('my_response', {'data': 'Connected', 'count': 0})
-
 
 @socketio.on('disconnect')
 def test_disconnect():
