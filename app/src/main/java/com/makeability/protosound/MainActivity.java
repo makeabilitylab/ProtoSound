@@ -1,6 +1,8 @@
 package com.makeability.protosound;
 
 import android.net.ConnectivityManager;
+import android.net.Network;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
@@ -68,8 +70,9 @@ public class MainActivity extends AppCompatActivity {
         Log.i(TAG, "onCreate");
 //         connect socketIO
         mSocket.connect();
+        // receiver
         mSocket.on("audio_data", onNewMessage);
-        mSocket.on("android_test", onTestMessage);
+        mSocket.on("android_test_2", onTestMessage);
 
         mSocket.once(EVENT_CONNECT, new Emitter.Listener() {
             @Override
@@ -95,8 +98,8 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
-        MainActivity.mSocket.emit("android_test");
-        MainActivity.mSocket.emit("audio_data", jsonObject);
+//        MainActivity.mSocket.emit("android_test");
+//        MainActivity.mSocket.emit("audio_data", jsonObject);
 
 
         setContentView(R.layout.activity_main);
@@ -110,6 +113,7 @@ public class MainActivity extends AppCompatActivity {
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
         NavigationUI.setupWithNavController(navView, navController);
 
+        checkNetworkConnection();
     }
 
 
@@ -146,6 +150,25 @@ public class MainActivity extends AppCompatActivity {
 
 
     private Emitter.Listener onTestMessage = args -> {
+        System.out.println(args[0]);
         Log.i(TAG, "Received socket event");
     };
+
+    private void checkNetworkConnection() {
+        ConnectivityManager connMgr =
+                (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
+        boolean isWifiConn = false;
+        boolean isMobileConn = false;
+        for (Network network : connMgr.getAllNetworks()) {
+            NetworkInfo networkInfo = connMgr.getNetworkInfo(network);
+            if (networkInfo.getType() == ConnectivityManager.TYPE_WIFI) {
+                isWifiConn |= networkInfo.isConnected();
+            }
+            if (networkInfo.getType() == ConnectivityManager.TYPE_MOBILE) {
+                isMobileConn |= networkInfo.isConnected();
+            }
+        }
+        Log.d(DEBUG_TAG, "Wifi connected: " + isWifiConn);
+        Log.d(DEBUG_TAG, "Mobile connected: " + isMobileConn);
+    }
 }

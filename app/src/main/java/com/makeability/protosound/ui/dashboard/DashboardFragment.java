@@ -1,16 +1,11 @@
 package com.makeability.protosound.ui.dashboard;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.pm.PackageManager;
-import android.content.res.Resources;
 import android.graphics.Color;
 import android.media.AudioFormat;
-import android.media.AudioRecord;
-import android.media.MediaRecorder;
-import android.net.rtp.AudioStream;
 import android.os.Bundle;
-import android.os.CountDownTimer;
-import android.os.Environment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,24 +13,17 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
-import android.widget.Spinner;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.github.nkzawa.emitter.Emitter;
 import com.github.nkzawa.socketio.client.Socket;
-import com.google.android.material.textfield.TextInputLayout;
 import com.makeability.protosound.MainActivity;
 import com.makeability.protosound.R;
-import com.makeability.protosound.utils.SocketUtil;
 import com.makeability.protosound.utils.SoundRecorder;
 
 import org.json.JSONArray;
@@ -51,20 +39,17 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.sql.Struct;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import static com.makeability.protosound.MainActivity.TEST_E2E_LATENCY;
-
 public class DashboardFragment extends Fragment {
 
+    private static final boolean TEST = true;
     private DashboardViewModel dashboardViewModel;
     private Socket mSocket;
     private static final int RECORDER_SAMPLE_RATE = 44100;
@@ -130,7 +115,7 @@ public class DashboardFragment extends Fragment {
         spinner2.setAdapter(adapter);
 
         Button submit = (Button) root.findViewById(R.id.submit);
-        setOnClickTestSubmit(submit, R.id.submit);
+        setOnClickTestSubmit(submit, R.id.record_1);
         return root;
     }
 
@@ -148,7 +133,7 @@ public class DashboardFragment extends Fragment {
                     stopRecording();
                     timer.cancel();
                 }
-            }, 1000);
+            }, 2000);
         });
     }
 
@@ -160,7 +145,8 @@ public class DashboardFragment extends Fragment {
         });
     }
 
-    private void setOnClickTestSubmit(final Button btn, final int id){
+
+    private void setOnClickTestSubmit(final Button btn, final int rid){
 
         btn.setOnClickListener(v -> {
             Log.d(TAG, "Test Submit to Server");
@@ -171,29 +157,45 @@ public class DashboardFragment extends Fragment {
             test.add((short) 45);
             test.add((short) 56);
             Log.d(TAG, "setOnClickTestSubmit: " + test);
-            sendRawAudioToServer(test);
-        });
-    }
-
-    private void setOnClickSubmit(final Button btn, final int id){
-
-        btn.setOnClickListener(v -> {
-            Log.d(TAG, "Submit to Server");
-            for (int rid: recordButtonList) {
-                try {
-                    byte[] byteArray = getBytesFromWave(VOICE_FILE_NAME + rid + ".pcm");
-                    short[] shortArray = convertByteArrayToShortArray(byteArray);
-                    List<Short> soundBuffer = new ArrayList<>();
-                    for (short num : shortArray) {
-                        soundBuffer.add(num);
-                    }
-                    sendRawAudioToServer(soundBuffer);
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
+//            sendRawAudioToServer(test);
+            try {
+                if (!checkAllFileExisted()) {
+                    Toast.makeText(requireActivity(), "There are still one of more unrecorded samples", Toast.LENGTH_SHORT).show();
+                    return;
                 }
+                byte[] byteArray = getBytesFromPCM(VOICE_FILE_NAME + rid + ".pcm");
+                short[] shortArray = convertByteArrayToShortArray(byteArray);
+                int[] intArray = convertByteArrayToUnsignedByteArray(byteArray);
+                List<Short> soundBuffer = new ArrayList<>();
+                for (short num : shortArray) {
+                    soundBuffer.add(num);
+                }
+                sendRawAudioToServer(soundBuffer);
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
             }
         });
     }
+
+//    private void setOnClickSubmit(final Button btn, final int id){
+//
+//        btn.setOnClickListener(v -> {
+//            Log.d(TAG, "Submit to Server");
+//            for (int rid: recordButtonList) {
+//                try {
+//                    byte[] byteArray = getBytesFromPCM(VOICE_FILE_NAME + rid + ".pcm");
+//                    short[] shortArray = convertByteArrayToShortArray(byteArray);
+//                    List<Byte> soundBuffer = new ArrayList<>();
+//                    for (byte num : byteArray) {
+//                        soundBuffer.add(num);
+//                    }
+//                    sendRawAudioToServer(soundBuffer);
+//                } catch (FileNotFoundException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//        });
+//    }
 
     private void startRecording(int id) {
         Log.d(TAG, "startRecording: ");
@@ -218,7 +220,17 @@ public class DashboardFragment extends Fragment {
         }
     }
 
-    private byte[] getBytesFromWave(String filename) throws FileNotFoundException {
+    private boolean checkAllFileExisted() {
+        for (int rid : recordButtonList) {
+            String filename = VOICE_FILE_NAME + rid + ".pcm";
+            if (!new File(requireActivity().getFilesDir(), filename).exists()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private byte[] getBytesFromPCM(String filename) throws FileNotFoundException {
         if (!new File(requireActivity().getFilesDir(), filename).exists()) {
             return new byte[0];
         }
@@ -259,6 +271,7 @@ public class DashboardFragment extends Fragment {
             jsonObject.put("time", "" + System.currentTimeMillis());
             Log.i(TAG, "Send raw audio to server:");
             Log.i(TAG, "Connected: " + MainActivity.mSocket.connected());
+//            emitter
             MainActivity.mSocket.emit("android_test");
             MainActivity.mSocket.emit("audio_data", jsonObject);
         } catch (JSONException e) {
@@ -282,6 +295,14 @@ public class DashboardFragment extends Fragment {
         short[] result = new short[bytes.length / 2];
         ByteBuffer.wrap(bytes).order(ByteOrder.LITTLE_ENDIAN).asShortBuffer().get(result);
         return result;
+    }
+
+    private int[] convertByteArrayToUnsignedByteArray(byte[] bytes) {
+        int[] unsigned = new int[bytes.length];
+        for (int i = 0; i < bytes.length; i++) {
+            unsigned[i] = bytes[i] & 0xFF;
+        }
+        return unsigned;
     }
 
 
@@ -346,5 +367,85 @@ public class DashboardFragment extends Fragment {
             });
         }
     };
+
+    /**
+     * Write PCM data as WAV file
+     * @param os  Stream to save file to
+     * @param list List of byte array audio data
+     * @param srate  Sample rate - 8000, 16000, etc.
+     * @param channel Number of channels - Mono = 1, Stereo = 2, etc..
+     * @param format Number of bits per sample (16 here)
+     * @throws IOException
+     */
+    public void PCMtoFile(FileOutputStream os, List<byte[]> list, int srate, int channel, int format) throws IOException {
+
+        // create byte[] data from a list of data from watch
+        int len = 0;
+        for (int i = 0; i < list.size(); i++) {
+            len += list.get(i).length;
+        }
+        byte[] data = new byte[len];
+        int k = 0;
+        for (int i = 0; i < list.size();i++) {
+            for (int j = 0; j <list.get(i).length; j++) {
+                data[k] = list.get(i)[j];
+                k++;
+            }
+        }
+
+        byte[] header = new byte[44];
+
+        long totalDataLen = data.length + 36;
+        long bitrate = srate * channel * format;
+
+        header[0] = 'R';
+        header[1] = 'I';
+        header[2] = 'F';
+        header[3] = 'F';
+        header[4] = (byte) (totalDataLen & 0xff);
+        header[5] = (byte) ((totalDataLen >> 8) & 0xff);
+        header[6] = (byte) ((totalDataLen >> 16) & 0xff);
+        header[7] = (byte) ((totalDataLen >> 24) & 0xff);
+        header[8] = 'W';
+        header[9] = 'A';
+        header[10] = 'V';
+        header[11] = 'E';
+        header[12] = 'f';
+        header[13] = 'm';
+        header[14] = 't';
+        header[15] = ' ';
+        header[16] = (byte) format;
+        header[17] = 0;
+        header[18] = 0;
+        header[19] = 0;
+        header[20] = 1;
+        header[21] = 0;
+        header[22] = (byte) channel;
+        header[23] = 0;
+        header[24] = (byte) (srate & 0xff);
+        header[25] = (byte) ((srate >> 8) & 0xff);
+        header[26] = (byte) ((srate >> 16) & 0xff);
+        header[27] = (byte) ((srate >> 24) & 0xff);
+        header[28] = (byte) ((bitrate / 8) & 0xff);
+        header[29] = (byte) (((bitrate / 8) >> 8) & 0xff);
+        header[30] = (byte) (((bitrate / 8) >> 16) & 0xff);
+        header[31] = (byte) (((bitrate / 8) >> 24) & 0xff);
+        header[32] = (byte) ((channel * format) / 8);
+        header[33] = 0;
+        header[34] = 16;
+        header[35] = 0;
+        header[36] = 'd';
+        header[37] = 'a';
+        header[38] = 't';
+        header[39] = 'a';
+        header[40] = (byte) (data.length  & 0xff);
+        header[41] = (byte) ((data.length >> 8) & 0xff);
+        header[42] = (byte) ((data.length >> 16) & 0xff);
+        header[43] = (byte) ((data.length >> 24) & 0xff);
+
+        os.write(header, 0, 44);
+        os.write(data);
+        os.close();
+    }
 
 }
