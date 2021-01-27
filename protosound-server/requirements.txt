@@ -12,3 +12,12 @@ Werkzeug==0.14.1
 
 numpy~=1.19.5
 scipy~=1.6.0
+torch~=1.7.1
+helpers~=0.2.0
+librosa~=0.8.0
+pandas~=1.2.1
+tqdm~=4.56.0
+tensorflow~=2.4.1
+wget~=3.2
+Keras~=2.4.3
+easing~=0.1.1

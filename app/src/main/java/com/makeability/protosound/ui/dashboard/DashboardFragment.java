@@ -239,7 +239,8 @@ public class DashboardFragment extends Fragment {
                 }
                 List<String> labels = new ArrayList<>(Arrays.asList(labelList));
                 soundPackage.put("label", labels);
-                MainActivity.mSocket.emit("submit_audio", soundPackage);
+                Log.d(TAG, "Socket connect:" + MainActivity.mSocket.connected());
+                MainActivity.mSocket.emit("submit_data", soundPackage);
             } catch (FileNotFoundException | JSONException e) {
                 e.printStackTrace();
             }

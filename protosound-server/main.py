@@ -30,7 +30,7 @@ def get_melspectrogram_db(file_path, sr=SAMPLING_RATE, n_fft=2048, hop_length=51
                           top_db=80):
     wav, sr = librosa.load(file_path, sr=sr)  # Librosa converts audio data to mono by default
     if wav.shape[0] < FILE_SIZE * sr:
-        print("Should never reach here")
+        # print("Should never reach here")
         wav = np.pad(wav, int(np.ceil((FILE_SIZE * sr - wav.shape[0]) / 2)), mode='reflect')
     else:
         wav = wav[:FILE_SIZE * sr]
@@ -50,7 +50,7 @@ def spec_to_image(spec, eps=1e-6):
     return spec_scaled
 
 
-class SoundWatchData(Dataset):
+class ProtoSoundDataset(Dataset):
     def __init__(self, data_path_directory, df, in_col, out_col):
         self.df = df
         self.data = []
@@ -97,7 +97,6 @@ def personalize_model(model, batch, ways, shot, device=None):
     labels = labels.to(device, dtype=torch.long)
     support_embeddings = model(data)
     mean_support_embeddings = support_embeddings.reshape(ways, shot, -1).mean(dim=1)
-
     return mean_support_embeddings
 
 
@@ -140,7 +139,7 @@ protosound_model = protosound_model.to(device)
 
 # LOAD DATA
 df = pd.read_csv(DATA_CSV_PATH)
-support_data = SoundWatchData(DATA_PATH, df, 'filename', 'category')
+support_data = ProtoSoundDataset(DATA_PATH, df, 'filename', 'category')
 
 # TRAIN MODEL
 train_loader = DataLoader(support_data, batch_size=WAYS * SHOTS)
