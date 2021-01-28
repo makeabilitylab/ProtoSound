@@ -160,9 +160,7 @@ def handle_source(json_data):
     print('Making prediction...')
     socketio.emit('audio_label',
                   {
-                      'label': str(output),
-                      'accuracy': '1.0',
-                      'db': '1.0'
+                      'label': str(output)
                   })
 
 

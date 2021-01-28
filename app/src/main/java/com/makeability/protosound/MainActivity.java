@@ -81,30 +81,19 @@ public class MainActivity extends AppCompatActivity {
 		public void call(final Object... args) {
 			Log.i(TAG, "Received audio label event");
 			JSONObject data = (JSONObject) args[0];
-			String db;
+			String db = "1.0"; // TODO: Hard code this number for now so we don't have to redesign notification
 			String audio_label;
-			String accuracy;
+			String accuracy = "1.0";
 			String record_time = "";
 			try {
 				audio_label = data.getString("label");
-				accuracy = data.getString("accuracy");
-				db = data.getString("db");
-				if (TEST_E2E_LATENCY) {
-					record_time = data.getString("record_time");
-				}
 			} catch (JSONException e) {
 				return;
 			}
 			Log.i(TAG, "received sound label from Socket server: " + audio_label + ", " + accuracy);
 			AudioLabel audioLabel;
-			if (TEST_E2E_LATENCY) {
-				audioLabel = new AudioLabel(audio_label, accuracy, null, db,
-						record_time);
-			} else {
-				audioLabel = new AudioLabel(audio_label, accuracy, null, db,
-						null);
-
-			}
+			audioLabel = new AudioLabel(audio_label, accuracy, null, db,
+					null);
 			createAudioLabelNotification(audioLabel);
 		}
 	};
@@ -217,7 +206,7 @@ public class MainActivity extends AppCompatActivity {
         Log.d(DEBUG_TAG, "Wifi connected: " + isWifiConn);
         Log.d(DEBUG_TAG, "Mobile connected: " + isMobileConn);
     }
-  
+
 	private void createNotificationChannel() {
 		// Create the NotificationChannel, but only on API 26+ because
 		// the NotificationChannel class is new and not in the support library
