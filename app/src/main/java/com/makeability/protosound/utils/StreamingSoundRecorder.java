@@ -60,8 +60,8 @@ import static com.makeability.protosound.utils.HelperUtils.convertByteArrayToSho
  * Stream sound from recorder to socketio server
  */
 public class StreamingSoundRecorder {
-	private static final String TAG = "SoundRecorder";
-	private static final int RECORDING_RATE = 16000; // can go up to 44K, if needed
+	private static final String TAG = "StreamingSoundRecorder";
+	private static final int RECORDING_RATE = 44100; // can go up to 44K, if needed
 	private static final int CHANNEL_IN = AudioFormat.CHANNEL_IN_MONO;
 	private static final int CHANNELS_OUT = AudioFormat.CHANNEL_OUT_MONO;
 	private static final int FORMAT = AudioFormat.ENCODING_PCM_16BIT;
@@ -145,15 +145,16 @@ public class StreamingSoundRecorder {
 						soundRecorder.mContext.openFileOutput(
 								soundRecorder.mOutputFileName,
 								Context.MODE_PRIVATE));
-				final byte[] buffer = new byte[BUFFER_SIZE];
+				byte[] buffer = new byte[BUFFER_SIZE];
 				mAudioRecord.startRecording();
 				while (!isCancelled()) {
 					int read = mAudioRecord.read(buffer, 0, buffer.length);
+					Log.d(TAG, "doInBackground: " + read);
 					short[] shorts = convertByteArrayToShortArray(buffer);
 					// buffer sounds up to 1 sec
-					if (soundRecorder.soundBuffer.size() <= 16000) {
+					if (soundRecorder.soundBuffer.size() <= 44100) {
 						for (short num : shorts) {
-							if (soundRecorder.soundBuffer.size() == 16000) {
+							if (soundRecorder.soundBuffer.size() == 44100) {
 								final List<Short> tempBuffer = soundRecorder.soundBuffer;
 								processAudioRecognition(tempBuffer, buffer);
 								soundRecorder.soundBuffer = new ArrayList<>();

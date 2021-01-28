@@ -33,6 +33,7 @@ public class ForegroundService extends Service {
 	private static Set<String> connectedHostIds = new HashSet<>();
 	@Override
 	public void onCreate() {
+		Log.d(TAG, "onCreate: ");
 		super.onCreate();
 		mSoundRecorder = new StreamingSoundRecorder(this, VOICE_FILE_NAME);
 	}
@@ -40,11 +41,11 @@ public class ForegroundService extends Service {
 	@Override
 	public int onStartCommand(final Intent intent, int flags, int startId) {
 		String input = intent.getStringExtra("connectedHostIds");
-		final Set<String> connectedHostIds = new HashSet<>(
-				Arrays.asList(
-						input.split(",")
-				)
-		);
+//		final Set<String> connectedHostIds = new HashSet<>(
+//				Arrays.asList(
+//						input.split(",")
+//				)
+//		);
 		createNotificationChannel();
 		Intent notificationIntent = new Intent(this, MainActivity.class);
 		PendingIntent pendingIntent = PendingIntent.getActivity(this,

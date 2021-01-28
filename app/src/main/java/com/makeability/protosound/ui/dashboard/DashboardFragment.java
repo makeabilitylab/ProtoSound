@@ -27,6 +27,7 @@ import com.github.nkzawa.socketio.client.Socket;
 import com.google.android.material.textfield.TextInputEditText;
 import com.makeability.protosound.MainActivity;
 import com.makeability.protosound.R;
+import com.makeability.protosound.utils.SocketUtil;
 import com.makeability.protosound.utils.SoundRecorder;
 
 import org.json.JSONArray;
@@ -47,8 +48,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Timer;
-import java.util.TimerTask;
 
 public class DashboardFragment extends Fragment {
 
@@ -64,9 +63,8 @@ public class DashboardFragment extends Fragment {
     SoundRecorder.OnVoicePlaybackStateChangedListener mListener;
     private Thread recordingThread = null;
     private boolean isRecording = false;
-    int BufferElements2Rec = 1024; // want to play 2048 (2K) since 2 bytes we use only 1024
-    int BytesPerElement = 2; // 2 bytes in 16bit format
-    String[] labelList = {"", "", "", "", ""};
+    private String portNumber;
+    private String[] labelList = {"", "", "", "", ""};
     SoundRecorder recorder;
     int[] recordButtonList = {R.id.record_1, R.id.record_2, R.id.record_3, R.id.record_4,
             R.id.record_5, R.id.record_6, R.id.record_7, R.id.record_8, R.id.record_9,
@@ -91,7 +89,12 @@ public class DashboardFragment extends Fragment {
 
         checkRecordPermission();
 
+        // setup port number edit text
         // setup Listener for 15 record and playback buttons
+
+        TextInputEditText portNumberEditText = (TextInputEditText) root.findViewById(R.id.port_number);
+        Button confirmPort = (Button) root.findViewById(R.id.confirm_port);
+        setPortNumber(portNumberEditText, confirmPort);
         for (int rid : recordButtonList) {
             Button record = root.findViewById(rid);
             setOnClickRecord(record, rid);
@@ -101,6 +104,7 @@ public class DashboardFragment extends Fragment {
             Button play = root.findViewById(pid);
             setOnClickPlay(play, recordPlayMap.get(pid));
         }
+
 
         // setup 2 Spinner drop-down lists for pre-determined sounds
         AutoCompleteTextView spinner = (AutoCompleteTextView) root.findViewById(R.id.menu);
@@ -125,10 +129,44 @@ public class DashboardFragment extends Fragment {
         setOnClickText(field_1, 1);
         setOnClickText(field_2, 2);
         setOnClickText(field_3, 3);
+
+        // Setup submit button
         Button submit = (Button) root.findViewById(R.id.submit);
         setOnClickSubmit(submit, R.id.record_1);
         return root;
     }
+
+    private void setPortNumber(TextInputEditText portNumberEditText, Button confirmPort) {
+        portNumberEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                String pN = s.toString();
+                if (pN.length() != 4) {
+                    portNumberEditText.setError("Port number need to have the format of 'XXXX'");
+                }
+                portNumber = pN;
+            }
+        });
+        confirmPort.setOnClickListener(v -> {
+            if (MainActivity.mSocket != null) {
+                MainActivity.mSocket.disconnect();
+            }
+            SocketUtil socketUtil = new SocketUtil(portNumber);
+            MainActivity.mSocket = socketUtil.getSocket();
+            ((MainActivity) requireActivity()).initSocket(portNumber);
+        });
+    }
+
 
     private void setOnClickText(TextInputEditText field, int id) {
         field.addTextChangedListener(new TextWatcher() {
@@ -174,7 +212,6 @@ public class DashboardFragment extends Fragment {
     }
 
 
-
     private void setOnClickRecord(final Button btn, final int id){
 
         btn.setOnClickListener(v -> {
@@ -182,14 +219,14 @@ public class DashboardFragment extends Fragment {
             Toast.makeText(requireActivity(), "Recording.." , Toast.LENGTH_SHORT).show();
             Log.d(TAG, "record:"+ id + " called");
             startRecording(id);
-            Timer timer = new Timer();
-            timer.schedule(new TimerTask() {
-                @Override
-                public void run() {
-                    stopRecording();
-                    timer.cancel();
-                }
-            }, 1000);
+//            Timer timer = new Timer();
+//            timer.schedule(new TimerTask() {
+//                @Override
+//                public void run() {
+//                    stopRecording();
+//                    timer.cancel();
+//                }
+//            }, 1000);
         });
     }
 
@@ -202,21 +239,6 @@ public class DashboardFragment extends Fragment {
         });
     }
 
-
-    private void setOnClickTestSubmit(final Button btn, final int rid){
-
-        btn.setOnClickListener(v -> {
-            Log.d(TAG, "Test Submit to Server");
-            List<Short> test = new ArrayList<>();
-            test.add((short) 12);
-            test.add((short) 23);
-            test.add((short) 34);
-            test.add((short) 45);
-            test.add((short) 56);
-            Log.d(TAG, "setOnClickTestSubmit: " + test);
-//            sendRawAudioToServer(test, i);
-        });
-    }
 
     private void setOnClickSubmit(final Button btn, final int id){
 
@@ -235,10 +257,10 @@ public class DashboardFragment extends Fragment {
                     for (short num : shortArray) {
                         soundBuffer.add(num);
                     }
-                    soundPackage.put("data_" + i, soundBuffer);
+                    soundPackage.put("data_" + i, new JSONArray(soundBuffer));
                 }
                 List<String> labels = new ArrayList<>(Arrays.asList(labelList));
-                soundPackage.put("label", labels);
+                soundPackage.put("label", new JSONArray(labels));
                 Log.d(TAG, "Socket connect:" + MainActivity.mSocket.connected());
                 MainActivity.mSocket.emit("submit_data", soundPackage);
             } catch (FileNotFoundException | JSONException e) {

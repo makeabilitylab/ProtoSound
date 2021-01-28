@@ -1,8 +1,8 @@
 <resources>
     <string name="app_name">ProtoSound</string>
-    <string name="title_home">Home</string>
-    <string name="title_dashboard">Dashboard</string>
-    <string name="title_notifications">Notifications</string>
+    <string name="title_home">Predict</string>
+    <string name="title_dashboard">Train</string>
+    <string name="title_notifications">About</string>
     <string name="class_1">Class 1</string>
     <string name="protosound">ProtoSound</string>
     <string name="play">Play</string>
@@ -12,9 +12,10 @@
     <string name="record_12">Record 12</string>
     <string name="class_4">Class 4</string>
     <string name="class_5">Class 5</string>
-    <string name="tutorial_1">Step 1: Pick a name for your class and record 5 samples of each sound class (scroll right to see more)</string>
-    <string name="tutorial_2">Step 2: Choose 2 classes from a list of pre-defined class</string>
-    <string name="tutorial_3">Step 3: Record background noises</string>
+    <string name="tutorial_0">Step 1: Enter a port number then click CONFIRM:</string>
+    <string name="tutorial_1">Step 2: Pick a name for your class and record 5 samples of each sound class (scroll right to see more)</string>
+    <string name="tutorial_2">Step 3: Choose 2 classes from a list of pre-defined class</string>
+    <string name="tutorial_3">Step 4: Record background noises</string>
     <string name="record_1">Record 1</string>
     <string name="record_2">Record 2</string>
     <string name="record_3">Record 3</string>
@@ -31,12 +32,17 @@
     <string-array name="sound_array">
         <item>Siren</item>
         <item>Fire Alarm</item>
-        <item>Placeholder1</item>
+        <item>Car Honk</item>
         <item>Placeholder2</item>
         <item>Placeholder3</item>
     </string-array>
+    <string name="hint0"><i>Port number:</i></string>
     <string name="hint1"><i>Class 1 name:</i></string>
     <string name="hint2"><i>Class 2 name:</i></string>
     <string name="hint3"><i>Class 3 name:</i></string>
+    <string name="listening">START LISTEN</string>
+    <string name="a">Listening..</string>
+    <string name="start_listen">Start Listen</string>
+    <string name="confirm">Confirm</string>
 
 </resources>

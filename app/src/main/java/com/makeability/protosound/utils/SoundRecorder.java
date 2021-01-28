@@ -35,7 +35,10 @@ import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.util.ArrayList;
 import java.util.List;
+
+import static com.makeability.protosound.utils.HelperUtils.convertByteArrayToShortArray;
 
 /**
  * A helper class to provide methods to record audio input from the MIC to the internal storage
@@ -56,6 +59,7 @@ public class SoundRecorder {
     private final Handler mHandler;
     private final Context mContext;
     private State mState = State.IDLE;
+    private List<Short> soundBuffer = new ArrayList<>();
 
     private OnVoicePlaybackStateChangedListener mListener;
     private AsyncTask<Void, Void, Void> mRecordingAsyncTask;
@@ -149,15 +153,6 @@ public class SoundRecorder {
         stopPlaying();
         stopRecording();
     }
-
-
-    private short[] convertByteArrayToShortArray(byte[] bytes) {
-//        Log.i(TAG, "convertByteArrayToShortArray()");
-        short[] result = new short[bytes.length / 2];
-        ByteBuffer.wrap(bytes).order(ByteOrder.LITTLE_ENDIAN).asShortBuffer().get(result);
-        return result;
-    }
-
 
     private static class PlayAudioAsyncTask extends AsyncTask<Void, Void, Void> {
 
@@ -283,8 +278,16 @@ public class SoundRecorder {
                                 Context.MODE_PRIVATE));
                 byte[] buffer = new byte[BUFFER_SIZE];
                 mAudioRecord.startRecording();
+                int total = 0;
                 while (!isCancelled()) {
                     int read = mAudioRecord.read(buffer, 0, buffer.length);
+                    short[] shorts = convertByteArrayToShortArray(buffer);
+                    // buffer sounds up to 1 sec
+                    total += shorts.length;
+                    if (total >= 44100) {
+                        mAudioRecord.stop();
+                        cancel(true);
+                    }
                     bufferedOutputStream.write(buffer, 0, read);
                 }
 

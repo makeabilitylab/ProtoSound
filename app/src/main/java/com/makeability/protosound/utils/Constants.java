@@ -1,7 +1,7 @@
 package com.makeability.protosound.utils;
 
 public class Constants {
-	public static final String VOICE_FILE_NAME = "audiorecord.pcm";
+	public static final String VOICE_FILE_NAME = "audioquery.pcm";
 
 	public static final String CHANNEL_ID = "ProtoSoundNotificationChannel";
 

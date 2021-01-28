@@ -2,10 +2,12 @@ package com.makeability.protosound.ui.home;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -39,14 +41,32 @@ public class HomeFragment extends Fragment {
                 textView.setText(s);
             }
         });
+        Button listeningBtn = (Button) root.findViewById(R.id.listening_btn);
+		setOnClickListening(listeningBtn);
         return root;
     }
+
+	private void setOnClickListening(Button listeningBtn) {
+    	listeningBtn.setOnClickListener(v -> {
+			if (!IS_RECORDING) {
+				listeningBtn.setBackgroundColor(Color.RED);
+				listeningBtn.setText(R.string.listening);
+				startRecording(requireActivity());
+			} else {
+				listeningBtn.setText(R.string.start_listen);
+				listeningBtn.setBackgroundColor(Color.BLUE);
+				stopRecording(requireActivity());
+			}
+			// Flip the flag so we can turn off/on next time
+			IS_RECORDING = !IS_RECORDING;
+		});
+	}
 
 
 	/**
 	 * Run this function to start streaming audio and send prediction back to phone
 	 */
-	private void onRecordClick() {
+	public void onRecordClick() {
     	if (!IS_RECORDING) {
 			startRecording(requireActivity());
 		} else {

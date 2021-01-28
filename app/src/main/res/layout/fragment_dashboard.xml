@@ -33,14 +33,42 @@
             android:orientation="vertical"
             android:paddingStart="@dimen/_5sdp"
             tools:ignore="RtlSymmetry">
+            <TextView
+                android:id="@+id/tutorial_0"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:breakStrategy="high_quality"
+                android:text="@string/tutorial_0"
+                android:textSize="@dimen/_15ssp" />
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/hint0"
+                app:endIconMode="clear_text">
 
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/port_number"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:imeOptions="actionDone"
+                    android:inputType="number"
+                    android:singleLine="true"
+                    android:maxLength="4" />
+
+            </com.google.android.material.textfield.TextInputLayout>
+            <Button
+                android:id="@+id/confirm_port"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/confirm"/>
             <TextView
                 android:id="@+id/tutorial_1"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:breakStrategy="high_quality"
                 android:text="@string/tutorial_1"
-                android:textSize="@dimen/_15ssp" />
+                android:textSize="@dimen/_15ssp"
+                android:paddingTop="@dimen/_15sdp"/>
 
             <HorizontalScrollView
                 android:id="@+id/horizontalScrollView"
@@ -408,7 +436,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:breakStrategy="high_quality"
-                android:paddingTop="@dimen/_10sdp"
+                android:paddingTop="@dimen/_15sdp"
+                android:paddingBottom="@dimen/_15sdp"
                 android:text="@string/tutorial_3"
                 android:textSize="@dimen/_15ssp" />
 
@@ -430,7 +459,7 @@
                 android:id="@+id/submit"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="64dp"
+                android:layout_marginStart="@dimen/_100sdp"
                 android:layout_marginTop="@dimen/_15sdp"
                 android:layout_marginEnd="16dp"
                 android:layout_marginBottom="@dimen/_55sdp"
