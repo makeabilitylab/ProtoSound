@@ -150,12 +150,11 @@ def submit_audio(json_data):
 
 @socketio.on('audio_data')
 def handle_source(json_data):
-    sample_rate = int(json_data['sample_rate'])
-    data = (np.asarray(json_data['data'])).astype(int)
+    data = np.asarray(json_data['data'], dtype=np.int16)
     PREDICTION_QUERY_FILE_NAME = 'query'
     # Write the prediction query file
-    QUERY_FILE = DATA_PATH + '/' + PREDICTION_QUERY_FILE_NAME + '.wav'
-    write(DATA_PATH + '/' + PREDICTION_QUERY_FILE_NAME, sample_rate, data)
+    QUERY_FILE = LIBRARY_DATA_PATH + '/' + PREDICTION_QUERY_FILE_NAME + '.wav'
+    write(QUERY_FILE, RATE, data)
     # Make prediction
     output = predict_query(protosound_model, QUERY_FILE, classes_prototypes, support_data.i2c, device=device)
     print('Making prediction...')
