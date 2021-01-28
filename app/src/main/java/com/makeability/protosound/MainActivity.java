@@ -14,6 +14,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
 import android.widget.Button;
+import android.widget.Toast;
 
 import com.github.nkzawa.emitter.Emitter;
 import com.github.nkzawa.socketio.client.IO;
@@ -157,6 +158,31 @@ public class MainActivity extends AppCompatActivity {
 		Log.i(TAG, "onDestroy: ");
 		super.onDestroy();
 		mSocket.disconnect();
+	}
+
+	public void initSocket(String port) {
+		mSocket.connect();
+		mSocket.on("audio_data", onNewMessage);
+		mSocket.on("android_test_2", onTestMessage);
+
+		// The server will return an audio_label to the phone with label
+		mSocket.on("audio_label", onAudioLabelMessage);
+
+		mSocket.once(EVENT_CONNECT, new Emitter.Listener() {
+			@Override
+			public void call(Object... args) {
+				Log.i(TAG, "call: " + args);
+				Log.d(TAG, "call: " + mSocket.connected());
+			}
+		});
+
+		if (mSocket.connected()) {
+			Toast.makeText(getApplicationContext(), "Port " + port + " is connected!" , Toast.LENGTH_SHORT).show();
+		} else {
+			Toast.makeText(getApplicationContext(), "Port " + port + " is not connected." , Toast.LENGTH_SHORT).show();
+		}
+
+		Log.d(TAG, "connected: " + mSocket.connected());
 	}
 
 	private Emitter.Listener onNewMessage = new Emitter.Listener() {
