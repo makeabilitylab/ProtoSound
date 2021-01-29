@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -17,6 +18,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.kuassivi.component.RipplePulseRelativeLayout;
 import com.makeability.protosound.R;
 import com.makeability.protosound.ui.home.service.ForegroundService;
 
@@ -41,20 +43,28 @@ public class HomeFragment extends Fragment {
                 textView.setText(s);
             }
         });
-        Button listeningBtn = (Button) root.findViewById(R.id.listening_btn);
-		setOnClickListening(listeningBtn);
+        ImageButton listeningBtn = (ImageButton) root.findViewById(R.id.mic);
+		RipplePulseRelativeLayout pulseLayout = root.findViewById(R.id.pulseLayout);
+		TextView soundTextView = root.findViewById(R.id.description);
+		soundTextView.setText(R.string.tap_blue);
+		setOnClickListening(listeningBtn, pulseLayout, soundTextView);
         return root;
     }
 
-	private void setOnClickListening(Button listeningBtn) {
+	private void setOnClickListening(ImageButton listeningBtn, RipplePulseRelativeLayout pulseLayout, TextView soundTextView) {
+//		TextView soundTextView = requireActivity().findViewById(R.id.description);
     	listeningBtn.setOnClickListener(v -> {
 			if (!IS_RECORDING) {
-				listeningBtn.setBackgroundColor(Color.RED);
-				listeningBtn.setText(R.string.listening);
+				listeningBtn.setBackground(getResources().getDrawable(R.drawable.rounded_background_red, null));
+				listeningBtn.setImageResource(R.drawable.ic_baseline_pause_24);
+				soundTextView.setText("Listening...");
+				pulseLayout.startPulse();
 				startRecording(requireActivity());
 			} else {
-				listeningBtn.setText(R.string.start_listen);
-				listeningBtn.setBackgroundColor(Color.BLUE);
+				listeningBtn.setBackground(getResources().getDrawable(R.drawable.rounded_background_blue, null));
+				listeningBtn.setImageResource(R.drawable.ic_mic_24);
+				soundTextView.setText(R.string.tap_blue);
+				pulseLayout.stopPulse();
 				stopRecording(requireActivity());
 			}
 			// Flip the flag so we can turn off/on next time

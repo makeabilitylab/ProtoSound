@@ -55,6 +55,7 @@ import java.util.List;
 import java.util.Set;
 
 import static com.makeability.protosound.utils.HelperUtils.convertByteArrayToShortArray;
+import static com.makeability.protosound.utils.HelperUtils.db;
 
 /**
  * Stream sound from recorder to socketio server
@@ -66,7 +67,7 @@ public class StreamingSoundRecorder {
 	private static final int CHANNELS_OUT = AudioFormat.CHANNEL_OUT_MONO;
 	private static final int FORMAT = AudioFormat.ENCODING_PCM_16BIT;
 	private static int BUFFER_SIZE = AudioRecord.getMinBufferSize(RECORDING_RATE, CHANNEL_IN, FORMAT);
-	int BufferElements2Rec = 16000;
+	private static final double DB_THRESHOLD = 45;
 
 	private List<Short> soundBuffer = new ArrayList<>();
 	private final String mOutputFileName;
@@ -156,7 +157,11 @@ public class StreamingSoundRecorder {
 						for (short num : shorts) {
 							if (soundRecorder.soundBuffer.size() == 44100) {
 								final List<Short> tempBuffer = soundRecorder.soundBuffer;
-								processAudioRecognition(tempBuffer, buffer);
+								double dbLevel = db(tempBuffer);
+								if (db(tempBuffer) > DB_THRESHOLD) {
+									Log.i(TAG, "doInBackground: sound db < 40 " + dbLevel);
+									processAudioRecognition(tempBuffer, dbLevel);
+								}
 								soundRecorder.soundBuffer = new ArrayList<>();
 							}
 							soundRecorder.soundBuffer.add(num);
@@ -180,9 +185,9 @@ public class StreamingSoundRecorder {
 			return null;
 		}
 
-		private void processAudioRecognition(List<Short> soundBuffer, byte[] buffer) {
+		private void processAudioRecognition(List<Short> soundBuffer, double db) {
 			long recordTime = System.currentTimeMillis();
-			sendRawAudioToServer(soundBuffer, recordTime);
+			sendRawAudioToServer(soundBuffer, recordTime, db);
 		}
 
 		/**
@@ -190,13 +195,14 @@ public class StreamingSoundRecorder {
 		 * @param soundBuffer
 		 * @param recordTime
 		 */
-		private void sendRawAudioToServer(List<Short> soundBuffer, long recordTime) {
+		private void sendRawAudioToServer(List<Short> soundBuffer, long recordTime, double db) {
 			try {
 				JSONObject jsonObject = new JSONObject();
 				jsonObject.put("data", new JSONArray(soundBuffer));
 				jsonObject.put("time", "" + System.currentTimeMillis());
+				jsonObject.put("db", db);
 				Log.i(TAG, "Sending audio data: " + soundBuffer.size());
-				MainActivity.mSocket.emit("audio_data", jsonObject);
+				MainActivity.mSocket.emit("audio_data_c2s", jsonObject);
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}

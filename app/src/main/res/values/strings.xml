@@ -40,9 +40,12 @@
     <string name="hint1"><i>Class 1 name:</i></string>
     <string name="hint2"><i>Class 2 name:</i></string>
     <string name="hint3"><i>Class 3 name:</i></string>
-    <string name="listening">START LISTEN</string>
-    <string name="a">Listening..</string>
+    <string name="listening">Listening..</string>
     <string name="start_listen">Start Listen</string>
     <string name="confirm">Confirm</string>
+    <string name="port_connected">Port connected!</string>
+    <string name="mic">mic</string>
+    <string name="tap_blue">Tap the blue icon to begin listen</string>
+    <string name="training_complete">Training completed</string>
 
 </resources>

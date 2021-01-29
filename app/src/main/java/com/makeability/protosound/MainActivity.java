@@ -6,6 +6,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.Network;
 import android.net.NetworkInfo;
@@ -13,7 +14,10 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
+import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.github.nkzawa.emitter.Emitter;
@@ -47,6 +51,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
 
 import static com.github.nkzawa.socketio.client.Socket.EVENT_CONNECT;
@@ -67,15 +73,15 @@ public class MainActivity extends AppCompatActivity {
 	private String db = "";
 	private Map<String, Long> soundLastTime = new HashMap<>();
 
-	{
-		try {
-			mSocket = IO.socket(TEST_SERVER);
-			Log.i(TAG, "Does this thing really run?");
-		} catch (URISyntaxException e) {
-			Log.e(TAG, "Failed to init Socket");
-			e.printStackTrace();
-		}
-	}
+//	{
+//		try {
+//			mSocket = IO.socket(TEST_SERVER);
+//			Log.i(TAG, "Does this thing really run?");
+//		} catch (URISyntaxException e) {
+//			Log.e(TAG, "Failed to init Socket");
+//			e.printStackTrace();
+//		}
+//	}
 
 	private Emitter.Listener onAudioLabelMessage = new Emitter.Listener() {
 		@Override
@@ -88,6 +94,8 @@ public class MainActivity extends AppCompatActivity {
 			String record_time = "";
 			try {
 				audio_label = data.getString("label");
+				accuracy = data.getString("confidence");
+				db = data.getString("db");
 			} catch (JSONException e) {
 				return;
 			}
@@ -104,25 +112,6 @@ public class MainActivity extends AppCompatActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		Log.i(TAG, "onCreate");
-//         connect socketIO
-		mSocket.connect();
-		// receiver
-		mSocket.on("audio_data", onNewMessage);
-		mSocket.on("android_test_2", onTestMessage);
-
-
-		// The server will return an audio_label to the phone with label
-		mSocket.on("audio_label", onAudioLabelMessage);
-
-		mSocket.once(EVENT_CONNECT, new Emitter.Listener() {
-			@Override
-			public void call(Object... args) {
-				Log.i(TAG, "call: " + args);
-				Log.d(TAG, "call: " + mSocket.connected());
-			}
-		});
-
-		Log.d(TAG, "connected: " + mSocket.connected());
 
 		List<Short> test = new ArrayList<>();
 		test.add((short) 12);
@@ -162,57 +151,51 @@ public class MainActivity extends AppCompatActivity {
 
 	public void initSocket(String port) {
 		mSocket.connect();
-		mSocket.on("audio_data", onNewMessage);
 		mSocket.on("android_test_2", onTestMessage);
 
 		// The server will return an audio_label to the phone with label
-		mSocket.on("audio_label", onAudioLabelMessage);
+		mSocket.on("audio_data_s2c", onAudioLabelMessage);
+		mSocket.on("training_complete", onTrainingCompleteMessage);
 
 		mSocket.once(EVENT_CONNECT, new Emitter.Listener() {
 			@Override
 			public void call(Object... args) {
 				Log.i(TAG, "call: " + args);
 				Log.d(TAG, "call: " + mSocket.connected());
+				Button confirmPort = (Button) findViewById(R.id.confirm_port);
+				confirmPort.setBackgroundColor(Color.GREEN);
+				TextView tick = (TextView) findViewById(R.id.tick);
+				tick.setText(R.string.port_connected);
+
+//				JSONObject data = (JSONObject) args[0];
+//				String userPrototypeAvailable;
+//				try {
+//					userPrototypeAvailable = data.getString("label");
+//					if (userPrototypeAvailable.equals("True")) {
+//
+//					}
+//
+//				} catch (JSONException e) {
+//					Log.i(TAG, "JSON Exception failed: " + data.toString());
+//					return;
+//				}
+
 			}
 		});
-
-		if (mSocket.connected()) {
-			Toast.makeText(getApplicationContext(), "Port " + port + " is connected!" , Toast.LENGTH_SHORT).show();
-		} else {
-			Toast.makeText(getApplicationContext(), "Port " + port + " is not connected." , Toast.LENGTH_SHORT).show();
-		}
-
 		Log.d(TAG, "connected: " + mSocket.connected());
 	}
-
-	private Emitter.Listener onNewMessage = new Emitter.Listener() {
-		@Override
-		public void call(final Object... args) {
-			Log.i(TAG, "Received socket event");
-			JSONObject data = (JSONObject) args[0];
-			String db;
-			String audio_label;
-			String accuracy;
-			String recordTime = "";
-			try {
-				audio_label = data.getString("label");
-				accuracy = data.getString("accuracy");
-				db = data.getString("db");
-				if (TEST_E2E_LATENCY) {
-					recordTime = data.getString("record_time");
-				}
-			} catch (JSONException e) {
-				Log.i(TAG, "JSON Exception failed: " + data.toString());
-				return;
-			}
-			Log.i(TAG, "received sound label from Socket server: " + audio_label + ", " + accuracy + ", " + db);
-		}
-	};
 
 
 	private Emitter.Listener onTestMessage = args -> {
 		System.out.println(args[0]);
 		Log.i(TAG, "Received socket event");
+	};
+
+	private Emitter.Listener onTrainingCompleteMessage = args -> {
+		Log.i(TAG, "Received training complete!");
+		Button submitButton = (Button) findViewById(R.id.submit);
+		submitButton.setBackgroundColor(Color.GREEN);
+		submitButton.setText(R.string.training_complete);
 	};
 
 	private void checkNetworkConnection() {
@@ -256,7 +239,7 @@ public class MainActivity extends AppCompatActivity {
 	public void createAudioLabelNotification(AudioLabel audioLabel) {
 		// Unique notification for each kind of sound
 		// TODO: supposed to have a unique id based on the label returned, but don't know what is the format yet, hard code as a constant for now
-		final int NOTIFICATION_ID = 1;
+		final int NOTIFICATION_ID = getIntegerValueOfSound(audioLabel.label);
 
 		// Disable same sound for 5 seconds
 		if (soundLastTime.containsKey(audioLabel.label)) {
@@ -272,8 +255,7 @@ public class MainActivity extends AppCompatActivity {
 			createNotificationChannel();
 			notificationChannelIsCreated = true;
 		}
-		int loudness = 90 - (int) Double.parseDouble(audioLabel.db);
-
+		int loudness = (int) Double.parseDouble(audioLabel.db);
 
 		db = Integer.toString(loudness);
 		//Log.i(TAG, "level" + audioLabel.db + " " + db);
@@ -296,7 +278,7 @@ public class MainActivity extends AppCompatActivity {
 
 		NotificationCompat.Builder notificationCompatBuilder = new NotificationCompat.Builder(getApplicationContext(), PREDICTION_CHANNEL_ID)
 				.setSmallIcon(R.drawable.circle_white)
-				.setContentTitle(audioLabel.label + ", " + (int) Math.round(audioLabel.confidence * 100) + "%")
+				.setContentTitle(audioLabel.label)
 				.setContentText("(" + db + " dB)")
 				.setPriority(NotificationCompat.PRIORITY_MAX)
 				.setCategory(NotificationCompat.CATEGORY_ALARM)
@@ -312,5 +294,12 @@ public class MainActivity extends AppCompatActivity {
 		NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
 		notificationManager.notify(NOTIFICATION_ID, notificationCompatBuilder.build());
 
+	}
+
+	public static int getIntegerValueOfSound(String sound){
+		int i = 0;
+		for (char c : sound.toCharArray())
+			i+=(int)c;
+		return i;
 	}
 }

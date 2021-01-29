@@ -10,26 +10,52 @@
         android:id="@+id/text_home"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
         android:textAlignment="center"
         android:textSize="20sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintBottom_toBottomOf="parent" />
 
-    <Button
-        android:id="@+id/listening_btn"
+    <com.kuassivi.component.RipplePulseRelativeLayout
+        android:id="@+id/pulseLayout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:scaleX="1.5"
-        android:scaleY="1.5"
+        android:layout_gravity="center"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/text_home"
         app:layout_constraintTop_toTopOf="parent"
-        android:text="@string/listening" />
+        app:layout_constraintVertical_bias="0.41000003"
+        app:pulse_layout_PulseDuration="3200"
+        app:pulse_layout_PulseType="fill"
+        app:pulse_layout_RippleColor="@color/grey"
+        app:pulse_layout_RippleEndRadiusPercent="220"
+        app:pulse_layout_RippleStartRadiusPercent="80"
+        app:pulse_layout_ShowPreview="true">
+
+        <ImageButton
+            android:id="@+id/mic"
+            android:layout_width="@dimen/_75sdp"
+            android:layout_height="@dimen/_75sdp"
+            android:background="@drawable/rounded_background_blue"
+            android:contentDescription="@string/mic"
+            android:gravity="center"
+            android:scaleType="centerCrop"
+            android:src="@drawable/ic_mic_24" />
+        <!-- You can add now any View inside here -->
+    </com.kuassivi.component.RipplePulseRelativeLayout>
+
+    <TextView
+        android:id="@+id/description"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text=""
+        android:textAlignment="center"
+        android:textSize="@dimen/_15ssp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/pulseLayout"
+        app:layout_constraintVertical_bias="0.047" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
