@@ -55,6 +55,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import static com.github.nkzawa.socketio.client.Socket.EVENT_CONNECT;
+import static com.makeability.protosound.MainActivity.TEST_END_TO_END_TRAINING_LATENCY_MODE;
 
 public class DashboardFragment extends Fragment {
 
@@ -290,6 +291,12 @@ public class DashboardFragment extends Fragment {
                 List<String> labels = new ArrayList<>(Arrays.asList(labelList));
                 soundPackage.put("label", new JSONArray(labels));
                 Log.d(TAG, "Socket connect:" + MainActivity.mSocket.connected());
+
+                if (MainActivity.currentMode == TEST_END_TO_END_TRAINING_LATENCY_MODE) {
+                	// If test end to end training time, need to start recording the time when the submit audio starts
+					soundPackage.put("submitAudioTime", "" + System.currentTimeMillis());
+				}
+
                 MainActivity.mSocket.emit("submit_data", soundPackage);
             } catch (FileNotFoundException | JSONException e) {
                 e.printStackTrace();

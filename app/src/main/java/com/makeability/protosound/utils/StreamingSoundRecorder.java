@@ -54,6 +54,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
+import static com.makeability.protosound.MainActivity.TEST_END_TO_END_PREDICTION_LATENCY_MODE;
 import static com.makeability.protosound.utils.HelperUtils.convertByteArrayToShortArray;
 import static com.makeability.protosound.utils.HelperUtils.db;
 
@@ -199,7 +200,9 @@ public class StreamingSoundRecorder {
 			try {
 				JSONObject jsonObject = new JSONObject();
 				jsonObject.put("data", new JSONArray(soundBuffer));
-				jsonObject.put("time", "" + System.currentTimeMillis());
+				if (MainActivity.currentMode == TEST_END_TO_END_PREDICTION_LATENCY_MODE) {
+					jsonObject.put("recordTime", "" + System.currentTimeMillis());
+				}
 				jsonObject.put("db", db);
 				Log.i(TAG, "Sending audio data: " + soundBuffer.size());
 				MainActivity.mSocket.emit("audio_data_c2s", jsonObject);

@@ -144,6 +144,7 @@ def generate_csv(data_path_directory, labels, output_path_directory):
 def submit_data(json_data):
     print("submit_data->receive request")
     labels = json_data['label']
+    submitAudioTime = str(json_data['submitAudioTime'])
     labels = [element.lower().replace(" ", "_") for element in labels]
     background_noise = np.asarray(json_data['data_15'], dtype=np.int16) / 32768.0
     background_noise = background_noise[:44100]
@@ -179,7 +180,7 @@ def submit_data(json_data):
     global classes_prototypes
     classes_prototypes = personalize_model(protosound_model, batch, WAYS, SHOTS, device=device)
     print("training complete")
-    socketio.emit('training_complete')
+    socketio.emit('training_complete', { 'submitAudioTime': submitAudioTime })
 
 
 @socketio.on('audio_data_c2s')
@@ -187,6 +188,8 @@ def handle_source(json_data):
     data = np.asarray(json_data['data'], dtype=np.int16) / 32768.0
     db = json_data['db']
     db = str(round(db, 2))
+
+    recordTime = str(json_data['record_time'])
     print("db:", db)
     data = data[:44100]
     PREDICTION_QUERY_FILE_NAME = 'query'
@@ -206,7 +209,12 @@ def handle_source(json_data):
         return
 
     print('Making prediction...', output[0])
-    socketio.emit('audio_data_s2c', {'label': output[0], 'confidence': str(confidence[0]), 'db': db})
+    socketio.emit('audio_data_s2c', {
+        'label': output[0],
+        'confidence': str(confidence[0]),
+        'db': db,
+        'recordTime': recordTime # pass the record time back if exist
+        })
 
 
 @app.route('/')

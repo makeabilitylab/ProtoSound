@@ -16,6 +16,7 @@ public class AudioLabel {
 	}
 
 	public String getTimeAndLabel() {
-		return time + " | " + this.label.substring(0, 1).toUpperCase() + this.label.substring(1);
+		return time + " | " + this.label.substring(0, 1).toUpperCase() + this.label.substring(1)
+				+ " | " + db + "dB";
 	}
 }
