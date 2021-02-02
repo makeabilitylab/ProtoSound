@@ -479,7 +479,7 @@
                 android:layout_marginTop="@dimen/_15sdp"
                 android:layout_marginEnd="16dp"
                 android:layout_marginBottom="@dimen/_55sdp"
-                android:text="SUBMIT TO SERVER" />
+                android:text="@string/submit_to_server" />
 
 
         </LinearLayout>

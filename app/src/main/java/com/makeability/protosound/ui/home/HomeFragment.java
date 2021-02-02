@@ -4,6 +4,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,12 +21,14 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.kuassivi.component.RipplePulseRelativeLayout;
+import com.makeability.protosound.MainActivity;
 import com.makeability.protosound.R;
 import com.makeability.protosound.ui.home.service.ForegroundService;
 
 public class HomeFragment extends Fragment {
 
-    private HomeViewModel homeViewModel;
+	private static final String TAG = "HomeFragment";
+	private HomeViewModel homeViewModel;
 	/**
 	 * Recording
 	 */
@@ -46,25 +50,28 @@ public class HomeFragment extends Fragment {
         ImageButton listeningBtn = (ImageButton) root.findViewById(R.id.mic);
 		RipplePulseRelativeLayout pulseLayout = root.findViewById(R.id.pulseLayout);
 		TextView soundTextView = root.findViewById(R.id.description);
-		soundTextView.setText(R.string.tap_blue);
+		// setup button for the first time
+		if (IS_RECORDING) {
+			switchToStartRecord(listeningBtn, pulseLayout, soundTextView);
+		} else {
+			switchToStopRecord(listeningBtn, pulseLayout, soundTextView);
+		}
+//		soundTextView.setText(R.string.tap_blue);
 		setOnClickListening(listeningBtn, pulseLayout, soundTextView);
         return root;
     }
 
 	private void setOnClickListening(ImageButton listeningBtn, RipplePulseRelativeLayout pulseLayout, TextView soundTextView) {
 //		TextView soundTextView = requireActivity().findViewById(R.id.description);
+		if (MainActivity.mSocket != null && !MainActivity.mSocket.connected()) {
+			MainActivity.mSocket.connect();
+		}
     	listeningBtn.setOnClickListener(v -> {
 			if (!IS_RECORDING) {
-				listeningBtn.setBackground(getResources().getDrawable(R.drawable.rounded_background_red, null));
-				listeningBtn.setImageResource(R.drawable.ic_baseline_pause_24);
-				soundTextView.setText("Listening...");
-				pulseLayout.startPulse();
+				switchToStartRecord(listeningBtn, pulseLayout, soundTextView);
 				startRecording(requireActivity());
 			} else {
-				listeningBtn.setBackground(getResources().getDrawable(R.drawable.rounded_background_blue, null));
-				listeningBtn.setImageResource(R.drawable.ic_mic_24);
-				soundTextView.setText(R.string.tap_blue);
-				pulseLayout.stopPulse();
+				switchToStopRecord(listeningBtn, pulseLayout, soundTextView);
 				stopRecording(requireActivity());
 			}
 			// Flip the flag so we can turn off/on next time
@@ -72,6 +79,21 @@ public class HomeFragment extends Fragment {
 		});
 	}
 
+	private void switchToStartRecord(ImageButton listeningBtn, RipplePulseRelativeLayout pulseLayout, TextView soundTextView) {
+		listeningBtn.setBackground(getResources().getDrawable(R.drawable.rounded_background_red, null));
+		listeningBtn.setImageResource(R.drawable.ic_baseline_pause_24);
+//				listeningBtn.setForegroundGravity(Gravity.BOTTOM);
+		soundTextView.setText("Listening...");
+		pulseLayout.startPulse();
+	}
+
+
+	private void switchToStopRecord(ImageButton listeningBtn, RipplePulseRelativeLayout pulseLayout, TextView soundTextView) {
+		listeningBtn.setBackground(getResources().getDrawable(R.drawable.rounded_background_blue, null));
+		listeningBtn.setImageResource(R.drawable.ic_mic_24);
+		soundTextView.setText(R.string.tap_blue);
+		pulseLayout.stopPulse();
+	}
 
 	/**
 	 * Run this function to start streaming audio and send prediction back to phone

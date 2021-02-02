@@ -47,5 +47,9 @@
     <string name="mic">mic</string>
     <string name="tap_blue">Tap the blue icon to begin listen</string>
     <string name="training_complete">Training completed</string>
+    <string name="recording">Recording</string>
+    <string name="done">DONE</string>
+    <string name="submitted_to_server">Submitted to server</string>
+    <string name="submit_to_server">SUBMIT TO SERVER</string>
 
 </resources>

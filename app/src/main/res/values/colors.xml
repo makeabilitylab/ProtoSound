@@ -25,5 +25,6 @@
     <color name="red_a200">#FF5252</color>
     <color name="secondary_text_light">#9E9E9E</color>
     <color name="semitransparent_grey">#66777777</color>
+    <color name="white_text">#E1E1E1</color>
     <color name="white">@android:color/white</color>
 </resources>

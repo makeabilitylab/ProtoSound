@@ -4,7 +4,6 @@ import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.net.ConnectivityManager;
@@ -12,20 +11,20 @@ import android.net.Network;
 import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.github.nkzawa.emitter.Emitter;
-import com.github.nkzawa.socketio.client.IO;
 import com.github.nkzawa.socketio.client.Socket;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.makeability.protosound.ui.home.models.AudioLabel;
-import com.makeability.protosound.utils.SocketUtil;
 
 import androidx.annotation.LongDef;
 import androidx.appcompat.app.AppCompatActivity;
@@ -40,20 +39,14 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.net.URISyntaxException;
-import java.text.SimpleDateFormat;
+import java.time.LocalTime;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
-import java.util.Random;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.concurrent.TimeUnit;
 
 import static com.github.nkzawa.socketio.client.Socket.EVENT_CONNECT;
 import static com.makeability.protosound.utils.Constants.PREDICTION_CHANNEL_ID;
@@ -72,7 +65,7 @@ public class MainActivity extends AppCompatActivity {
 	public static boolean notificationChannelIsCreated = false;
 	private String db = "";
 	private Map<String, Long> soundLastTime = new HashMap<>();
-
+	private List<String> timeLine = new ArrayList<>();
 //	{
 //		try {
 //			mSocket = IO.socket(TEST_SERVER);
@@ -82,30 +75,6 @@ public class MainActivity extends AppCompatActivity {
 //			e.printStackTrace();
 //		}
 //	}
-
-	private Emitter.Listener onAudioLabelMessage = new Emitter.Listener() {
-		@Override
-		public void call(final Object... args) {
-			Log.i(TAG, "Received audio label event");
-			JSONObject data = (JSONObject) args[0];
-			String db = "1.0"; // TODO: Hard code this number for now so we don't have to redesign notification
-			String audio_label;
-			String accuracy = "1.0";
-			String record_time = "";
-			try {
-				audio_label = data.getString("label");
-				accuracy = data.getString("confidence");
-				db = data.getString("db");
-			} catch (JSONException e) {
-				return;
-			}
-			Log.i(TAG, "received sound label from Socket server: " + audio_label + ", " + accuracy);
-			AudioLabel audioLabel;
-			audioLabel = new AudioLabel(audio_label, accuracy, null, db,
-					null);
-			createAudioLabelNotification(audioLabel);
-		}
-	};
 
 
 	@Override
@@ -149,23 +118,95 @@ public class MainActivity extends AppCompatActivity {
 		mSocket.disconnect();
 	}
 
+	private Emitter.Listener onAudioLabelUIViewMessage = new Emitter.Listener() {
+		@Override
+		public void call(Object... args) {
+			Log.i(TAG, "Received audio label event");
+			JSONObject data = (JSONObject) args[0];
+			String db = "1.0"; // TODO: Hard code this number for now so we don't have to redesign notification
+			String audio_label;
+			String accuracy = "1.0";
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
+			LocalTime localTime = LocalTime.now();
+			String time = formatter.format(localTime);
+			try {
+				audio_label = data.getString("label");
+				accuracy = data.getString("confidence");
+				db = data.getString("db");
+			} catch (JSONException e) {
+				return;
+			}
+			Log.i(TAG, "received sound label from Socket server: " + audio_label + ", " + accuracy);
+			AudioLabel audioLabel = new AudioLabel(audio_label, accuracy, time, db,
+					null);;
+			if (soundLastTime.containsKey(audioLabel.label)) {
+				if (System.currentTimeMillis() <= (soundLastTime.get(audioLabel.label) + 5 * 1000)) { //multiply by 1000 to get milliseconds
+					Log.i(TAG, "Same sound appear in less than 5 seconds");
+					return; // stop sending noti if less than 10 second
+				}
+			}
+			timeLine.add(audioLabel.getTimeAndLabel());
+			if (timeLine.size() > 500) {
+				timeLine.remove(0);
+			}
+			soundLastTime.put(audioLabel.label, System.currentTimeMillis());
+			ListView listView = (ListView) findViewById(R.id.listView);
+			new Handler(Looper.getMainLooper()).post(() -> {
+				ArrayAdapter<String> adapter = new ArrayAdapter<>(getApplicationContext(), R.layout.custom_dialog_layout, timeLine);
+				listView.setAdapter(adapter);
+				listView.setSelection(adapter.getCount() - 1);
+				adapter.notifyDataSetChanged();
+
+			});
+		}
+	};
+
+	private Emitter.Listener onAudioLabelNotificationMessage = new Emitter.Listener() {
+		@Override
+		public void call(final Object... args) {
+			Log.i(TAG, "Received audio label event");
+			JSONObject data = (JSONObject) args[0];
+			String db = "1.0"; // TODO: Hard code this number for now so we don't have to redesign notification
+			String audio_label;
+			String accuracy = "1.0";
+			String record_time = "";
+			try {
+				audio_label = data.getString("label");
+				accuracy = data.getString("confidence");
+				db = data.getString("db");
+			} catch (JSONException e) {
+				return;
+			}
+			Log.i(TAG, "received sound label from Socket server: " + audio_label + ", " + accuracy);
+			AudioLabel audioLabel;
+			audioLabel = new AudioLabel(audio_label, accuracy, null, db,
+					null);
+			createAudioLabelNotification(audioLabel);
+		}
+	};
+
 	public void initSocket(String port) {
 		mSocket.connect();
 		mSocket.on("android_test_2", onTestMessage);
 
 		// The server will return an audio_label to the phone with label
-		mSocket.on("audio_data_s2c", onAudioLabelMessage);
+		mSocket.on("audio_data_s2c", onAudioLabelUIViewMessage);
 		mSocket.on("training_complete", onTrainingCompleteMessage);
 
 		mSocket.once(EVENT_CONNECT, new Emitter.Listener() {
 			@Override
 			public void call(Object... args) {
-				Log.i(TAG, "call: " + args);
-				Log.d(TAG, "call: " + mSocket.connected());
-				Button confirmPort = (Button) findViewById(R.id.confirm_port);
-				confirmPort.setBackgroundColor(Color.GREEN);
-				TextView tick = (TextView) findViewById(R.id.tick);
-				tick.setText(R.string.port_connected);
+				new Handler(Looper.getMainLooper()).post(() -> {
+					// Update UI here
+					Log.i(TAG, "call: " + args);
+					Log.d(TAG, "call: " + mSocket.connected());
+					Button confirmPort = (Button) findViewById(R.id.confirm_port);
+					confirmPort.setBackgroundColor(Color.GREEN);
+					TextView tick = (TextView) findViewById(R.id.tick);
+					tick.setText(R.string.port_connected);
+					Button submit = (Button) findViewById(R.id.submit);
+					submit.setText(R.string.submit_to_server);
+				});
 
 //				JSONObject data = (JSONObject) args[0];
 //				String userPrototypeAvailable;

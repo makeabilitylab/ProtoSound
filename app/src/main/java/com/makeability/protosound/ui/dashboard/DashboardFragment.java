@@ -5,6 +5,8 @@ import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.media.AudioFormat;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -49,6 +51,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import static com.github.nkzawa.socketio.client.Socket.EVENT_CONNECT;
 
@@ -103,7 +107,7 @@ public class DashboardFragment extends Fragment {
             setOnClickRecord(record, rid);
         }
 
-        for (int pid: playButtonList) {
+        for (int pid : playButtonList) {
             Button play = root.findViewById(pid);
             setOnClickPlay(play, recordPlayMap.get(pid));
         }
@@ -124,7 +128,6 @@ public class DashboardFragment extends Fragment {
         // Set Listener for spinner
         setOnItemClickListener(spinner, 4);
         setOnItemClickListener(spinner2, 5);
-
         // Setup 3 edit texts for 3 classes
         TextInputEditText field_1 = (TextInputEditText) root.findViewById(R.id.class_1);
         TextInputEditText field_2 = (TextInputEditText) root.findViewById(R.id.class_2);
@@ -136,6 +139,13 @@ public class DashboardFragment extends Fragment {
         // Setup submit button
         Button submit = (Button) root.findViewById(R.id.submit);
         setOnClickSubmit(submit, R.id.record_1);
+
+        // Disable the submit button if the port hasn't been establish
+        if (MainActivity.mSocket == null) {
+            submit.setText("Please complete step 1 before submit");
+        } else {
+            submit.setText(R.string.submit_to_server);
+        }
         return root;
     }
 
@@ -218,18 +228,28 @@ public class DashboardFragment extends Fragment {
     private void setOnClickRecord(final Button btn, final int id){
 
         btn.setOnClickListener(v -> {
-            btn.setBackgroundColor(Color.GREEN);
-            Toast.makeText(requireActivity(), "Recording.." , Toast.LENGTH_SHORT).show();
             Log.d(TAG, "record:"+ id + " called");
+            btn.setBackgroundColor(Color.YELLOW);
+            btn.setText(R.string.recording);
             startRecording(id);
-//            Timer timer = new Timer();
-//            timer.schedule(new TimerTask() {
-//                @Override
-//                public void run() {
-//                    stopRecording();
-//                    timer.cancel();
-//                }
-//            }, 1000);
+            for (int rid : recordButtonList) {
+                if (rid != id) {
+                    Button record = requireActivity().findViewById(rid);
+                    record.setEnabled(false);
+                }
+            }
+            final Handler handler = new Handler(Looper.getMainLooper());
+            handler.postDelayed(() -> {
+                //Do something after 1200ms
+                btn.setBackgroundColor(Color.GREEN);
+                btn.setText(R.string.done);
+                for (int rid : recordButtonList) {
+                    if (rid != id) {
+                        Button record = requireActivity().findViewById(rid);
+                        record.setEnabled(true);
+                    }
+                }
+            }, 1200);
         });
     }
 
@@ -251,6 +271,11 @@ public class DashboardFragment extends Fragment {
                 if (!checkAllFieldsExisted()) {
                     return;
                 }
+                if (MainActivity.mSocket != null) {
+                    btn.setText(R.string.submit_to_server);
+                }
+                btn.setBackgroundColor(Color.YELLOW);
+                btn.setText(R.string.submitted_to_server);
                 JSONObject soundPackage = new JSONObject();
 
                 for (int i = 0; i < recordButtonList.length; i++) {
@@ -275,7 +300,7 @@ public class DashboardFragment extends Fragment {
     private void startRecording(int id) {
         Log.d(TAG, "startRecording: ");
         recorder = new SoundRecorder(this.requireContext(), VOICE_FILE_NAME + id + ".pcm", mListener);
-        recorder.startRecording();
+        recorder.startRecording(id);
     }
 
     private void stopRecording() {

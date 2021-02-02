@@ -16,6 +16,7 @@
 
 package com.makeability.protosound.utils;
 
+import android.app.Activity;
 import android.content.Context;
 import android.media.AudioFormat;
 import android.media.AudioManager;
@@ -26,6 +27,12 @@ import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
+import android.widget.Button;
+
+import com.makeability.protosound.MainActivity;
+import com.makeability.protosound.R;
+import com.makeability.protosound.ui.dashboard.DashboardFragment;
+import com.makeability.protosound.ui.dashboard.DashboardViewModel;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -86,7 +93,7 @@ public class SoundRecorder {
     /**
      * Starts recording from the MIC.
      */
-    public void startRecording() {
+    public void startRecording(int id) {
         if (mState != State.IDLE) {
             Log.w(TAG, "Requesting to start recording while state was not IDLE");
             return;

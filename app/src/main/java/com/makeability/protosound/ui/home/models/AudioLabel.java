@@ -14,4 +14,8 @@ public class AudioLabel {
 		this.db = db;
 		this.recordTime = recordTime;
 	}
+
+	public String getTimeAndLabel() {
+		return time + " | " + this.label.substring(0, 1).toUpperCase() + this.label.substring(1);
+	}
 }
