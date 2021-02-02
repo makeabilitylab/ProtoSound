@@ -1,8 +1,10 @@
 #!/usr/bin/env python
-from random import random
-from threading import Lock
+
 
 # Load the necessary python libraries
+import random
+from threading import Lock
+from shutil import copy
 import numpy as np
 import librosa
 import os
@@ -19,7 +21,7 @@ from flask import Flask, render_template, session, request, \
 from flask_socketio import SocketIO, emit, join_room, leave_room, \
     close_room, rooms, disconnect
 from scipy.io.wavfile import write
-from main import personalize_model, predict_query
+from main import personalize_model, predict_query, ProtoSoundDataset
 
 # Set this variable to "threading", "eventlet" or "gevent" to test the
 # different async modes, or leave it set to None for the application to choose
@@ -41,6 +43,9 @@ LIBRARY_DATA_PATH = 'library'
 DATA_PATH = 'meta-test-data'  # DIRECTORY OF 25 SAMPLES
 DATA_CSV_PATH = ''
 MODEL_PATH = 'model/protosound_10_classes.pt'
+QUERY_PATH = 'meta-test-query/'
+QUERY_FILE = 'meta-test-data/kitchen_hazard-alarm_5ft_sample4_344_chunk0_009.wav'
+user_prototype_available = False
 
 # GET DEVICE
 if torch.cuda.is_available():
@@ -73,8 +78,23 @@ def background_thread():
                       {'data': 'Server generated event', 'count': count})
 
 
-def add_background_noise(data, noise, noise_ratio=0.5):
-    output = data * (1 - noise_ratio) + noise * noise_ratio
+def seed():
+    return 0.31415926
+
+
+def background_thread():
+    """Example of how to send server generated events to clients."""
+    count = 0
+    while True:
+        socketio.sleep(10)
+        count += 1
+        socketio.emit('my_response',
+                      {'data': 'Server generated event', 'count': count})
+
+
+def add_background_noise(input_data, noise_data, noise_ratio=0.5):
+    output = input_data * (1 - noise_ratio) + noise_data * noise_ratio
+    output = output.astype(np.float32)
     return output
 
 
@@ -99,6 +119,8 @@ def generate_csv(data_path_directory, labels, output_path_directory):
             try:
                 if file_name.endswith('.wav'):
                     file_path = os.path.join(path, file_name)
+                    if not os.path.exists(output_path_directory):
+                        os.makedirs(output_path_directory)
                     category.append(ea_dir)
                     name.append(file_name)
                     # index = num_class + 1
@@ -106,62 +128,85 @@ def generate_csv(data_path_directory, labels, output_path_directory):
                         csv_index = 1
                     fold.append(csv_index)
                     csv_index += 1
-            #         TODO: Copy filepath to output_path_directory
-
+                    # Copy filepath to output_path_directory
+                    copy(file_path, output_path_directory)
             except:
                 open("exceptions.txt", "a").write("Exception raised for: %s\n" % file_name)
     dict = {'filename': name, 'fold': fold, 'category': category}
     df = pd.DataFrame(dict)
     df.to_csv(output_path_directory + '/user_data.csv')
-    print("Processing complete.")
+    global DATA_CSV_PATH
+    DATA_CSV_PATH = output_path_directory + '/user_data.csv';
+    print("Generata CSV complete.")
 
 
 @socketio.on('submit_data')
-def submit_audio(json_data):
+def submit_data(json_data):
     print("submit_data->receive request")
-    data = []
-    for i in range(0, 16):
-        data.append(json_data['data_' + i])
-    labels = json_data['labels']
-    background_noise = np.asarray(data[16], dtype=np.int16)
+    labels = json_data['label']
+    labels = [element.lower().replace(" ", "_") for element in labels]
+    background_noise = np.asarray(json_data['data_15'], dtype=np.int16) / 32768.0
+    background_noise = background_noise[:44100]
     for i in range(0, 15):
         # generate new directory for new data, store it into "library" for future usage
-        label = labels[i % 5]
+        label = labels[i // 5]
         current_dir = os.path.join(LIBRARY_DATA_PATH, label)
         if not os.path.exists(current_dir):
             os.makedirs(current_dir)
-
-        np_data = np.asarray(data[i], dtype=np.int16)
-        output = add_background_noise(np_data, background_noise, 0.5)
+        data = json_data['data_' + str(i)]
+        np_data = np.asarray(data, dtype=np.int16) / 32768.0
+        np_data = np_data[:44100]
+        output = add_background_noise(np_data, background_noise, 0.25)
 
         filename = os.path.join(current_dir, label + "_user_" + str(i % 5) + '.wav')
 
         write(filename, RATE, output)
+    
+    # Generate CSV file and put 25 samples into one single folder
+    print('Generate CSV file and put 25 samples into one single folder')
     generate_csv(LIBRARY_DATA_PATH, labels, DATA_PATH)
 
+    # LOAD DATA
+    df = pd.read_csv(DATA_CSV_PATH)
+    global support_data
+    support_data = ProtoSoundDataset(DATA_PATH, df, 'filename', 'category')
+    print(support_data.c2i, support_data.categories, support_data.i2c)
+    # TRAIN MODEL   
+    train_loader = DataLoader(support_data, batch_size=WAYS*SHOTS)
+    batch = next(iter(train_loader))
+    # IMPORTANT: MAKE SURE THAT "classes_prototypes" AND "support_data.i2c" 
+    # ARE GLOBAL VARIABLEs WHICH NEED TO CHANGE EVERY TIME TRAINING IS DONE
+    global classes_prototypes
+    classes_prototypes = personalize_model(protosound_model, batch, WAYS, SHOTS, device=device)
+    print("training complete")
+    socketio.emit('training_complete')
 
-# sample_rate = int(json_data['sample_rate'])
-# data = (np.asarray(json_data['data'])).astype(int)
-# file_name = json_data['file_name']
-# print('writing_file', sample_rate, type(sample_rate))
-# print('data', data)
-# write(DATA_PATH + '/' + file_name, sample_rate, data)
 
-
-@socketio.on('audio_data')
+@socketio.on('audio_data_c2s')
 def handle_source(json_data):
-    data = np.asarray(json_data['data'], dtype=np.int16)
+    data = np.asarray(json_data['data'], dtype=np.int16) / 32768.0
+    db = json_data['db']
+    db = str(round(db, 2))
+    print("db:", db)
+    data = data[:44100]
     PREDICTION_QUERY_FILE_NAME = 'query'
     # Write the prediction query file
-    QUERY_FILE = LIBRARY_DATA_PATH + '/' + PREDICTION_QUERY_FILE_NAME + '.wav'
+    QUERY_FILE = QUERY_PATH + '/' + PREDICTION_QUERY_FILE_NAME + '.wav'
     write(QUERY_FILE, RATE, data)
     # Make prediction
-    output = predict_query(protosound_model, QUERY_FILE, classes_prototypes, support_data.i2c, device=device)
-    print('Making prediction...')
-    socketio.emit('audio_label',
-                  {
-                      'label': str(output)
-                  })
+    global support_data
+    global classes_prototypes
+    if support_data is None or classes_prototypes is None:
+        print('no training happened yet')
+        return
+    output, confidence = predict_query(protosound_model, QUERY_FILE, classes_prototypes, support_data.i2c, device=device)
+    print('output:', output[0], 'confidence', confidence[0])
+    if (confidence < -10):
+        print("Exit due to confidence < -10: ")
+        return
+
+    print('Making prediction...', output[0])
+    socketio.emit('audio_data_s2c', {'label': output[0], 'confidence': str(confidence[0]), 'db': db})
 
 
 @app.route('/')
@@ -172,6 +217,19 @@ def index():
 @socketio.on('disconnect')
 def test_disconnect():
     print('Client disconnected', request.sid)
+
+
+@socketio.on('connect')
+def test_connect():
+    print('Client connect', request.sid)
+    global support_data
+    global classes_prototypes
+    global user_prototype_available
+    if (support_data is not None and classes_prototypes is not None):
+        user_prototype_available = True
+    socketio.emit("server_received_request", {
+        'user_prototype_available': user_prototype_available
+    })
 
 
 if __name__ == '__main__':
