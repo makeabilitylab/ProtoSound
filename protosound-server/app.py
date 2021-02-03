@@ -15,6 +15,7 @@ import torch.nn.functional as F
 import torch.optim as optim
 from torch.utils.data import Dataset, DataLoader
 from tqdm import tqdm
+import time
 
 from flask import Flask, render_template, session, request, \
     copy_current_request_context
@@ -45,6 +46,9 @@ DATA_CSV_PATH = ''
 MODEL_PATH = 'model/protosound_10_classes.pt'
 QUERY_PATH = 'meta-test-query/'
 QUERY_FILE = 'meta-test-data/kitchen_hazard-alarm_5ft_sample4_344_chunk0_009.wav'
+USER_FEEDBACK_FILE = 'user_feedback.csv'
+TRAINING_TIME_FILE = 'training_time.csv'
+PREDICTION_TIME_FILE = 'prediction_time.csv'
 user_prototype_available = False
 
 # GET DEVICE
@@ -58,6 +62,13 @@ protosound_model = torch.load(MODEL_PATH, map_location=device)
 protosound_model = protosound_model.to(device)
 classes_prototypes = None  # TODO: Replace this variable once the training is done
 support_data = None
+
+"""
+    Perf test constants
+"""
+
+SHOULD_RECORD_TRAINING_TIME = True
+SHOULD_RECORD_PREDICTION_TIME = True
 
 """
     Flask SocketIO functions
@@ -142,6 +153,7 @@ def generate_csv(data_path_directory, labels, output_path_directory):
 
 @socketio.on('submit_data')
 def submit_data(json_data):
+    start_time = time.time()
     print("submit_data->receive request")
     labels = json_data['label']
     submitAudioTime = str(json_data['submitAudioTime'])
@@ -180,7 +192,23 @@ def submit_data(json_data):
     global classes_prototypes
     classes_prototypes = personalize_model(protosound_model, batch, WAYS, SHOTS, device=device)
     print("training complete")
+    if (SHOULD_RECORD_TRAINING_TIME):
+        elapsed_time = time.time() - start_time
+        # Write prediction time to file
+        with open(TRAINING_TIME_FILE, 'a') as file:
+            file.write(str(elapsed_time) + '\n')
     socketio.emit('training_complete', { 'submitAudioTime': submitAudioTime })
+
+
+@socketio.on('audio_prediction_feedback')
+def audio_prediction_feedback(json_data):
+    predictedLabel = str(json_data['predictedLabel'])
+    actualUserLabel = str(json_data['actualUserLabel'])
+    isFalsePrediction = str(json_data['isFalsePrediction'])
+    # Write user feedback to a file
+    with open(USER_FEEDBACK_FILE, 'a') as file:
+        file.write(predictedLabel + ',' + actualUserLabel + ',' + isFalsePrediction + '\n')
+
 
 
 @socketio.on('audio_data_c2s')
@@ -202,7 +230,17 @@ def handle_source(json_data):
     if support_data is None or classes_prototypes is None:
         print('no training happened yet')
         return
-    output, confidence = predict_query(protosound_model, QUERY_FILE, classes_prototypes, support_data.i2c, device=device)
+    
+    output, confidence = None, None
+    if (SHOULD_RECORD_PREDICTION_TIME):
+        start_time = time.time()
+        output, confidence = predict_query(protosound_model, QUERY_FILE, classes_prototypes, support_data.i2c, device=device)
+        elapsed_time = time.time() - start_time
+        # Write prediction time to file
+        with open('model_prediction_time.csv', 'a') as file:
+            file.write(str(elapsed_time) + '\n')
+    else:
+        output, confidence = predict_query(protosound_model, QUERY_FILE, classes_prototypes, support_data.i2c, device=device)
     print('output:', output[0], 'confidence', confidence[0])
     if (confidence < -10):
         print("Exit due to confidence < -10: ")

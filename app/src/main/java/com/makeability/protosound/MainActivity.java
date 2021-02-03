@@ -193,6 +193,41 @@ public class MainActivity extends AppCompatActivity {
 	};
 
 	/**
+	 * TODO Khoa: use this function to report checkbox feedback to user
+	 * @param predictedLabel
+	 * @param actualUserLabel
+	 */
+	private void reportUserPredictionFeedback(String predictedLabel, String actualUserLabel) {
+		try {
+			JSONObject jsonObject = new JSONObject();
+			jsonObject.put("predictedLabel", predictedLabel);
+			jsonObject.put("actualUserLabel", actualUserLabel);
+			jsonObject.put("isFalsePrediction", !predictedLabel.equalsIgnoreCase(actualUserLabel));
+			MainActivity.mSocket.emit("audio_prediction_feedback", jsonObject);
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+	}
+
+
+	/**
+	 * TODO Khoa: use this function to report checkbox feedback to user
+	 * @param predictedLabel
+	 * @param isFalsePrediction
+	 */
+	private void reportUserPredictionFeedback(String predictedLabel, boolean isFalsePrediction) {
+		try {
+			JSONObject jsonObject = new JSONObject();
+			jsonObject.put("predictedLabel", predictedLabel);
+			jsonObject.put("actualUserLabel", null);
+			jsonObject.put("isFalsePrediction", isFalsePrediction);
+			MainActivity.mSocket.emit("audio_prediction_feedback", jsonObject);
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+	}
+
+	/**
 	 *
 	 * @param recordTime original record time when recorded from audiorecorder
 	 * @param fileName the file name we wants to write to (o.e: e2e_pred_latency.txt, e2e_training_latency.txt)
