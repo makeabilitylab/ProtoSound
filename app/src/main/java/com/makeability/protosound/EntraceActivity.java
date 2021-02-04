@@ -26,7 +26,7 @@ public class EntraceActivity extends AppCompatActivity {
 		});
 
 		Button button2 = (Button) findViewById(R.id.e2eprediction);
-		button1.setOnClickListener(new View.OnClickListener() {
+		button2.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
 				launchMainProtosoundActivity(view.getContext(), 1);
@@ -34,7 +34,7 @@ public class EntraceActivity extends AppCompatActivity {
 		});
 
 		Button button3 = (Button) findViewById(R.id.e2etraining);
-		button1.setOnClickListener(new View.OnClickListener() {
+		button3.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
 				launchMainProtosoundActivity(view.getContext(), 2);

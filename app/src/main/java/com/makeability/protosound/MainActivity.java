@@ -15,10 +15,15 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.BaseAdapter;
 import android.widget.Button;
+import android.widget.ImageButton;
+import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -72,13 +77,78 @@ public class MainActivity extends AppCompatActivity {
 	public static boolean notificationChannelIsCreated = false;
 	private String db = "";
 	private Map<String, Long> soundLastTime = new HashMap<>();
-	private List<String> timeLine = new ArrayList<>();
+	private List<AudioLabel> timeLine = new ArrayList<>();
 
 	private static final int NORMAL_MODE = 0;
 	public static final int TEST_END_TO_END_PREDICTION_LATENCY_MODE = 1;
 	public static final int TEST_END_TO_END_TRAINING_LATENCY_MODE = 2;
 
 	public static int currentMode = NORMAL_MODE;
+
+
+	/**
+	 * Adapter to draw the timeline view for user to submit audio feedback
+	 */
+	public class TimelineAdapter extends BaseAdapter implements ListAdapter {
+		private List<AudioLabel> list = new ArrayList<>();
+		private Context context;
+
+
+		public TimelineAdapter(List<AudioLabel> list, Context context) {
+			this.list = list;
+			this.context = context;
+		}
+
+		@Override
+		public int getCount() {
+			return list.size();
+		}
+
+		@Override
+		public Object getItem(int pos) {
+			return list.get(pos);
+		}
+
+		@Override
+		public long getItemId(int pos) {
+			//just return 0 because we don't have id for each position
+			return 0;
+		}
+
+		@Override
+		public View getView(final int position, View convertView, ViewGroup parent) {
+			View view = convertView;
+			if (view == null) {
+				LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+				view = inflater.inflate(R.layout.custom_dialog_layout, null);
+			}
+
+			//Handle TextView and display string from your list
+			TextView listItemText = (TextView)view.findViewById(R.id.soundLabel);
+			listItemText.setText(list.get(position).getTimeAndLabel());
+
+			//Handle buttons and add onClickListeners
+			ImageButton trueButton = (ImageButton) view.findViewById(R.id.trueButton);
+			ImageButton falseButton = (ImageButton) view.findViewById(R.id.falseButton);
+
+			trueButton.setOnClickListener(new View.OnClickListener(){
+				@Override
+				public void onClick(View v) {
+					Log.i(TAG, "Submit true button feedback");
+					reportUserPredictionFeedback(list.get(position).label, false);
+				}
+			});
+			falseButton.setOnClickListener(new View.OnClickListener(){
+				@Override
+				public void onClick(View v) {
+					Log.i(TAG, "Submit false button feedback");
+					reportUserPredictionFeedback(list.get(position).label, true);
+				}
+			});
+
+			return view;
+		}
+	}
 //	{
 //		try {
 //			mSocket = IO.socket(TEST_SERVER);
@@ -176,18 +246,17 @@ public class MainActivity extends AppCompatActivity {
 					return; // stop sending noti if less than 10 second
 				}
 			}
-			timeLine.add(audioLabel.getTimeAndLabel());
+			timeLine.add(audioLabel);
 			if (timeLine.size() > 500) {
 				timeLine.remove(0);
 			}
 			soundLastTime.put(audioLabel.label, System.currentTimeMillis());
 			ListView listView = (ListView) findViewById(R.id.listView);
 			new Handler(Looper.getMainLooper()).post(() -> {
-				ArrayAdapter<String> adapter = new ArrayAdapter<>(getApplicationContext(), R.layout.custom_dialog_layout, timeLine);
+				TimelineAdapter adapter = new TimelineAdapter(timeLine, getApplicationContext());
 				listView.setAdapter(adapter);
 				listView.setSelection(adapter.getCount() - 1);
 				adapter.notifyDataSetChanged();
-
 			});
 		}
 	};
@@ -323,17 +392,17 @@ public class MainActivity extends AppCompatActivity {
 	private Emitter.Listener onTrainingCompleteMessage = args -> {
 		Log.i(TAG, "Received training complete!");
 		Log.i(TAG, "Received audio label event");
-		JSONObject data = (JSONObject) args[0];
-		String submitAudioTime = ""; // original submit audio time when starts training the audio
-		try {
-			submitAudioTime = data.getString("submitAudioTime");
-			if (currentMode == TEST_END_TO_END_TRAINING_LATENCY_MODE) {
+		if (currentMode == TEST_END_TO_END_TRAINING_LATENCY_MODE) {
+			JSONObject data = (JSONObject) args[0];
+			String submitAudioTime = ""; // original submit audio time when starts training the audio
+			try {
+				submitAudioTime = data.getString("submitAudioTime");
 				// If test end2end training, there should be a record submit time from SoundRecorder
 				submitAudioTime = data.getString("submitAudioTime");
 				writeEndToEndLatencyToExternalFile(submitAudioTime, "e2e_training");
+			} catch (JSONException e) {
+				return;
 			}
-		} catch (JSONException e) {
-			return;
 		}
 		Button submitButton = (Button) findViewById(R.id.submit);
 		submitButton.setBackgroundColor(Color.GREEN);
