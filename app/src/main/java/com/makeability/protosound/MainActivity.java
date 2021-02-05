@@ -4,6 +4,7 @@ import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.net.ConnectivityManager;
@@ -14,10 +15,15 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.BaseAdapter;
 import android.widget.Button;
+import android.widget.ImageButton;
+import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -39,10 +45,15 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.text.SimpleDateFormat;
 import java.time.LocalTime;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -50,6 +61,7 @@ import java.util.Map;
 
 import static com.github.nkzawa.socketio.client.Socket.EVENT_CONNECT;
 import static com.makeability.protosound.utils.Constants.PREDICTION_CHANNEL_ID;
+import static com.makeability.protosound.utils.Constants.TEST_NUMBER_EXTRA;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -65,7 +77,78 @@ public class MainActivity extends AppCompatActivity {
 	public static boolean notificationChannelIsCreated = false;
 	private String db = "";
 	private Map<String, Long> soundLastTime = new HashMap<>();
-	private List<String> timeLine = new ArrayList<>();
+	private List<AudioLabel> timeLine = new ArrayList<>();
+
+	private static final int NORMAL_MODE = 0;
+	public static final int TEST_END_TO_END_PREDICTION_LATENCY_MODE = 1;
+	public static final int TEST_END_TO_END_TRAINING_LATENCY_MODE = 2;
+
+	public static int currentMode = NORMAL_MODE;
+
+
+	/**
+	 * Adapter to draw the timeline view for user to submit audio feedback
+	 */
+	public class TimelineAdapter extends BaseAdapter implements ListAdapter {
+		private List<AudioLabel> list = new ArrayList<>();
+		private Context context;
+
+
+		public TimelineAdapter(List<AudioLabel> list, Context context) {
+			this.list = list;
+			this.context = context;
+		}
+
+		@Override
+		public int getCount() {
+			return list.size();
+		}
+
+		@Override
+		public Object getItem(int pos) {
+			return list.get(pos);
+		}
+
+		@Override
+		public long getItemId(int pos) {
+			//just return 0 because we don't have id for each position
+			return 0;
+		}
+
+		@Override
+		public View getView(final int position, View convertView, ViewGroup parent) {
+			View view = convertView;
+			if (view == null) {
+				LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+				view = inflater.inflate(R.layout.custom_dialog_layout, null);
+			}
+
+			//Handle TextView and display string from your list
+			TextView listItemText = (TextView)view.findViewById(R.id.soundLabel);
+			listItemText.setText(list.get(position).getTimeAndLabel());
+
+			//Handle buttons and add onClickListeners
+			ImageButton trueButton = (ImageButton) view.findViewById(R.id.trueButton);
+			ImageButton falseButton = (ImageButton) view.findViewById(R.id.falseButton);
+
+			trueButton.setOnClickListener(new View.OnClickListener(){
+				@Override
+				public void onClick(View v) {
+					Log.i(TAG, "Submit true button feedback");
+					reportUserPredictionFeedback(list.get(position).label, false);
+				}
+			});
+			falseButton.setOnClickListener(new View.OnClickListener(){
+				@Override
+				public void onClick(View v) {
+					Log.i(TAG, "Submit false button feedback");
+					reportUserPredictionFeedback(list.get(position).label, true);
+				}
+			});
+
+			return view;
+		}
+	}
 //	{
 //		try {
 //			mSocket = IO.socket(TEST_SERVER);
@@ -76,11 +159,21 @@ public class MainActivity extends AppCompatActivity {
 //		}
 //	}
 
+	// Finish current activity when back button is pressed
+	@Override
+	public void onBackPressed() {
+		super.onBackPressed();
+		this.finish();
+	}
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		Log.i(TAG, "onCreate");
+
+		// Get the test extra from the Entrance activity to determine which test we want to run
+		Intent intent = this.getIntent();
+		currentMode = intent.getIntExtra(TEST_NUMBER_EXTRA, NORMAL_MODE);
 
 		List<Short> test = new ArrayList<>();
 		test.add((short) 12);
@@ -115,7 +208,9 @@ public class MainActivity extends AppCompatActivity {
 	protected void onDestroy() {
 		Log.i(TAG, "onDestroy: ");
 		super.onDestroy();
-		mSocket.disconnect();
+		if (mSocket != null) {
+			mSocket.disconnect();
+		}
 	}
 
 	private Emitter.Listener onAudioLabelUIViewMessage = new Emitter.Listener() {
@@ -129,10 +224,16 @@ public class MainActivity extends AppCompatActivity {
 			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
 			LocalTime localTime = LocalTime.now();
 			String time = formatter.format(localTime);
+			String recordTime = "";
 			try {
 				audio_label = data.getString("label");
 				accuracy = data.getString("confidence");
 				db = data.getString("db");
+				if (currentMode == TEST_END_TO_END_PREDICTION_LATENCY_MODE) {
+					// If test end2end prediction, there should be a record time to determine the original record time of this sound
+					recordTime =  data.getString("recordTime");
+					writeEndToEndLatencyToExternalFile(recordTime, "e2e_prediction");
+				}
 			} catch (JSONException e) {
 				return;
 			}
@@ -145,21 +246,77 @@ public class MainActivity extends AppCompatActivity {
 					return; // stop sending noti if less than 10 second
 				}
 			}
-			timeLine.add(audioLabel.getTimeAndLabel());
+			timeLine.add(audioLabel);
 			if (timeLine.size() > 500) {
 				timeLine.remove(0);
 			}
 			soundLastTime.put(audioLabel.label, System.currentTimeMillis());
 			ListView listView = (ListView) findViewById(R.id.listView);
 			new Handler(Looper.getMainLooper()).post(() -> {
-				ArrayAdapter<String> adapter = new ArrayAdapter<>(getApplicationContext(), R.layout.custom_dialog_layout, timeLine);
+				TimelineAdapter adapter = new TimelineAdapter(timeLine, getApplicationContext());
 				listView.setAdapter(adapter);
 				listView.setSelection(adapter.getCount() - 1);
 				adapter.notifyDataSetChanged();
-
 			});
 		}
 	};
+
+	/**
+	 * TODO Khoa: use this function to report checkbox feedback to user
+	 * @param predictedLabel
+	 * @param actualUserLabel
+	 */
+	private void reportUserPredictionFeedback(String predictedLabel, String actualUserLabel) {
+		try {
+			JSONObject jsonObject = new JSONObject();
+			jsonObject.put("predictedLabel", predictedLabel);
+			jsonObject.put("actualUserLabel", actualUserLabel);
+			jsonObject.put("isFalsePrediction", !predictedLabel.equalsIgnoreCase(actualUserLabel));
+			MainActivity.mSocket.emit("audio_prediction_feedback", jsonObject);
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+	}
+
+
+	/**
+	 * TODO Khoa: use this function to report checkbox feedback to user
+	 * @param predictedLabel
+	 * @param isFalsePrediction
+	 */
+	private void reportUserPredictionFeedback(String predictedLabel, boolean isFalsePrediction) {
+		try {
+			JSONObject jsonObject = new JSONObject();
+			jsonObject.put("predictedLabel", predictedLabel);
+			jsonObject.put("actualUserLabel", null);
+			jsonObject.put("isFalsePrediction", isFalsePrediction);
+			MainActivity.mSocket.emit("audio_prediction_feedback", jsonObject);
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 *
+	 * @param recordTime original record time when recorded from audiorecorder
+	 * @param fileName the file name we wants to write to (o.e: e2e_pred_latency.txt, e2e_training_latency.txt)
+	 */
+	private void writeEndToEndLatencyToExternalFile(String recordTime, String fileName) {
+		long elapsedTime = System.currentTimeMillis() - Long.parseLong(recordTime);
+		Log.i(TAG, "Elapsed time: " + elapsedTime);
+		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("hh:mm:ss");
+		Date date = new Date(System.currentTimeMillis());
+		String timeStamp = simpleDateFormat.format(date);
+
+		try {
+			OutputStreamWriter outputStreamWriter = new OutputStreamWriter(openFileOutput(fileName +  ".txt", Context.MODE_APPEND));
+			outputStreamWriter.write(timeStamp + "," +  Long.toString(elapsedTime) + "\n");
+			outputStreamWriter.close();
+		}
+		catch (IOException e) {
+			Log.e("Exception", "File write failed: " + e.toString());
+		}
+	}
 
 	private Emitter.Listener onAudioLabelNotificationMessage = new Emitter.Listener() {
 		@Override
@@ -234,6 +391,19 @@ public class MainActivity extends AppCompatActivity {
 
 	private Emitter.Listener onTrainingCompleteMessage = args -> {
 		Log.i(TAG, "Received training complete!");
+		Log.i(TAG, "Received audio label event");
+		if (currentMode == TEST_END_TO_END_TRAINING_LATENCY_MODE) {
+			JSONObject data = (JSONObject) args[0];
+			String submitAudioTime = ""; // original submit audio time when starts training the audio
+			try {
+				submitAudioTime = data.getString("submitAudioTime");
+				// If test end2end training, there should be a record submit time from SoundRecorder
+				submitAudioTime = data.getString("submitAudioTime");
+				writeEndToEndLatencyToExternalFile(submitAudioTime, "e2e_training");
+			} catch (JSONException e) {
+				return;
+			}
+		}
 		Button submitButton = (Button) findViewById(R.id.submit);
 		submitButton.setBackgroundColor(Color.GREEN);
 		submitButton.setText(R.string.training_complete);
