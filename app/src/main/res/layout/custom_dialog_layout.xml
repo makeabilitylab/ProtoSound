@@ -22,16 +22,18 @@
 		android:id="@+id/trueButton"
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
-		android:layout_alignParentRight="true"
-		android:layout_marginRight="-12dp"
-		android:src="@drawable/ic_baseline_check_circle_24" />
+		android:layout_alignParentEnd="true"
+		android:layout_marginEnd="@dimen/_5ssp"
+		android:src="@drawable/ic_baseline_thumb_up_alt_24"
+		android:contentDescription="ThumbsUp" />
 
 	<ImageButton
 		android:id="@+id/falseButton"
-		android:layout_width="47dp"
-		android:layout_height="46dp"
-		android:layout_marginRight="17dp"
-		android:layout_toLeftOf="@id/trueButton"
-		android:src="@drawable/rounded_background_red"
-	/>
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_marginEnd="@dimen/_15sdp"
+		android:layout_toStartOf="@id/trueButton"
+		android:src="@drawable/ic_baseline_thumb_down_alt_24"
+		android:contentDescription="ThumbsDown"
+		/>
 </RelativeLayout>

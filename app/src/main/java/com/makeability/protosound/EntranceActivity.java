@@ -8,9 +8,11 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 
+import com.makeability.protosound.ui.dashboard.DashboardFragment;
+
 import static com.makeability.protosound.utils.Constants.TEST_NUMBER_EXTRA;
 
-public class EntraceActivity extends AppCompatActivity {
+public class EntranceActivity extends AppCompatActivity {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -25,21 +27,21 @@ public class EntraceActivity extends AppCompatActivity {
 			}
 		});
 
-		Button button2 = (Button) findViewById(R.id.e2eprediction);
-		button2.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View view) {
-				launchMainProtosoundActivity(view.getContext(), 1);
-			}
-		});
-
-		Button button3 = (Button) findViewById(R.id.e2etraining);
-		button3.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View view) {
-				launchMainProtosoundActivity(view.getContext(), 2);
-			}
-		});
+//		Button button2 = (Button) findViewById(R.id.e2eprediction);
+//		button2.setOnClickListener(new View.OnClickListener() {
+//			@Override
+//			public void onClick(View view) {
+//				launchMainProtosoundActivity(view.getContext(), 1);
+//			}
+//		});
+//
+//		Button button3 = (Button) findViewById(R.id.e2etraining);
+//		button3.setOnClickListener(new View.OnClickListener() {
+//			@Override
+//			public void onClick(View view) {
+//				launchMainProtosoundActivity(view.getContext(), 2);
+//			}
+//		});
 
 
 	}

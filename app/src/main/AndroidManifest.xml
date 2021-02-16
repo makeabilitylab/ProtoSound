@@ -20,7 +20,7 @@
 		android:theme="@style/Theme.ProtoSound"
 		android:usesCleartextTraffic="true">
 
-		<activity android:name=".EntraceActivity">
+		<activity android:name=".EntranceActivity">
 			<intent-filter>
 				<action android:name="android.intent.action.MAIN" />
 

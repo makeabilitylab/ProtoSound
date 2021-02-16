@@ -17,7 +17,9 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
-import android.widget.ImageView;
+import android.widget.ProgressBar;
+import android.widget.TableRow;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -51,10 +53,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Timer;
-import java.util.TimerTask;
 
-import static com.github.nkzawa.socketio.client.Socket.EVENT_CONNECT;
 import static com.makeability.protosound.MainActivity.TEST_END_TO_END_TRAINING_LATENCY_MODE;
 
 public class DashboardFragment extends Fragment {
@@ -73,14 +72,34 @@ public class DashboardFragment extends Fragment {
     private boolean isRecording = false;
     private String portNumber;
     private String[] labelList = {"", "", "", "", ""};
+    private int countUserClass = 0;
     SoundRecorder recorder;
-    int[] recordButtonList = {R.id.record_1, R.id.record_2, R.id.record_3, R.id.record_4,
-            R.id.record_5, R.id.record_6, R.id.record_7, R.id.record_8, R.id.record_9,
-            R.id.record_10, R.id.record_11, R.id.record_12, R.id.record_13, R.id.record_14, R.id.record_15, R.id.record_bg};
+    int[] recordButtonList = {R.id.record_1, R.id.record_2, R.id.record_3, R.id.record_4, R.id.record_5,
+                                R.id.record_6, R.id.record_7, R.id.record_8, R.id.record_9, R.id.record_10,
+                                R.id.record_11, R.id.record_12, R.id.record_13, R.id.record_14, R.id.record_15,
+                                R.id.record_16, R.id.record_17, R.id.record_18, R.id.record_19, R.id.record_20,
+                                R.id.record_21, R.id.record_22, R.id.record_23, R.id.record_24, R.id.record_25, R.id.record_bg};
 
     int[] playButtonList = {R.id.play_1, R.id.play_2, R.id.play_3, R.id.play_4, R.id.play_5,
-    R.id.play_6, R.id.play_7, R.id.play_8, R.id.play_9, R.id.play_10, R.id.play_11,
-            R.id.play_12, R.id.play_13, R.id.play_14, R.id.play_15, R.id.play_bg};
+                            R.id.play_6, R.id.play_7, R.id.play_8, R.id.play_9, R.id.play_10,
+                            R.id.play_11, R.id.play_12, R.id.play_13, R.id.play_14, R.id.play_15,
+                            R.id.play_16, R.id.play_17, R.id.play_18, R.id.play_19, R.id.play_20,
+                            R.id.play_21, R.id.play_22, R.id.play_23, R.id.play_24, R.id.play_25, R.id.play_bg};
+
+    int[] rowSelectAList = {R.id.row_1_select_a, R.id.row_2_select_a, R.id.row_3_select_a, R.id.row_4_select_a, R.id.row_5_select_a};
+    int[] rowSelectBList = {R.id.row_1_select_b, R.id.row_2_select_b, R.id.row_3_select_b, R.id.row_4_select_b, R.id.row_5_select_b};
+
+    int[] rowRecordList = {R.id.row_1_record, R.id.row_2_record, R.id.row_3_record, R.id.row_4_record, R.id.row_5_record};
+    int[] rowPlayList = {R.id.row_1_play, R.id.row_2_play, R.id.row_3_play, R.id.row_4_play, R.id.row_5_play};
+
+    int[] selectAButtonList = {R.id.select_1a, R.id.select_2a, R.id.select_3a, R.id.select_4a, R.id.select_5a};
+    int[] selectBButtonList = {R.id.select_1b, R.id.select_2b, R.id.select_3b, R.id.select_4b, R.id.select_5b};
+    int[] selection = {R.id.selection_1, R.id.selection_2, R.id.selection_3, R.id.selection_4, R.id.selection_5};
+    int[] menuList = {R.id.menu_1, R.id.menu_2, R.id.menu_3, R.id.menu_4, R.id.menu_5};
+    int[] classNameList = {R.id.class_1, R.id.class_2, R.id.class_3, R.id.class_4, R.id.class_5};
+
+    boolean[] sampleRecorded = new boolean[26];
+    int[] predefinedSamples = new int[26];
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -103,9 +122,10 @@ public class DashboardFragment extends Fragment {
         TextInputEditText portNumberEditText = (TextInputEditText) root.findViewById(R.id.port_number);
         Button confirmPort = (Button) root.findViewById(R.id.confirm_port);
         setPortNumber(portNumberEditText, confirmPort);
-        for (int rid : recordButtonList) {
-            Button record = root.findViewById(rid);
-            setOnClickRecord(record, rid);
+
+        for (int i = 0; i < recordButtonList.length; i++) {
+            Button record = root.findViewById(recordButtonList[i]);
+            setOnClickRecord(record, recordButtonList[i], i);
         }
 
         for (int pid : playButtonList) {
@@ -114,36 +134,42 @@ public class DashboardFragment extends Fragment {
         }
 
 
-        // setup 2 Spinner drop-down lists for pre-determined sounds
-        AutoCompleteTextView spinner = (AutoCompleteTextView) root.findViewById(R.id.menu);
-        AutoCompleteTextView spinner2 = (AutoCompleteTextView) root.findViewById(R.id.menu2);
         // Create an ArrayAdapter using the string array and a default spinner layout
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(requireActivity(),
                 R.array.sound_array, android.R.layout.simple_spinner_dropdown_item);
-        // Specify the layout to use when the list of choices appears
-//        adapter.setDropDownViewResource(android.R.layout.simple_dropdown_item_1line);
-        // Apply the adapter to the spinner
-        spinner.setAdapter(adapter);
-        spinner2.setAdapter(adapter);
+        // setup Spinner drop-down lists for pre-determined sounds
+        for (int i = 0; i < menuList.length; i++) {
+            AutoCompleteTextView spinner = (AutoCompleteTextView) root.findViewById(menuList[i]);
+            // Specify the layout to use when the list of choices appears
+            // Apply the adapter to the spinner
+            spinner.setAdapter(adapter);
+            // Set Listener for spinner
+            setSelectItemList(spinner, i+1);
+        }
 
-        // Set Listener for spinner
-        setOnItemClickListener(spinner, 4);
-        setOnItemClickListener(spinner2, 5);
         // Setup 3 edit texts for 3 classes
-        TextInputEditText field_1 = (TextInputEditText) root.findViewById(R.id.class_1);
-        TextInputEditText field_2 = (TextInputEditText) root.findViewById(R.id.class_2);
-        TextInputEditText field_3 = (TextInputEditText) root.findViewById(R.id.class_3);
-        setOnClickText(field_1, 1);
-        setOnClickText(field_2, 2);
-        setOnClickText(field_3, 3);
+        for (int i = 0; i < classNameList.length; i++) {
+            TextInputEditText classTextField = (TextInputEditText) root.findViewById(classNameList[i]);
+            setOnClickText(classTextField, i+1);
+        }
 
         // Setup submit button
         Button submit = (Button) root.findViewById(R.id.submit);
-        setOnClickSubmit(submit, R.id.record_1);
+        setOnClickSubmit(submit, R.id.record_1, root);
+
+        // hide all selection UI until user choose an option
+        hideUIOnCreate(root);
+
+        // set Listener for all UI selection
+        for (int i = 0; i < selectAButtonList.length; i++) {
+            Button userChoice = root.findViewById(selectAButtonList[i]);
+            Button preDefined = root.findViewById(selectBButtonList[i]);
+            setUIVisibility(userChoice, preDefined, i);
+        }
 
         // Disable the submit button if the port hasn't been establish
         if (MainActivity.mSocket == null) {
-            submit.setText("Please complete step 1 before submit");
+            submit.setText("Please complete all steps to submit");
         } else {
             submit.setText(R.string.submit_to_server);
         }
@@ -181,6 +207,48 @@ public class DashboardFragment extends Fragment {
         });
     }
 
+    private void hideUIOnCreate(View root) {
+        for (int rowID : rowSelectAList) {
+            TableRow tableRow = root.findViewById(rowID);
+            tableRow.setVisibility(View.GONE);
+        }
+        for (int rowID : rowSelectBList) {
+            TableRow tableRow = root.findViewById(rowID);
+            tableRow.setVisibility(View.GONE);
+        }
+        for (int rowID : rowRecordList) {
+            TableRow tableRow = root.findViewById(rowID);
+            tableRow.setVisibility(View.GONE);
+        }
+        for (int rowID : rowPlayList) {
+            TableRow tableRow = root.findViewById(rowID);
+            tableRow.setVisibility(View.GONE);
+        }
+    }
+
+    private void setUIVisibility(Button userChoice, Button preDefined, int id) {
+        userChoice.setOnClickListener(v -> {
+            TableRow rowRecord = requireActivity().findViewById(rowRecordList[id]);
+            TableRow rowPlay = requireActivity().findViewById(rowPlayList[id]);
+            TableRow rowSelectA = requireActivity().findViewById(rowSelectAList[id]);
+            TableRow rowSelection = requireActivity().findViewById(selection[id]);
+            rowRecord.setVisibility(View.VISIBLE);
+            rowPlay.setVisibility(View.VISIBLE);
+            rowSelectA.setVisibility(View.VISIBLE);
+            rowSelection.setVisibility(View.GONE);
+        });
+        preDefined.setOnClickListener(v -> {
+            TableRow rowSelectB = requireActivity().findViewById(rowSelectBList[id]);
+            TableRow rowSelection = requireActivity().findViewById(selection[id]);
+            rowSelectB.setVisibility(View.VISIBLE);
+            rowSelection.setVisibility(View.GONE);
+            for (int i = id * 5; i < id * 5 + 5; i++) {
+                sampleRecorded[i] = true;
+                predefinedSamples[i] = 1;
+            }
+        });
+    }
+
 
     private void setOnClickText(TextInputEditText field, int id) {
         field.addTextChangedListener(new TextWatcher() {
@@ -214,23 +282,20 @@ public class DashboardFragment extends Fragment {
         });
     }
 
-    private void setOnItemClickListener(final AutoCompleteTextView spinner, int spinner_id) {
-        spinner.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                String selection = (String)parent.getItemAtPosition(position);
-                Log.d(TAG, "spinner " + spinner_id + ": " + selection);
-                labelList[spinner_id - 1] = selection;
-            }
+    private void setSelectItemList(final AutoCompleteTextView spinner, int spinner_id) {
+        spinner.setOnItemClickListener((parent, view, position, id) -> {
+            String selection = (String)parent.getItemAtPosition(position);
+            Log.d(TAG, "spinner " + spinner_id + ": " + selection);
+            labelList[spinner_id-1] = selection;
         });
     }
 
 
-    private void setOnClickRecord(final Button btn, final int id){
+    private void setOnClickRecord(final Button btn, final int id, int order){
 
         btn.setOnClickListener(v -> {
             Log.d(TAG, "record:"+ id + " called");
-            btn.setBackgroundColor(Color.YELLOW);
+            btn.setBackgroundColor(Color.DKGRAY);
             btn.setText(R.string.recording);
             startRecording(id);
             for (int rid : recordButtonList) {
@@ -239,6 +304,7 @@ public class DashboardFragment extends Fragment {
                     record.setEnabled(false);
                 }
             }
+            sampleRecorded[order] = true;
             final Handler handler = new Handler(Looper.getMainLooper());
             handler.postDelayed(() -> {
                 //Do something after 1200ms
@@ -264,7 +330,7 @@ public class DashboardFragment extends Fragment {
     }
 
 
-    private void setOnClickSubmit(final Button btn, final int id){
+    private void setOnClickSubmit(final Button btn, final int id, View root){
 
         btn.setOnClickListener(v -> {
             Log.d(TAG, "Submit to Server");
@@ -275,18 +341,23 @@ public class DashboardFragment extends Fragment {
                 if (MainActivity.mSocket != null) {
                     btn.setText(R.string.submit_to_server);
                 }
-                btn.setBackgroundColor(Color.YELLOW);
+                btn.setBackgroundColor(Color.GRAY);
                 btn.setText(R.string.submitted_to_server);
+                ProgressBar progressBar = root.findViewById(R.id.progressBar);
+                progressBar.setVisibility(View.VISIBLE);
+
                 JSONObject soundPackage = new JSONObject();
 
                 for (int i = 0; i < recordButtonList.length; i++) {
-                    byte[] byteArray = getBytesFromPCM(VOICE_FILE_NAME + recordButtonList[i] + ".pcm");
-                    short[] shortArray = convertByteArrayToShortArray(byteArray);
-                    List<Short> soundBuffer = new ArrayList<>();
-                    for (short num : shortArray) {
-                        soundBuffer.add(num);
+                    if (sampleRecorded[i]) {
+                        byte[] byteArray = getBytesFromPCM(VOICE_FILE_NAME + recordButtonList[i] + ".pcm");
+                        short[] shortArray = convertByteArrayToShortArray(byteArray);
+                        List<Short> soundBuffer = new ArrayList<>();
+                        for (short num : shortArray) {
+                            soundBuffer.add(num);
+                        }
+                        soundPackage.put("data_" + i, new JSONArray(soundBuffer));
                     }
-                    soundPackage.put("data_" + i, new JSONArray(soundBuffer));
                 }
                 List<String> labels = new ArrayList<>(Arrays.asList(labelList));
                 soundPackage.put("label", new JSONArray(labels));
@@ -295,7 +366,10 @@ public class DashboardFragment extends Fragment {
                 if (MainActivity.currentMode == TEST_END_TO_END_TRAINING_LATENCY_MODE) {
                 	// If test end to end training time, need to start recording the time when the submit audio starts
 					soundPackage.put("submitAudioTime", "" + System.currentTimeMillis());
-				}
+				} else {
+                    soundPackage.put("submitAudioTime", 0);
+                }
+                soundPackage.put("predefinedSamples", new JSONArray(predefinedSamples));
 
                 MainActivity.mSocket.emit("submit_data", soundPackage);
             } catch (FileNotFoundException | JSONException e) {
@@ -328,11 +402,18 @@ public class DashboardFragment extends Fragment {
     }
 
     private boolean checkAllFieldsExisted() {
-        for (int rid : recordButtonList) {
-            String filename = VOICE_FILE_NAME + rid + ".pcm";
-            if (!new File(requireActivity().getFilesDir(), filename).exists()) {
-                Log.d(TAG, "File not exist: " + filename);
-                Toast.makeText(requireActivity(), "Missing one or more record samples", Toast.LENGTH_SHORT).show();
+//        for (int rid : recordButtonList) {
+//            String filename = VOICE_FILE_NAME + rid + ".pcm";
+//            if (!new File(requireActivity().getFilesDir(), filename).exists()) {
+//                Log.d(TAG, "File not exist: " + filename);
+//                Toast.makeText(requireActivity(), "Missing one or more record samples", Toast.LENGTH_SHORT).show();
+//                return false;
+//            }
+//        }
+        for (boolean recordedSample : sampleRecorded) {
+            if (!recordedSample) {
+                Log.d(TAG, "record not exist");
+                Toast.makeText(requireActivity(), "Missing one or more recordings", Toast.LENGTH_SHORT).show();
                 return false;
             }
         }

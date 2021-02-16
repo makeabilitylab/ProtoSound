@@ -3,19 +3,24 @@
     <string name="title_home">Predict</string>
     <string name="title_dashboard">Train</string>
     <string name="title_notifications">About</string>
-    <string name="class_1">Class 1</string>
+    <string name="class_1">Sound 1:</string>
+    <string name="class_2">Sound 2:</string>
+    <string name="class_3">Sound 3:</string>
+    <string name="class_4">Sound 4:</string>
+    <string name="class_5">Sound 5:</string>
+    <string name="class_1_predefined">Pre-defined sound 1</string>
+    <string name="class_2_predefined">Pre-defined sound 2</string>
+    <string name="class_3_predefined">Pre-defined sound 3</string>
+    <string name="class_4_predefined">Pre-defined sound 4</string>
+    <string name="class_5_predefined">Pre-defined sound 5</string>
     <string name="protosound">ProtoSound</string>
-    <string name="play">Play</string>
-    <string name="class_2">Class 2</string>
-    <string name="class_3">Class 3</string>
+    <string name="play">Playback</string>
     <string name="record_11">Record 11</string>
     <string name="record_12">Record 12</string>
-    <string name="class_4">Class 4</string>
-    <string name="class_5">Class 5</string>
     <string name="tutorial_0">Step 1: Enter a port number then click CONFIRM:</string>
-    <string name="tutorial_1">Step 2: Pick a name for your class and record 5 samples of each sound class (scroll right to see more)</string>
+    <string name="tutorial_1">Step 2: Select between two training options: \n <b>Your choice:</b> Choose a name for your sound and record 5 samples for each sound (scroll right to see more). \n <b>Pre-defined:</b> Choose an existing sound from a list</string>
     <string name="tutorial_2">Step 3: Choose 2 classes from a list of pre-defined class</string>
-    <string name="tutorial_3">Step 4: Record background noises</string>
+    <string name="tutorial_3">Step 3: Record background noises</string>
     <string name="record_1">Record 1</string>
     <string name="record_2">Record 2</string>
     <string name="record_3">Record 3</string>
@@ -37,9 +42,11 @@
         <item>Placeholder3</item>
     </string-array>
     <string name="hint0"><i>Port number:</i></string>
-    <string name="hint1"><i>Class 1 name:</i></string>
-    <string name="hint2"><i>Class 2 name:</i></string>
-    <string name="hint3"><i>Class 3 name:</i></string>
+    <string name="hint1"><i>Sound 1 name:</i></string>
+    <string name="hint2"><i>Sound 2 name:</i></string>
+    <string name="hint3"><i>Sound 3 name:</i></string>
+    <string name="hint4"><i>Sound 4 name:</i></string>
+    <string name="hint5"><i>Sound 5 name:</i></string>
     <string name="listening">Listening..</string>
     <string name="start_listen">Start Listen</string>
     <string name="confirm">Confirm</string>
@@ -51,5 +58,8 @@
     <string name="done">DONE</string>
     <string name="submitted_to_server">Submitted to server</string>
     <string name="submit_to_server">SUBMIT TO SERVER</string>
+    <string name="user_choice">Your choice</string>
+    <string name="pre_defined">Pre-defined</string>
+    <string name="greeting"><b>Welcome to ProtoSound</b></string>
 
 </resources>

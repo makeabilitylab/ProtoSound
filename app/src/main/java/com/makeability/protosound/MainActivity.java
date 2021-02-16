@@ -25,6 +25,7 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ListAdapter;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.github.nkzawa.emitter.Emitter;
@@ -78,6 +79,7 @@ public class MainActivity extends AppCompatActivity {
 	private String db = "";
 	private Map<String, Long> soundLastTime = new HashMap<>();
 	private List<AudioLabel> timeLine = new ArrayList<>();
+	private List<Boolean> ratedLabels = new ArrayList<>();
 
 	private static final int NORMAL_MODE = 0;
 	public static final int TEST_END_TO_END_PREDICTION_LATENCY_MODE = 1;
@@ -130,19 +132,29 @@ public class MainActivity extends AppCompatActivity {
 			//Handle buttons and add onClickListeners
 			ImageButton trueButton = (ImageButton) view.findViewById(R.id.trueButton);
 			ImageButton falseButton = (ImageButton) view.findViewById(R.id.falseButton);
-
+			if (ratedLabels.get(position)) {
+				Log.i(TAG, "remove position " + position);
+				trueButton.setVisibility(View.GONE);
+				falseButton.setVisibility(View.GONE);
+			}
 			trueButton.setOnClickListener(new View.OnClickListener(){
 				@Override
 				public void onClick(View v) {
-					Log.i(TAG, "Submit true button feedback");
-					reportUserPredictionFeedback(list.get(position).label, false);
+					Log.i(TAG, "Submit true button feedback " + position);
+					reportUserPredictionFeedback(list.get(position).label, true, list.get(position).getTime());
+					trueButton.setVisibility(View.GONE);
+					falseButton.setVisibility(View.GONE);
+					ratedLabels.set(position, true);
 				}
 			});
 			falseButton.setOnClickListener(new View.OnClickListener(){
 				@Override
 				public void onClick(View v) {
-					Log.i(TAG, "Submit false button feedback");
-					reportUserPredictionFeedback(list.get(position).label, true);
+					Log.i(TAG, "Submit false button feedback" + position);
+					reportUserPredictionFeedback(list.get(position).label, false, list.get(position).getTime());
+					trueButton.setVisibility(View.GONE);
+					falseButton.setVisibility(View.GONE);
+					ratedLabels.set(position, true);
 				}
 			});
 
@@ -247,6 +259,7 @@ public class MainActivity extends AppCompatActivity {
 				}
 			}
 			timeLine.add(audioLabel);
+			ratedLabels.add(false);
 			if (timeLine.size() > 500) {
 				timeLine.remove(0);
 			}
@@ -262,7 +275,7 @@ public class MainActivity extends AppCompatActivity {
 	};
 
 	/**
-	 * TODO Khoa: use this function to report checkbox feedback to user
+	 * Use this function to report checkbox feedback to user
 	 * @param predictedLabel
 	 * @param actualUserLabel
 	 */
@@ -271,7 +284,7 @@ public class MainActivity extends AppCompatActivity {
 			JSONObject jsonObject = new JSONObject();
 			jsonObject.put("predictedLabel", predictedLabel);
 			jsonObject.put("actualUserLabel", actualUserLabel);
-			jsonObject.put("isFalsePrediction", !predictedLabel.equalsIgnoreCase(actualUserLabel));
+			jsonObject.put("isTruePrediction", !predictedLabel.equalsIgnoreCase(actualUserLabel));
 			MainActivity.mSocket.emit("audio_prediction_feedback", jsonObject);
 		} catch (JSONException e) {
 			e.printStackTrace();
@@ -280,16 +293,17 @@ public class MainActivity extends AppCompatActivity {
 
 
 	/**
-	 * TODO Khoa: use this function to report checkbox feedback to user
+	 * Use this function to report checkbox feedback to user
 	 * @param predictedLabel
-	 * @param isFalsePrediction
+	 * @param isTruePrediction
 	 */
-	private void reportUserPredictionFeedback(String predictedLabel, boolean isFalsePrediction) {
+	private void reportUserPredictionFeedback(String predictedLabel, boolean isTruePrediction, String time) {
 		try {
 			JSONObject jsonObject = new JSONObject();
 			jsonObject.put("predictedLabel", predictedLabel);
-			jsonObject.put("actualUserLabel", null);
-			jsonObject.put("isFalsePrediction", isFalsePrediction);
+//			jsonObject.put("actualUserLabel", null);
+			jsonObject.put("isTruePrediction", isTruePrediction);
+			jsonObject.put("time", time);
 			MainActivity.mSocket.emit("audio_prediction_feedback", jsonObject);
 		} catch (JSONException e) {
 			e.printStackTrace();
@@ -318,29 +332,29 @@ public class MainActivity extends AppCompatActivity {
 		}
 	}
 
-	private Emitter.Listener onAudioLabelNotificationMessage = new Emitter.Listener() {
-		@Override
-		public void call(final Object... args) {
-			Log.i(TAG, "Received audio label event");
-			JSONObject data = (JSONObject) args[0];
-			String db = "1.0"; // TODO: Hard code this number for now so we don't have to redesign notification
-			String audio_label;
-			String accuracy = "1.0";
-			String record_time = "";
-			try {
-				audio_label = data.getString("label");
-				accuracy = data.getString("confidence");
-				db = data.getString("db");
-			} catch (JSONException e) {
-				return;
-			}
-			Log.i(TAG, "received sound label from Socket server: " + audio_label + ", " + accuracy);
-			AudioLabel audioLabel;
-			audioLabel = new AudioLabel(audio_label, accuracy, null, db,
-					null);
-			createAudioLabelNotification(audioLabel);
-		}
-	};
+//	private Emitter.Listener onAudioLabelNotificationMessage = new Emitter.Listener() {
+//		@Override
+//		public void call(final Object... args) {
+//			Log.i(TAG, "Received audio label event");
+//			JSONObject data = (JSONObject) args[0];
+//			String db = "1.0"; // TODO: Hard code this number for now so we don't have to redesign notification
+//			String audio_label;
+//			String accuracy = "1.0";
+//			String record_time = "";
+//			try {
+//				audio_label = data.getString("label");
+//				accuracy = data.getString("confidence");
+//				db = data.getString("db");
+//			} catch (JSONException e) {
+//				return;
+//			}
+//			Log.i(TAG, "received sound label from Socket server: " + audio_label + ", " + accuracy);
+//			AudioLabel audioLabel;
+//			audioLabel = new AudioLabel(audio_label, accuracy, null, db,
+//					null);
+//			createAudioLabelNotification(audioLabel);
+//		}
+//	};
 
 	public void initSocket(String port) {
 		mSocket.connect();
@@ -350,20 +364,18 @@ public class MainActivity extends AppCompatActivity {
 		mSocket.on("audio_data_s2c", onAudioLabelUIViewMessage);
 		mSocket.on("training_complete", onTrainingCompleteMessage);
 
-		mSocket.once(EVENT_CONNECT, new Emitter.Listener() {
-			@Override
-			public void call(Object... args) {
-				new Handler(Looper.getMainLooper()).post(() -> {
-					// Update UI here
-					Log.i(TAG, "call: " + args);
-					Log.d(TAG, "call: " + mSocket.connected());
-					Button confirmPort = (Button) findViewById(R.id.confirm_port);
-					confirmPort.setBackgroundColor(Color.GREEN);
-					TextView tick = (TextView) findViewById(R.id.tick);
-					tick.setText(R.string.port_connected);
-					Button submit = (Button) findViewById(R.id.submit);
-					submit.setText(R.string.submit_to_server);
-				});
+		mSocket.once(EVENT_CONNECT, (Emitter.Listener) args -> {
+			new Handler(Looper.getMainLooper()).post(() -> {
+				// Update UI here
+				Log.i(TAG, "call: " + args);
+				Log.d(TAG, "call: " + mSocket.connected());
+				Button confirmPort = (Button) findViewById(R.id.confirm_port);
+				confirmPort.setBackgroundColor(Color.GREEN);
+				TextView tick = (TextView) findViewById(R.id.tick);
+				tick.setText(R.string.port_connected);
+				Button submit = (Button) findViewById(R.id.submit);
+				submit.setText(R.string.submit_to_server);
+			});
 
 //				JSONObject data = (JSONObject) args[0];
 //				String userPrototypeAvailable;
@@ -378,7 +390,6 @@ public class MainActivity extends AppCompatActivity {
 //					return;
 //				}
 
-			}
 		});
 		Log.d(TAG, "connected: " + mSocket.connected());
 	}
@@ -405,8 +416,13 @@ public class MainActivity extends AppCompatActivity {
 			}
 		}
 		Button submitButton = (Button) findViewById(R.id.submit);
+		ProgressBar progressBar = findViewById(R.id.progressBar);
 		submitButton.setBackgroundColor(Color.GREEN);
 		submitButton.setText(R.string.training_complete);
+		new Handler(Looper.getMainLooper()).post(() -> {
+			progressBar.setVisibility(View.GONE);
+		});
+
 	};
 
 	private void checkNetworkConnection() {
@@ -443,69 +459,68 @@ public class MainActivity extends AppCompatActivity {
 		}
 	}
 
-	/**
-	 *
-	 * @param audioLabel
-	 */
-	public void createAudioLabelNotification(AudioLabel audioLabel) {
-		// Unique notification for each kind of sound
-		// TODO: supposed to have a unique id based on the label returned, but don't know what is the format yet, hard code as a constant for now
-		final int NOTIFICATION_ID = getIntegerValueOfSound(audioLabel.label);
-
-		// Disable same sound for 5 seconds
-		if (soundLastTime.containsKey(audioLabel.label)) {
-			if (System.currentTimeMillis() <= (soundLastTime.get(audioLabel.label) + 5 * 1000)) { //multiply by 1000 to get milliseconds
-				Log.i(TAG, "Same sound appear in less than 5 seconds");
-				return; // stop sending noti if less than 10 second
-			}
-		}
-		soundLastTime.put(audioLabel.label, System.currentTimeMillis());
-
-		Log.d(TAG, "generateBigTextStyleNotification()");
-		if (!notificationChannelIsCreated) {
-			createNotificationChannel();
-			notificationChannelIsCreated = true;
-		}
-		int loudness = (int) Double.parseDouble(audioLabel.db);
-
-		db = Integer.toString(loudness);
-		//Log.i(TAG, "level" + audioLabel.db + " " + db);
-
-		if(loudness > 70)
-			db = "Loud, " + db;
-		else if(loudness > 60)
-			db = "Med, " + db;
-		else
-			db = "Soft, " + db;
-
-
-		Intent intent = new Intent(this, MainActivity.class);       //Just go the MainActivity for now. Replace with other activity if you want more actions.
-		String[] dataPassed = {audioLabel.label, Double.toString(audioLabel.confidence), audioLabel.time, audioLabel.db};         //Adding data to be passed back to the main activity
-		intent.putExtra("audio_label", dataPassed);
-		intent.setAction(Long.toString(System.currentTimeMillis()));
-		intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-		int uniqueInt = (int) (System.currentTimeMillis() & 0xfffffff);
-		PendingIntent pendingIntent = PendingIntent.getActivity(this, uniqueInt, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-
-		NotificationCompat.Builder notificationCompatBuilder = new NotificationCompat.Builder(getApplicationContext(), PREDICTION_CHANNEL_ID)
-				.setSmallIcon(R.drawable.circle_white)
-				.setContentTitle(audioLabel.label)
-				.setContentText("(" + db + " dB)")
-				.setPriority(NotificationCompat.PRIORITY_MAX)
-				.setCategory(NotificationCompat.CATEGORY_ALARM)
-				.setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-				.setStyle(new NotificationCompat.BigTextStyle()
-						.bigText("")
-						.setSummaryText(""))
-				.setAutoCancel(true) //Remove notification from the list after the user has tapped it
-				.setContentIntent(pendingIntent);
-
-		//NOTIFICATION ID depends on the sound and the location so a particular sound in a particular location is only notified once until dismissed
-		Log.d(TAG, "Notification Id: " + NOTIFICATION_ID);
-		NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
-		notificationManager.notify(NOTIFICATION_ID, notificationCompatBuilder.build());
-
-	}
+//	/**
+//	 *
+//	 * @param audioLabel
+//	 */
+//	public void createAudioLabelNotification(AudioLabel audioLabel) {
+//		// Unique notification for each kind of sound
+//		final int NOTIFICATION_ID = getIntegerValueOfSound(audioLabel.label);
+//
+//		// Disable same sound for 5 seconds
+//		if (soundLastTime.containsKey(audioLabel.label)) {
+//			if (System.currentTimeMillis() <= (soundLastTime.get(audioLabel.label) + 5 * 1000)) { //multiply by 1000 to get milliseconds
+//				Log.i(TAG, "Same sound appear in less than 5 seconds");
+//				return; // stop sending noti if less than 10 second
+//			}
+//		}
+//		soundLastTime.put(audioLabel.label, System.currentTimeMillis());
+//
+//		Log.d(TAG, "generateBigTextStyleNotification()");
+//		if (!notificationChannelIsCreated) {
+//			createNotificationChannel();
+//			notificationChannelIsCreated = true;
+//		}
+//		int loudness = (int) Double.parseDouble(audioLabel.db);
+//
+//		db = Integer.toString(loudness);
+//		//Log.i(TAG, "level" + audioLabel.db + " " + db);
+//
+//		if(loudness > 70)
+//			db = "Loud, " + db;
+//		else if(loudness > 60)
+//			db = "Med, " + db;
+//		else
+//			db = "Soft, " + db;
+//
+//
+//		Intent intent = new Intent(this, MainActivity.class);       //Just go the MainActivity for now. Replace with other activity if you want more actions.
+//		String[] dataPassed = {audioLabel.label, Double.toString(audioLabel.confidence), audioLabel.time, audioLabel.db};         //Adding data to be passed back to the main activity
+//		intent.putExtra("audio_label", dataPassed);
+//		intent.setAction(Long.toString(System.currentTimeMillis()));
+//		intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+//		int uniqueInt = (int) (System.currentTimeMillis() & 0xfffffff);
+//		PendingIntent pendingIntent = PendingIntent.getActivity(this, uniqueInt, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+//
+//		NotificationCompat.Builder notificationCompatBuilder = new NotificationCompat.Builder(getApplicationContext(), PREDICTION_CHANNEL_ID)
+//				.setSmallIcon(R.drawable.circle_white)
+//				.setContentTitle(audioLabel.label)
+//				.setContentText("(" + db + " dB)")
+//				.setPriority(NotificationCompat.PRIORITY_MAX)
+//				.setCategory(NotificationCompat.CATEGORY_ALARM)
+//				.setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+//				.setStyle(new NotificationCompat.BigTextStyle()
+//						.bigText("")
+//						.setSummaryText(""))
+//				.setAutoCancel(true) //Remove notification from the list after the user has tapped it
+//				.setContentIntent(pendingIntent);
+//
+//		//NOTIFICATION ID depends on the sound and the location so a particular sound in a particular location is only notified once until dismissed
+//		Log.d(TAG, "Notification Id: " + NOTIFICATION_ID);
+//		NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
+//		notificationManager.notify(NOTIFICATION_ID, notificationCompatBuilder.build());
+//
+//	}
 
 	public static int getIntegerValueOfSound(String sound){
 		int i = 0;
