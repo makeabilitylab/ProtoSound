@@ -151,7 +151,7 @@ public class StreamingSoundRecorder {
 				mAudioRecord.startRecording();
 				while (!isCancelled()) {
 					int read = mAudioRecord.read(buffer, 0, buffer.length);
-					Log.d(TAG, "doInBackground: " + read);
+//					Log.d(TAG, "doInBackground: " + read);
 					short[] shorts = convertByteArrayToShortArray(buffer);
 					// buffer sounds up to 1 sec
 					if (soundRecorder.soundBuffer.size() <= 44100) {

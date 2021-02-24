@@ -272,7 +272,7 @@ public class SoundRecorder {
 
             SoundRecorder soundRecorder = mSoundRecorderWeakReference.get();
 
-            mAudioRecord = new AudioRecord(MediaRecorder.AudioSource.MIC,
+            mAudioRecord = new AudioRecord(MediaRecorder.AudioSource.UNPROCESSED,
                     RECORDING_RATE, CHANNEL_IN, FORMAT, BUFFER_SIZE * 3);
 
 

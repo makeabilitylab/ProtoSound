@@ -21,6 +21,8 @@
         android:id="@+id/scrollView2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:paddingStart="@dimen/_5sdp"
+        android:paddingEnd="@dimen/_5sdp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -39,7 +41,7 @@
                 android:layout_height="match_parent"
                 android:breakStrategy="high_quality"
                 android:text="@string/tutorial_0"
-                android:textSize="@dimen/_15ssp" />
+                android:textSize="@dimen/_17ssp" />
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -82,9 +84,45 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:breakStrategy="high_quality"
+                android:paddingTop="@dimen/_10ssp"
                 android:text="@string/tutorial_1"
-                android:textSize="@dimen/_15ssp"
+                android:textSize="@dimen/_17ssp" />
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/hint0b"
+                app:endIconMode="clear_text">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/testing_location"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:imeOptions="actionDone"
+                    android:inputType="textAutoCorrect"
+                    android:singleLine="true"/>
+
+            </com.google.android.material.textfield.TextInputLayout>
+            <Button
+                android:id="@+id/confirm_location"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/send"/>
+            <TextView
+                android:id="@+id/tutorial_2a"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:breakStrategy="high_quality"
+                android:text="@string/tutorial_2a"
+                android:textSize="@dimen/_17ssp"
                 android:paddingTop="@dimen/_15sdp"/>
+            <TextView
+                android:id="@+id/tutorial_2b"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:breakStrategy="high_quality"
+                android:text="@string/tutorial_2b"
+                android:paddingStart="@dimen/_5sdp"
+                android:textSize="@dimen/_15ssp" />
 
             <HorizontalScrollView
                 android:id="@+id/horizontalScrollView"
@@ -97,18 +135,17 @@
                 <TableLayout
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent">
-
+                    <TextView
+                        android:id="@+id/selection_title_1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="@dimen/_15ssp"
+                        android:text="@string/class_1"
+                        android:paddingTop="@dimen/_15sdp"/>
                     <TableRow
                         android:id="@+id/selection_1"
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:paddingTop="@dimen/_15sdp">
-                        <TextView
-                            android:id="@+id/selection_title_1"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:textSize="@dimen/_15ssp"
-                            android:text="@string/class_1"/>
+                        android:layout_height="match_parent">
 
                         <Button
                             android:id="@+id/select_1a"
@@ -264,17 +301,19 @@
                             android:text="@string/play" />
 
                     </TableRow>
+                    <TextView
+                        android:id="@+id/selection_title_2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="@dimen/_15ssp"
+                        android:text="@string/class_2"
+                        android:paddingTop="@dimen/_15sdp"/>
                     <TableRow
                         android:id="@+id/selection_2"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:paddingTop="@dimen/_15sdp">
-                        <TextView
-                            android:id="@+id/selection_title_2"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:textSize="@dimen/_15ssp"
-                            android:text="@string/class_2"/>
+                        >
+
                         <Button
                             android:id="@+id/select_2a"
                             android:layout_width="wrap_content"
@@ -425,17 +464,19 @@
                             android:text="@string/play" />
 
                     </TableRow>
+                    <TextView
+                        android:id="@+id/selection_title_3"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="@dimen/_15ssp"
+                        android:text="@string/class_3"
+                        android:paddingTop="@dimen/_15sdp"/>
                     <TableRow
                         android:id="@+id/selection_3"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:paddingTop="@dimen/_15sdp">
-                        <TextView
-                            android:id="@+id/selection_title_3"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:textSize="@dimen/_15ssp"
-                            android:text="@string/class_3"/>
+                        >
+
                         <Button
                             android:id="@+id/select_3a"
                             android:layout_width="wrap_content"
@@ -586,18 +627,19 @@
                             android:text="@string/play" />
 
                     </TableRow>
-
+                    <TextView
+                        android:id="@+id/selection_title_4"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="@dimen/_15ssp"
+                        android:text="@string/class_4"
+                        android:paddingTop="@dimen/_15sdp"/>
                     <TableRow
                         android:id="@+id/selection_4"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:paddingTop="@dimen/_15sdp">
-                        <TextView
-                            android:id="@+id/selection_title_4"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:textSize="@dimen/_15ssp"
-                            android:text="@string/class_4"/>
+                        >
+
                         <Button
                             android:id="@+id/select_4a"
                             android:layout_width="wrap_content"
@@ -748,18 +790,19 @@
                             android:text="@string/play" />
 
                     </TableRow>
-
+                    <TextView
+                        android:id="@+id/selection_title_5"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="@dimen/_15ssp"
+                        android:text="@string/class_5"
+                        android:paddingTop="@dimen/_15sdp"/>
                     <TableRow
                         android:id="@+id/selection_5"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:paddingTop="@dimen/_15sdp">
-                        <TextView
-                            android:id="@+id/selection_title_5"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:textSize="@dimen/_15ssp"
-                            android:text="@string/class_5"/>
+                        >
+
                         <Button
                             android:id="@+id/select_5a"
                             android:layout_width="wrap_content"
@@ -922,7 +965,7 @@
                 android:paddingTop="@dimen/_15sdp"
                 android:paddingBottom="@dimen/_15sdp"
                 android:text="@string/tutorial_3"
-                android:textSize="@dimen/_15ssp" />
+                android:textSize="@dimen/_17ssp" />
 
             <Button
                 android:id="@+id/record_bg"

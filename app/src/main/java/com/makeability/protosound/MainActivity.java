@@ -1,10 +1,12 @@
 package com.makeability.protosound;
 
+import android.app.AlertDialog;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.net.ConnectivityManager;
@@ -15,7 +17,9 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -23,20 +27,26 @@ import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.ListAdapter;
 import android.widget.ListView;
+import android.widget.PopupWindow;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.github.nkzawa.emitter.Emitter;
 import com.github.nkzawa.socketio.client.Socket;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.kuassivi.component.RipplePulseRelativeLayout;
 import com.makeability.protosound.ui.home.models.AudioLabel;
+import com.makeability.protosound.ui.home.service.ForegroundService;
 
 import androidx.annotation.LongDef;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
+import androidx.core.content.ContextCompat;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
@@ -77,9 +87,12 @@ public class MainActivity extends AppCompatActivity {
 	private static final String TAG = "MainActivity";
 	public static boolean notificationChannelIsCreated = false;
 	private String db = "";
+	public static int evalCount = 0;
+	private static final int DELAY_IN_SECOND = 4;
+	private static final int TOTAL_EVAL_PER_TESTER = 100;
 	private Map<String, Long> soundLastTime = new HashMap<>();
 	private List<AudioLabel> timeLine = new ArrayList<>();
-	private List<Boolean> ratedLabels = new ArrayList<>();
+	private List<Integer> ratedLabels = new ArrayList<>();
 
 	private static final int NORMAL_MODE = 0;
 	public static final int TEST_END_TO_END_PREDICTION_LATENCY_MODE = 1;
@@ -127,49 +140,96 @@ public class MainActivity extends AppCompatActivity {
 
 			//Handle TextView and display string from your list
 			TextView listItemText = (TextView)view.findViewById(R.id.soundLabel);
+			Log.d(TAG, "getView: evalCount" + evalCount);
+			if (evalCount == TOTAL_EVAL_PER_TESTER) {
+				setAlert(evalCount);
+				evalCount = 0;
+			}
 			listItemText.setText(list.get(position).getTimeAndLabel());
 
 			//Handle buttons and add onClickListeners
 			ImageButton trueButton = (ImageButton) view.findViewById(R.id.trueButton);
 			ImageButton falseButton = (ImageButton) view.findViewById(R.id.falseButton);
-			if (ratedLabels.get(position)) {
-				Log.i(TAG, "remove position " + position);
+			// weird bugs with position, this is a temporary fix
+			if (position < this.getCount() - 1) {
+				if (ratedLabels.get(position) == 1) {
+					Log.i(TAG, "remove position " + position);
+					trueButton.setEnabled(false);
+					falseButton.setEnabled(false);
+					falseButton.setVisibility(View.INVISIBLE);
+				} else if (ratedLabels.get(position) == -1) {
+					Log.i(TAG, "remove position " + position);
+					falseButton.setEnabled(false);
+					trueButton.setEnabled(false);
+					trueButton.setVisibility(View.INVISIBLE);
+				}
+			}
+			// unless this is called specifically, the last position always show incorrect UI
+			if (position == this.getCount() - 1) {
+				listItemText.setVisibility(View.GONE);
 				trueButton.setVisibility(View.GONE);
 				falseButton.setVisibility(View.GONE);
 			}
-			trueButton.setOnClickListener(new View.OnClickListener(){
-				@Override
-				public void onClick(View v) {
-					Log.i(TAG, "Submit true button feedback " + position);
-					reportUserPredictionFeedback(list.get(position).label, true, list.get(position).getTime());
-					trueButton.setVisibility(View.GONE);
-					falseButton.setVisibility(View.GONE);
-					ratedLabels.set(position, true);
-				}
+			trueButton.setOnClickListener(v -> {
+				Log.i(TAG, "Submit true button feedback " + position);
+				reportUserPredictionFeedback(list.get(position).label, true, list.get(position).getTime());
+				trueButton.setEnabled(false);
+				falseButton.setEnabled(false);
+				falseButton.setVisibility(View.INVISIBLE);
+				ratedLabels.set(position, 1);
+				evalCount++;
 			});
-			falseButton.setOnClickListener(new View.OnClickListener(){
-				@Override
-				public void onClick(View v) {
-					Log.i(TAG, "Submit false button feedback" + position);
-					reportUserPredictionFeedback(list.get(position).label, false, list.get(position).getTime());
-					trueButton.setVisibility(View.GONE);
-					falseButton.setVisibility(View.GONE);
-					ratedLabels.set(position, true);
-				}
+			falseButton.setOnClickListener(v -> {
+				Log.i(TAG, "Submit false button feedback" + position);
+				reportUserPredictionFeedback(list.get(position).label, false, list.get(position).getTime());
+				trueButton.setVisibility(View.INVISIBLE);
+				trueButton.setEnabled(false);
+				falseButton.setEnabled(false);
+				ratedLabels.set(position, -1);
+				evalCount++;
 			});
 
 			return view;
 		}
 	}
-//	{
-//		try {
-//			mSocket = IO.socket(TEST_SERVER);
-//			Log.i(TAG, "Does this thing really run?");
-//		} catch (URISyntaxException e) {
-//			Log.e(TAG, "Failed to init Socket");
-//			e.printStackTrace();
-//		}
-//	}
+
+	public void setAlert(int evalCount) {
+		// inflate the layout of the popup window
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+		//Set title for AlertDialog
+		builder.setTitle("Evaluations completed");
+
+		//Set body message of Dialog
+		builder.setMessage("You have completed " + evalCount + " evaluations. Do you wish to continue testing?");
+
+		//// Is dismiss when touching outside?
+		builder.setCancelable(true);
+
+		//Positive Button and it onClicked event listener
+		builder.setPositiveButton("Yes",
+				new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int id) {
+						Toast.makeText(MainActivity.this, "Thank you for your time!", Toast.LENGTH_SHORT).show();
+					}
+				});
+
+		//Negative Button
+		builder.setNegativeButton("No",
+				new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int id) {
+						stopRecording(MainActivity.this);
+						ImageButton listeningBtn = (ImageButton) findViewById(R.id.mic);
+						RipplePulseRelativeLayout pulseLayout = findViewById(R.id.pulseLayout);
+						TextView soundTextView = findViewById(R.id.description);
+						switchToStopRecord(listeningBtn, pulseLayout, soundTextView);
+						Toast.makeText(MainActivity.this, "Thank you for your input!", Toast.LENGTH_SHORT).show();
+					}
+				});
+
+		AlertDialog dialog = builder.create();
+		dialog.show();
+	}
 
 	// Finish current activity when back button is pressed
 	@Override
@@ -206,7 +266,7 @@ public class MainActivity extends AppCompatActivity {
 		// Passing each menu ID as a set of Ids because each
 		// menu should be considered as top level destinations.
 		AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
-				R.id.navigation_home, R.id.navigation_dashboard, R.id.navigation_notifications)
+				R.id.navigation_home, R.id.navigation_dashboard)
 				.build();
 		NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
 		NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
@@ -253,23 +313,23 @@ public class MainActivity extends AppCompatActivity {
 			AudioLabel audioLabel = new AudioLabel(audio_label, accuracy, time, db,
 					null);;
 			if (soundLastTime.containsKey(audioLabel.label)) {
-				if (System.currentTimeMillis() <= (soundLastTime.get(audioLabel.label) + 5 * 1000)) { //multiply by 1000 to get milliseconds
+				if (System.currentTimeMillis() <= (soundLastTime.get(audioLabel.label) + DELAY_IN_SECOND * 1000)) { //multiply by 1000 to get milliseconds
 					Log.i(TAG, "Same sound appear in less than 5 seconds");
 					return; // stop sending noti if less than 10 second
 				}
 			}
 			timeLine.add(audioLabel);
-			ratedLabels.add(false);
+			ratedLabels.add(0);
 			if (timeLine.size() > 500) {
 				timeLine.remove(0);
 			}
 			soundLastTime.put(audioLabel.label, System.currentTimeMillis());
-			ListView listView = (ListView) findViewById(R.id.listView);
+			ListView listView = findViewById(R.id.listView);
 			new Handler(Looper.getMainLooper()).post(() -> {
 				TimelineAdapter adapter = new TimelineAdapter(timeLine, getApplicationContext());
 				listView.setAdapter(adapter);
-				listView.setSelection(adapter.getCount() - 1);
-				adapter.notifyDataSetChanged();
+//				listView.setSelection(adapter.getCount() - 1);
+//				adapter.notifyDataSetChanged();
 			});
 		}
 	};
@@ -364,17 +424,27 @@ public class MainActivity extends AppCompatActivity {
 		mSocket.on("audio_data_s2c", onAudioLabelUIViewMessage);
 		mSocket.on("training_complete", onTrainingCompleteMessage);
 
+		mSocket.on("receive_location", onReceiveLocation);
+
 		mSocket.once(EVENT_CONNECT, (Emitter.Listener) args -> {
 			new Handler(Looper.getMainLooper()).post(() -> {
 				// Update UI here
 				Log.i(TAG, "call: " + args);
 				Log.d(TAG, "call: " + mSocket.connected());
 				Button confirmPort = (Button) findViewById(R.id.confirm_port);
+				new Handler(Looper.getMainLooper()).post(() -> {
+					confirmPort.setBackgroundColor(Color.GREEN);
+					confirmPort.setText("CONFIRMED");
+				});
 				confirmPort.setBackgroundColor(Color.GREEN);
 				TextView tick = (TextView) findViewById(R.id.tick);
-				tick.setText(R.string.port_connected);
+				tick.setText( R.string.port_connected);
 				Button submit = (Button) findViewById(R.id.submit);
+				submit.setEnabled(true);
+				submit.setBackgroundColor(Color.parseColor("#FF4972"));
 				submit.setText(R.string.submit_to_server);
+				ProgressBar progressBar = findViewById(R.id.progressBar);
+				progressBar.setVisibility(View.GONE);
 			});
 
 //				JSONObject data = (JSONObject) args[0];
@@ -398,6 +468,16 @@ public class MainActivity extends AppCompatActivity {
 	private Emitter.Listener onTestMessage = args -> {
 		System.out.println(args[0]);
 		Log.i(TAG, "Received socket event");
+	};
+
+	private Emitter.Listener onReceiveLocation = args -> {
+		Log.i(TAG, "Received location event");
+		Button confirmLocation = (Button) findViewById(R.id.confirm_location);
+
+		new Handler(Looper.getMainLooper()).post(() -> {
+			confirmLocation.setBackgroundColor(Color.GREEN);
+			confirmLocation.setText("Sent");
+		});
 	};
 
 	private Emitter.Listener onTrainingCompleteMessage = args -> {
@@ -521,6 +601,23 @@ public class MainActivity extends AppCompatActivity {
 //		notificationManager.notify(NOTIFICATION_ID, notificationCompatBuilder.build());
 //
 //	}
+
+	private void startRecording(final Context main) {
+		Intent serviceIntent = new Intent(main, ForegroundService.class);
+		ContextCompat.startForegroundService(main, serviceIntent);
+	}
+
+	public void stopRecording(final Context main) {
+		Intent serviceIntent = new Intent(main, ForegroundService.class);
+		main.stopService(serviceIntent);
+	}
+
+	private void switchToStopRecord(ImageButton listeningBtn, RipplePulseRelativeLayout pulseLayout, TextView soundTextView) {
+		listeningBtn.setBackground(getResources().getDrawable(R.drawable.rounded_background_blue, null));
+		listeningBtn.setImageResource(R.drawable.ic_mic_24);
+		soundTextView.setText(R.string.tap_blue);
+		pulseLayout.stopPulse();
+	}
 
 	public static int getIntegerValueOfSound(String sound){
 		int i = 0;

@@ -71,6 +71,7 @@ public class DashboardFragment extends Fragment {
     private Thread recordingThread = null;
     private boolean isRecording = false;
     private String portNumber;
+    private String testingLocation = "";
     private String[] labelList = {"", "", "", "", ""};
     private int countUserClass = 0;
     SoundRecorder recorder;
@@ -122,6 +123,9 @@ public class DashboardFragment extends Fragment {
         TextInputEditText portNumberEditText = (TextInputEditText) root.findViewById(R.id.port_number);
         Button confirmPort = (Button) root.findViewById(R.id.confirm_port);
         setPortNumber(portNumberEditText, confirmPort);
+        TextInputEditText locationEditText = (TextInputEditText) root.findViewById(R.id.testing_location);
+        Button confirmLocation = root.findViewById(R.id.confirm_location);
+        setLocation(locationEditText, confirmLocation);
 
         for (int i = 0; i < recordButtonList.length; i++) {
             Button record = root.findViewById(recordButtonList[i]);
@@ -169,11 +173,49 @@ public class DashboardFragment extends Fragment {
 
         // Disable the submit button if the port hasn't been establish
         if (MainActivity.mSocket == null) {
+            submit.setEnabled(false);
             submit.setText("Please complete all steps to submit");
         } else {
             submit.setText(R.string.submit_to_server);
         }
         return root;
+    }
+
+    private void setLocation(TextInputEditText locationEditText, Button confirmLocation) {
+        locationEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                testingLocation = s.toString();
+            }
+        });
+
+        confirmLocation.setOnClickListener(v -> {
+            JSONObject locationPackage = new JSONObject();
+            try {
+                locationPackage.put("location", testingLocation);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            if (MainActivity.mSocket == null) {
+                Toast.makeText(getContext(), "Please connect to a port from step 1", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            if (testingLocation.isEmpty()) {
+                locationEditText.setError("Please enter your testing location");
+            } else {
+                MainActivity.mSocket.emit("submit_location", locationPackage);
+            }
+        });
     }
 
     private void setPortNumber(TextInputEditText portNumberEditText, Button confirmPort) {
@@ -240,6 +282,8 @@ public class DashboardFragment extends Fragment {
         preDefined.setOnClickListener(v -> {
             TableRow rowSelectB = requireActivity().findViewById(rowSelectBList[id]);
             TableRow rowSelection = requireActivity().findViewById(selection[id]);
+            TableRow rowPlay = requireActivity().findViewById(rowPlayList[4]);
+            rowPlay.setVisibility(View.INVISIBLE);
             rowSelectB.setVisibility(View.VISIBLE);
             rowSelection.setVisibility(View.GONE);
             for (int i = id * 5; i < id * 5 + 5; i++) {
@@ -340,6 +384,8 @@ public class DashboardFragment extends Fragment {
                 }
                 if (MainActivity.mSocket != null) {
                     btn.setText(R.string.submit_to_server);
+                } else {
+                    return;
                 }
                 btn.setBackgroundColor(Color.GRAY);
                 btn.setText(R.string.submitted_to_server);
