@@ -4,7 +4,7 @@
 # Load the necessary python libraries
 import random
 from threading import Lock
-from shutil import copy
+from shutil import copy, rmtree
 import numpy as np
 import librosa
 import os
@@ -121,6 +121,7 @@ def generate_csv(data_path_directory, labels, output_path_directory):
     name = []
     fold = []
     category = []
+    USE_USER_DATA = False
     for ea_dir in labels:
         csv_index = 1
         path = os.path.join(data_path_directory, ea_dir)
@@ -128,7 +129,13 @@ def generate_csv(data_path_directory, labels, output_path_directory):
         random.shuffle(file_list, seed)
         for file_name in file_list:
             try:
+                # if user train an existing label, then use their data instead
+                if len(file_list) != 5:
+                    print('USE_USER_DATA')
+                    USE_USER_DATA = True
                 if file_name.endswith('.wav'):
+                    if USE_USER_DATA and 'user' not in file_name:
+                        continue
                     file_path = os.path.join(path, file_name)
                     if not os.path.exists(output_path_directory):
                         os.makedirs(output_path_directory)
@@ -143,6 +150,7 @@ def generate_csv(data_path_directory, labels, output_path_directory):
                     copy(file_path, output_path_directory)
             except:
                 open("exceptions.txt", "a").write("Exception raised for: %s\n" % file_name)
+        USE_USER_DATA = False
     dict = {'filename': name, 'fold': fold, 'category': category}
     df = pd.DataFrame(dict)
     df.to_csv(output_path_directory + '/user_data.csv')
@@ -156,19 +164,27 @@ def submit_data(json_data):
     start_time = time.time()
     print("submit_data->receive request")
     labels = json_data['label']
-    submitAudioTime = str(json_data['submitAudioTime'])
+    # submitAudioTime = str(json_data['submitAudioTime'])
     labels = [element.lower().replace(" ", "_") for element in labels]
-    background_noise = np.asarray(json_data['data_15'], dtype=np.int16) / 32768.0
-    background_noise = background_noise[:44100]
-    for i in range(0, 15):
+    background_noise = np.asarray(json_data['data_25'], dtype=np.int16) / 32768.0
+    print(labels)
+    background_noise = background_noise[700:]
+
+    predefine_sample = json_data['predefinedSamples']
+    print(predefine_sample)
+    for i in range(0, 25):
+        predefine_sample = np.asarray(predefine_sample, dtype=np.int16)
+        if predefine_sample[i] == 1:
+            continue
         # generate new directory for new data, store it into "library" for future usage
         label = labels[i // 5]
         current_dir = os.path.join(LIBRARY_DATA_PATH, label)
         if not os.path.exists(current_dir):
             os.makedirs(current_dir)
-        data = json_data['data_' + str(i)]
+        data = json_data['data_' + str(i)]  
         np_data = np.asarray(data, dtype=np.int16) / 32768.0
-        np_data = np_data[:44100]
+        print(len(np_data))
+        np_data = np_data[700:]
         output = add_background_noise(np_data, background_noise, 0.25)
 
         filename = os.path.join(current_dir, label + "_user_" + str(i % 5) + '.wav')
@@ -192,32 +208,41 @@ def submit_data(json_data):
     global classes_prototypes
     classes_prototypes = personalize_model(protosound_model, batch, WAYS, SHOTS, device=device)
     print("training complete")
-    if (SHOULD_RECORD_TRAINING_TIME):
+    if (SHOULD_RECORD_TRAINING_TIME):                                                                           
         elapsed_time = time.time() - start_time
         # Write prediction time to file
         with open(TRAINING_TIME_FILE, 'a') as file:
             file.write(str(elapsed_time) + '\n')
-    socketio.emit('training_complete', { 'submitAudioTime': submitAudioTime })
+    # socketio.emit('training_complete', { 'submitAudioTime': submitAudioTime })
+    socketio.emit('training_complete')
 
+
+@socketio.on('submit_location')
+def submit_location(json_data):
+    print('receive location:', str(json_data['location']))
+    location = str(json_data['location'])
+    with open(USER_FEEDBACK_FILE, 'a') as file:
+        file.write(location + '\n')
+    socketio.emit('receive_location')
 
 @socketio.on('audio_prediction_feedback')
 def audio_prediction_feedback(json_data):
     predictedLabel = str(json_data['predictedLabel'])
-    actualUserLabel = str(json_data['actualUserLabel'])
-    isFalsePrediction = str(json_data['isFalsePrediction'])
+    # actualUserLabel = str(json_data['actualUserLabel'])
+    isTruePrediction = str(json_data['isTruePrediction'])
+    time = str(json_data['time'])
     # Write user feedback to a file
     with open(USER_FEEDBACK_FILE, 'a') as file:
-        file.write(predictedLabel + ',' + actualUserLabel + ',' + isFalsePrediction + '\n')
-
+        file.write(time + ',' + predictedLabel + ','  + isTruePrediction + '\n')
 
 
 @socketio.on('audio_data_c2s')
 def handle_source(json_data):
     data = np.asarray(json_data['data'], dtype=np.int16) / 32768.0
     db = json_data['db']
-    db = str(round(db, 2))
+    db = str(round(db))
 
-    recordTime = str(json_data['record_time'])
+    # recordTime = str(json_data['record_time'])
     print("db:", db)
     data = data[:44100]
     PREDICTION_QUERY_FILE_NAME = 'query'
@@ -251,7 +276,7 @@ def handle_source(json_data):
         'label': output[0],
         'confidence': str(confidence[0]),
         'db': db,
-        'recordTime': recordTime # pass the record time back if exist
+        # 'recordTime': recordTime # pass the record time back if exist
         })
 
 
