@@ -97,7 +97,9 @@ public class MainActivity extends AppCompatActivity {
 	private static final int NORMAL_MODE = 0;
 	public static final int TEST_END_TO_END_PREDICTION_LATENCY_MODE = 1;
 	public static final int TEST_END_TO_END_TRAINING_LATENCY_MODE = 2;
+	private static final int MAX_TIMELINE_SIZE = 10;
 
+	public ListView listView;
 	public static int currentMode = NORMAL_MODE;
 
 
@@ -263,6 +265,7 @@ public class MainActivity extends AppCompatActivity {
 
 		setContentView(R.layout.activity_main);
 		BottomNavigationView navView = findViewById(R.id.nav_view);
+		listView = findViewById(R.id.listView);
 		// Passing each menu ID as a set of Ids because each
 		// menu should be considered as top level destinations.
 		AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
@@ -320,14 +323,15 @@ public class MainActivity extends AppCompatActivity {
 			}
 			timeLine.add(audioLabel);
 			ratedLabels.add(0);
-			if (timeLine.size() > 500) {
+			if (timeLine.size() > MAX_TIMELINE_SIZE) {
 				timeLine.remove(0);
 			}
 			soundLastTime.put(audioLabel.label, System.currentTimeMillis());
-			ListView listView = findViewById(R.id.listView);
 			new Handler(Looper.getMainLooper()).post(() -> {
 				TimelineAdapter adapter = new TimelineAdapter(timeLine, getApplicationContext());
 				listView.setAdapter(adapter);
+				// Disable scrolling
+				listView.setEnabled(false);
 //				listView.setSelection(adapter.getCount() - 1);
 //				adapter.notifyDataSetChanged();
 			});

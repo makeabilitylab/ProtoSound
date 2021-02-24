@@ -62,6 +62,7 @@ protosound_model = torch.load(MODEL_PATH, map_location=device)
 protosound_model = protosound_model.to(device)
 classes_prototypes = None  # TODO: Replace this variable once the training is done
 support_data = None
+location = ''
 
 """
     Perf test constants
@@ -111,6 +112,7 @@ def add_background_noise(input_data, noise_data, noise_ratio=0.5):
 
 def generate_csv(data_path_directory, labels, output_path_directory):
     # dirs = sorted([dI for dI in os.listdir(data_path_directory) if os.path.isdir(os.path.join(data_path_directory, dI))])
+    global location
     categories = labels
     c2i = {}
     i2c = {}
@@ -135,6 +137,10 @@ def generate_csv(data_path_directory, labels, output_path_directory):
                     USE_USER_DATA = True
                 if file_name.endswith('.wav'):
                     if USE_USER_DATA and 'user' not in file_name:
+                        continue
+                    # if there is a location string sent by user and the .wav file doesn't have the corresponding
+                    # location, then we ignore this .wav file
+                    if location != '' and location not in file_name:
                         continue
                     file_path = os.path.join(path, file_name)
                     if not os.path.exists(output_path_directory):
@@ -161,6 +167,7 @@ def generate_csv(data_path_directory, labels, output_path_directory):
 
 @socketio.on('submit_data')
 def submit_data(json_data):
+    global location
     start_time = time.time()
     print("submit_data->receive request")
     labels = json_data['label']
@@ -187,7 +194,7 @@ def submit_data(json_data):
         np_data = np_data[700:]
         output = add_background_noise(np_data, background_noise, 0.25)
 
-        filename = os.path.join(current_dir, label + "_user_" + str(i % 5) + '.wav')
+        filename = os.path.join(current_dir, location + '_' + label + "_user_" + str(i % 5) + '.wav')
 
         write(filename, RATE, output)
     
@@ -220,6 +227,7 @@ def submit_data(json_data):
 @socketio.on('submit_location')
 def submit_location(json_data):
     print('receive location:', str(json_data['location']))
+    global location
     location = str(json_data['location'])
     with open(USER_FEEDBACK_FILE, 'a') as file:
         file.write(location + '\n')
