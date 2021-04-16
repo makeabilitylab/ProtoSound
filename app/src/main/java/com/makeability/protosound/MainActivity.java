@@ -4,7 +4,6 @@ import android.app.AlertDialog;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -17,20 +16,14 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ImageButton;
-import android.widget.LinearLayout;
 import android.widget.ListAdapter;
 import android.widget.ListView;
-import android.widget.PopupWindow;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -42,10 +35,7 @@ import com.kuassivi.component.RipplePulseRelativeLayout;
 import com.makeability.protosound.ui.home.models.AudioLabel;
 import com.makeability.protosound.ui.home.service.ForegroundService;
 
-import androidx.annotation.LongDef;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.NotificationCompat;
-import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
@@ -56,18 +46,15 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.text.SimpleDateFormat;
 import java.time.LocalTime;
-import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
 import static com.github.nkzawa.socketio.client.Socket.EVENT_CONNECT;
@@ -88,7 +75,7 @@ public class MainActivity extends AppCompatActivity {
 	public static boolean notificationChannelIsCreated = false;
 	private String db = "";
 	public static int evalCount = 0;
-	private static final int DELAY_IN_SECOND = 4;
+	private static final int DELAY_IN_SECOND = 1;
 	private static final int TOTAL_EVAL_PER_TESTER = 100;
 	private Map<String, Long> soundLastTime = new HashMap<>();
 	private List<AudioLabel> timeLine = new ArrayList<>();
@@ -98,8 +85,8 @@ public class MainActivity extends AppCompatActivity {
 	public static final int TEST_END_TO_END_PREDICTION_LATENCY_MODE = 1;
 	public static final int TEST_END_TO_END_TRAINING_LATENCY_MODE = 2;
 	private static final int MAX_TIMELINE_SIZE = 10;
-
-	public ListView listView;
+	private String location = "";
+//	public ListView listView;
 	public static int currentMode = NORMAL_MODE;
 
 
@@ -159,7 +146,7 @@ public class MainActivity extends AppCompatActivity {
 					trueButton.setEnabled(false);
 					falseButton.setEnabled(false);
 					falseButton.setVisibility(View.INVISIBLE);
-				} else if (ratedLabels.get(position) == -1) {
+				} else if (ratedLabels.get(position) == - 1) {
 					Log.i(TAG, "remove position " + position);
 					falseButton.setEnabled(false);
 					trueButton.setEnabled(false);
@@ -265,7 +252,7 @@ public class MainActivity extends AppCompatActivity {
 
 		setContentView(R.layout.activity_main);
 		BottomNavigationView navView = findViewById(R.id.nav_view);
-		listView = findViewById(R.id.listView);
+//		listView = findViewById(R.id.listView);
 		// Passing each menu ID as a set of Ids because each
 		// menu should be considered as top level destinations.
 		AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
@@ -315,18 +302,25 @@ public class MainActivity extends AppCompatActivity {
 			Log.i(TAG, "received sound label from Socket server: " + audio_label + ", " + accuracy);
 			AudioLabel audioLabel = new AudioLabel(audio_label, accuracy, time, db,
 					null);;
-			if (soundLastTime.containsKey(audioLabel.label)) {
-				if (System.currentTimeMillis() <= (soundLastTime.get(audioLabel.label) + DELAY_IN_SECOND * 1000)) { //multiply by 1000 to get milliseconds
-					Log.i(TAG, "Same sound appear in less than 5 seconds");
-					return; // stop sending noti if less than 10 second
-				}
+//			if (soundLastTime.containsKey(audioLabel.label)) {
+//				if (System.currentTimeMillis() <= (soundLastTime.get(audioLabel.label) + DELAY_IN_SECOND * 1000)) { //multiply by 1000 to get milliseconds
+//					Log.i(TAG, "Same sound appear in less than 4 seconds");
+//					return; // stop sending noti if less than 10 second
+//				}
+//			}
+			Log.d(TAG, "onAudioLabelUIViewMessage" + audioLabel.getShortenLabel());
+			if (timeLine.isEmpty()) {
+				Log.d(TAG, "timeline isEmpty. Initiate");
+				timeLine.add(new AudioLabel("Begin by liking this box", "1.0", "", "", ""));
 			}
 			timeLine.add(audioLabel);
 			ratedLabels.add(0);
 			if (timeLine.size() > MAX_TIMELINE_SIZE) {
 				timeLine.remove(0);
+				ratedLabels.remove(0);
 			}
 			soundLastTime.put(audioLabel.label, System.currentTimeMillis());
+			ListView listView = findViewById(R.id.listView);
 			new Handler(Looper.getMainLooper()).post(() -> {
 				TimelineAdapter adapter = new TimelineAdapter(timeLine, getApplicationContext());
 				listView.setAdapter(adapter);
@@ -365,7 +359,7 @@ public class MainActivity extends AppCompatActivity {
 		try {
 			JSONObject jsonObject = new JSONObject();
 			jsonObject.put("predictedLabel", predictedLabel);
-//			jsonObject.put("actualUserLabel", null);
+			jsonObject.put("location", location);
 			jsonObject.put("isTruePrediction", isTruePrediction);
 			jsonObject.put("time", time);
 			MainActivity.mSocket.emit("audio_prediction_feedback", jsonObject);
@@ -476,8 +470,14 @@ public class MainActivity extends AppCompatActivity {
 
 	private Emitter.Listener onReceiveLocation = args -> {
 		Log.i(TAG, "Received location event");
-		Button confirmLocation = (Button) findViewById(R.id.confirm_location);
+		JSONObject data = (JSONObject) args[0];
+		try {
+			location = data.getString("location");
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
 
+		Button confirmLocation = (Button) findViewById(R.id.confirm_location);
 		new Handler(Looper.getMainLooper()).post(() -> {
 			confirmLocation.setBackgroundColor(Color.GREEN);
 			confirmLocation.setText("Sent");

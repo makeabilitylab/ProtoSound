@@ -15,7 +15,7 @@ public class AudioLabel {
 		this.recordTime = recordTime;
 	}
 
-	public String shortenLabel() {
+	public String getShortenLabel() {
 		// stores each characters to a char array
 		char[] charArray = label.toCharArray();
 		boolean foundSpace = true;
@@ -44,7 +44,7 @@ public class AudioLabel {
 	}
 
 	public String getTimeAndLabel() {
-		return time + "| " + this.shortenLabel() + " | " + db + " dB";
+		return time + "| " + this.getShortenLabel() + " | " + db + " dB";
 	}
 	public String getTime() {
 		return this.time;

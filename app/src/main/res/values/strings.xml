@@ -63,7 +63,7 @@
     <string name="recording">Recording</string>
     <string name="done">Recorded</string>
     <string name="submitted_to_server">Submitted to server</string>
-    <string name="submit_to_server">SUBMIT TO SERVER</string>
+    <string name="submit_to_server">TRAIN MODEL</string>
     <string name="user_choice">Your choice</string>
     <string name="pre_defined">Pre-defined</string>
     <string name="greeting"><b>Welcome to ProtoSound</b></string>

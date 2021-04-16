@@ -1,9 +1,12 @@
 package com.makeability.protosound.ui.dashboard;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.media.AudioFormat;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -379,14 +382,27 @@ public class DashboardFragment extends Fragment {
         btn.setOnClickListener(v -> {
             Log.d(TAG, "Submit to Server");
             try {
+
+                ConnectivityManager cm =
+                        (ConnectivityManager)getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+
+                NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+                boolean isConnected = activeNetwork != null &&
+                        activeNetwork.isConnectedOrConnecting();
+                if (!isConnected) {
+                    Toast.makeText(getActivity(), "Please check your internet connection and try again", Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 if (!checkAllFieldsExisted()) {
                     return;
                 }
                 if (MainActivity.mSocket != null) {
                     btn.setText(R.string.submit_to_server);
                 } else {
+                    Toast.makeText(getActivity(), "Not connect to a socket. Please connect to a socket on step 1", Toast.LENGTH_SHORT).show();
                     return;
                 }
+
                 btn.setBackgroundColor(Color.GRAY);
                 btn.setText(R.string.submitted_to_server);
                 ProgressBar progressBar = root.findViewById(R.id.progressBar);

@@ -99,7 +99,8 @@
                     android:layout_height="match_parent"
                     android:imeOptions="actionDone"
                     android:inputType="textAutoCorrect"
-                    android:singleLine="true"/>
+                    android:singleLine="true"
+                    android:digits="0123456789 ,qwertzuiopasdfghjklyxcvbnm"/>
 
             </com.google.android.material.textfield.TextInputLayout>
             <Button
@@ -207,7 +208,8 @@
                                 android:layout_height="match_parent"
                                 android:imeOptions="actionDone"
                                 android:inputType="text"
-                                android:singleLine="true" />
+                                android:singleLine="true"
+                                android:digits="0123456789 ,qwertzuiopasdfghjklyxcvbnm"/>
 
                         </com.google.android.material.textfield.TextInputLayout>
 
@@ -371,7 +373,8 @@
                                 android:layout_height="wrap_content"
                                 android:imeOptions="actionDone"
                                 android:inputType="text"
-                                android:singleLine="true" />
+                                android:singleLine="true"
+                                android:digits="0123456789 ,qwertzuiopasdfghjklyxcvbnm"/>
 
                         </com.google.android.material.textfield.TextInputLayout>
                     </TableRow>
@@ -534,7 +537,8 @@
                                 android:layout_height="wrap_content"
                                 android:imeOptions="actionDone"
                                 android:inputType="text"
-                                android:singleLine="true" />
+                                android:singleLine="true"
+                                android:digits="0123456789 ,qwertzuiopasdfghjklyxcvbnm"/>
 
                         </com.google.android.material.textfield.TextInputLayout>
                     </TableRow>
@@ -697,7 +701,8 @@
                                 android:layout_height="wrap_content"
                                 android:imeOptions="actionDone"
                                 android:inputType="text"
-                                android:singleLine="true" />
+                                android:singleLine="true"
+                                android:digits="0123456789 ,qwertzuiopasdfghjklyxcvbnm"/>
 
                         </com.google.android.material.textfield.TextInputLayout>
                     </TableRow>
@@ -861,7 +866,8 @@
                                 android:layout_height="wrap_content"
                                 android:imeOptions="actionDone"
                                 android:inputType="text"
-                                android:singleLine="true" />
+                                android:singleLine="true"
+                                android:digits="0123456789 ,qwertzuiopasdfghjklyxcvbnm"/>
 
                         </com.google.android.material.textfield.TextInputLayout>
                     </TableRow>

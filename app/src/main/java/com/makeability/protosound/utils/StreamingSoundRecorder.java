@@ -24,8 +24,13 @@ import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.AudioTrack;
 import android.media.MediaRecorder;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.makeability.protosound.MainActivity;
 
@@ -68,7 +73,7 @@ public class StreamingSoundRecorder {
 	private static final int CHANNELS_OUT = AudioFormat.CHANNEL_OUT_MONO;
 	private static final int FORMAT = AudioFormat.ENCODING_PCM_16BIT;
 	private static int BUFFER_SIZE = AudioRecord.getMinBufferSize(RECORDING_RATE, CHANNEL_IN, FORMAT);
-	private static final double DB_THRESHOLD = 45;
+	private static final double DB_THRESHOLD = 50;
 
 	private List<Short> soundBuffer = new ArrayList<>();
 	private final String mOutputFileName;
@@ -198,6 +203,20 @@ public class StreamingSoundRecorder {
 		 */
 		private void sendRawAudioToServer(List<Short> soundBuffer, long recordTime, double db) {
 			try {
+				final StreamingSoundRecorder soundRecorder = mSoundRecorderWeakReference.get();
+				ConnectivityManager cm =
+						(ConnectivityManager)soundRecorder.mContext.getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+
+				NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+				boolean isConnected = activeNetwork != null &&
+						activeNetwork.isConnectedOrConnecting();
+				if (!isConnected) {
+					new Handler(Looper.getMainLooper()).post(() -> {
+						Toast.makeText(soundRecorder.mContext.getApplicationContext(), "Please check your internet connection and try again", Toast.LENGTH_LONG).show();
+
+					});
+					return;
+				}
 				JSONObject jsonObject = new JSONObject();
 				jsonObject.put("data", new JSONArray(soundBuffer));
 				if (MainActivity.currentMode == TEST_END_TO_END_PREDICTION_LATENCY_MODE) {
