@@ -28,12 +28,15 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.github.nkzawa.emitter.Emitter;
-import com.github.nkzawa.socketio.client.Socket;
+import com.chaquo.python.PyObject;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.kuassivi.component.RipplePulseRelativeLayout;
+import com.makeability.protosound.ui.dashboard.DashboardFragment;
 import com.makeability.protosound.ui.home.models.AudioLabel;
 import com.makeability.protosound.ui.home.service.ForegroundService;
+import com.makeability.protosound.utils.ProtoModel;
+import com.makeability.protosound.utils.ProtoModel;
+import com.makeability.protosound.utils.StreamingSoundRecorder;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
@@ -42,11 +45,19 @@ import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.pytorch.Module;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.text.SimpleDateFormat;
 import java.time.LocalTime;
@@ -57,13 +68,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.github.nkzawa.socketio.client.Socket.EVENT_CONNECT;
 import static com.makeability.protosound.utils.Constants.PREDICTION_CHANNEL_ID;
 import static com.makeability.protosound.utils.Constants.TEST_NUMBER_EXTRA;
 
 public class MainActivity extends AppCompatActivity {
-
-	public static Socket mSocket;
+	private ProtoModel model;
 	private static final String DEBUG_TAG = "NetworkStatusExample";
 	public static final boolean TEST_MODEL_LATENCY = false;
 	public static final boolean TEST_E2E_LATENCY = false;
@@ -86,7 +95,7 @@ public class MainActivity extends AppCompatActivity {
 	public static final int TEST_END_TO_END_TRAINING_LATENCY_MODE = 2;
 	private static final int MAX_TIMELINE_SIZE = 10;
 	private String location = "";
-//	public ListView listView;
+	//	public ListView listView;
 	public static int currentMode = NORMAL_MODE;
 
 
@@ -231,6 +240,8 @@ public class MainActivity extends AppCompatActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		Log.i(TAG, "onCreate");
+		EventBus.getDefault().register(this);
+		this.model = (ProtoModel) getApplicationContext();
 
 		// Get the test extra from the Entrance activity to determine which test we want to run
 		Intent intent = this.getIntent();
@@ -263,91 +274,119 @@ public class MainActivity extends AppCompatActivity {
 		NavigationUI.setupWithNavController(navView, navController);
 
 		checkNetworkConnection();
+		//receiveAudioLabel();
 	}
 
+	@Subscribe(threadMode = ThreadMode.MAIN)
+	public void onReceiveLocation (DashboardFragment event){
+		Log.i(TAG, "Received location event");
 
-	@Override
-	protected void onDestroy() {
-		Log.i(TAG, "onDestroy: ");
-		super.onDestroy();
-		if (mSocket != null) {
-			mSocket.disconnect();
+		location = event.location;
+
+		Button confirmLocation = (Button) findViewById(R.id.confirm_location);
+		new Handler(Looper.getMainLooper()).post(() -> {
+			confirmLocation.setBackgroundColor(Color.GREEN);
+			confirmLocation.setText("Sent");
+		});
+	};
+
+	@Subscribe(threadMode = ThreadMode.MAIN)
+	public void onReceiveTrainingComplete (DashboardFragment event){
+		Log.i(TAG, "Received training complete!");
+		Log.i(TAG, "Received audio label event");
+		if (currentMode == TEST_END_TO_END_TRAINING_LATENCY_MODE) {
+			String submitAudioTime = ""; // original submit audio time when starts training the audio
+			// If test end2end training, there should be a record submit time from SoundRecorder
+			submitAudioTime = event.submitAudioTime;
+			writeEndToEndLatencyToExternalFile(submitAudioTime, "e2e_training");
+
 		}
+		Button submitButton = (Button) findViewById(R.id.submit);
+		ProgressBar progressBar = findViewById(R.id.progressBar);
+		submitButton.setBackgroundColor(Color.GREEN);
+		submitButton.setText(R.string.training_complete);
+		new Handler(Looper.getMainLooper()).post(() -> {
+			progressBar.setVisibility(View.GONE);
+		});
 	}
 
-	private Emitter.Listener onAudioLabelUIViewMessage = new Emitter.Listener() {
-		@Override
-		public void call(Object... args) {
-			Log.i(TAG, "Received audio label event");
-			JSONObject data = (JSONObject) args[0];
-			String db = "1.0"; // TODO: Hard code this number for now so we don't have to redesign notification
-			String audio_label;
-			String accuracy = "1.0";
-			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
-			LocalTime localTime = LocalTime.now();
-			String time = formatter.format(localTime);
-			String recordTime = "";
-			try {
-				audio_label = data.getString("label");
-				accuracy = data.getString("confidence");
-				db = data.getString("db");
-				if (currentMode == TEST_END_TO_END_PREDICTION_LATENCY_MODE) {
-					// If test end2end prediction, there should be a record time to determine the original record time of this sound
-					recordTime =  data.getString("recordTime");
-					writeEndToEndLatencyToExternalFile(recordTime, "e2e_prediction");
-				}
-			} catch (JSONException e) {
-				return;
-			}
-			Log.i(TAG, "received sound label from Socket server: " + audio_label + ", " + accuracy);
-			AudioLabel audioLabel = new AudioLabel(audio_label, accuracy, time, db,
-					null);;
+
+	@Subscribe(threadMode = ThreadMode.MAIN)
+	public void onReceiveAudioLabelEvent(StreamingSoundRecorder.RecordAudioAsyncTask event) {
+		Log.i(TAG, "Received audio label event");
+		String db = "1.0"; // TODO: Hard code this number for now so we don't have to redesign notification
+		String audio_label;
+		String accuracy = "1.0";
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
+		LocalTime localTime = LocalTime.now();
+		String time = formatter.format(localTime);
+		String recordTime = "";
+
+		audio_label = event.label;
+		accuracy = event.confidence;
+		db = event.db;
+		if (currentMode == TEST_END_TO_END_PREDICTION_LATENCY_MODE) {
+			// If test end2end prediction, there should be a record time to determine the original record time of this sound
+//temp comment out			recordTime =  data.getString("recordTime");
+			writeEndToEndLatencyToExternalFile(recordTime, "e2e_prediction");
+		}
+
+		Log.i(TAG, "received sound label from Socket server: " + audio_label + ", " + accuracy);
+		AudioLabel audioLabel = new AudioLabel(audio_label, accuracy, time, db, null);;
 //			if (soundLastTime.containsKey(audioLabel.label)) {
 //				if (System.currentTimeMillis() <= (soundLastTime.get(audioLabel.label) + DELAY_IN_SECOND * 1000)) { //multiply by 1000 to get milliseconds
 //					Log.i(TAG, "Same sound appear in less than 4 seconds");
 //					return; // stop sending noti if less than 10 second
 //				}
 //			}
-			Log.d(TAG, "onAudioLabelUIViewMessage" + audioLabel.getShortenLabel());
-			if (timeLine.isEmpty()) {
-				Log.d(TAG, "timeline isEmpty. Initiate");
-				timeLine.add(new AudioLabel("Begin by liking this box", "1.0", "", "", ""));
-			}
-			timeLine.add(audioLabel);
-			ratedLabels.add(0);
-			if (timeLine.size() > MAX_TIMELINE_SIZE) {
-				timeLine.remove(0);
-				ratedLabels.remove(0);
-			}
-			soundLastTime.put(audioLabel.label, System.currentTimeMillis());
-			ListView listView = findViewById(R.id.listView);
-			new Handler(Looper.getMainLooper()).post(() -> {
-				TimelineAdapter adapter = new TimelineAdapter(timeLine, getApplicationContext());
-				listView.setAdapter(adapter);
-				// Disable scrolling
-				listView.setEnabled(false);
+		Log.d(TAG, "onAudioLabelUIViewMessage " + audioLabel.getShortenLabel());
+		if (timeLine.isEmpty()) {
+			Log.d(TAG, "timeline isEmpty. Initiate");
+			timeLine.add(new AudioLabel("Begin by liking this box", "1.0", "", "", ""));
+		}
+		timeLine.add(audioLabel);
+		ratedLabels.add(0);
+		if (timeLine.size() > MAX_TIMELINE_SIZE) {
+			timeLine.remove(0);
+			ratedLabels.remove(0);
+		}
+		soundLastTime.put(audioLabel.label, System.currentTimeMillis());
+		ListView listView = findViewById(R.id.listView);
+		new Handler(Looper.getMainLooper()).post(() -> {
+			TimelineAdapter adapter = new TimelineAdapter(timeLine, getApplicationContext());
+			listView.setAdapter(adapter);
+			// Disable scrolling
+			listView.setEnabled(false);
 //				listView.setSelection(adapter.getCount() - 1);
 //				adapter.notifyDataSetChanged();
-			});
-		}
-	};
-
-	/**
-	 * Use this function to report checkbox feedback to user
-	 * @param predictedLabel
-	 * @param actualUserLabel
-	 */
-	private void reportUserPredictionFeedback(String predictedLabel, String actualUserLabel) {
-		try {
-			JSONObject jsonObject = new JSONObject();
-			jsonObject.put("predictedLabel", predictedLabel);
-			jsonObject.put("actualUserLabel", actualUserLabel);
-			jsonObject.put("isTruePrediction", !predictedLabel.equalsIgnoreCase(actualUserLabel));
-			MainActivity.mSocket.emit("audio_prediction_feedback", jsonObject);
-		} catch (JSONException e) {
-			e.printStackTrace();
-		}
+		});
 	}
+
+
+	@Override
+	protected void onDestroy() {
+		Log.i(TAG, "onDestroy: ");
+		EventBus.getDefault().unregister(this);
+		super.onDestroy();
+	}
+
+
+//	/**
+//	 * Use this function to report checkbox feedback to user
+//	 * @param predictedLabel
+//	 * @param actualUserLabel
+//	 */
+//	private void reportUserPredictionFeedback(String predictedLabel, String actualUserLabel) {
+//		try {
+//			JSONObject jsonObject = new JSONObject();
+//			jsonObject.put("predictedLabel", predictedLabel);
+//			jsonObject.put("actualUserLabel", actualUserLabel);
+//			jsonObject.put("isTruePrediction", !predictedLabel.equalsIgnoreCase(actualUserLabel));
+//			MainActivity.mSocket.emit("audio_prediction_feedback", jsonObject);
+//		} catch (JSONException e) {
+//			e.printStackTrace();
+//		}
+//	}
 
 
 	/**
@@ -362,7 +401,9 @@ public class MainActivity extends AppCompatActivity {
 			jsonObject.put("location", location);
 			jsonObject.put("isTruePrediction", isTruePrediction);
 			jsonObject.put("time", time);
-			MainActivity.mSocket.emit("audio_prediction_feedback", jsonObject);
+
+			PyObject proto = model.getProtosoundApp();
+			proto.callAttr("audio_prediction_feedback", jsonObject.toString());
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
@@ -414,100 +455,8 @@ public class MainActivity extends AppCompatActivity {
 //		}
 //	};
 
-	public void initSocket(String port) {
-		mSocket.connect();
-		mSocket.on("android_test_2", onTestMessage);
-
-		// The server will return an audio_label to the phone with label
-		mSocket.on("audio_data_s2c", onAudioLabelUIViewMessage);
-		mSocket.on("training_complete", onTrainingCompleteMessage);
-
-		mSocket.on("receive_location", onReceiveLocation);
-
-		mSocket.once(EVENT_CONNECT, (Emitter.Listener) args -> {
-			new Handler(Looper.getMainLooper()).post(() -> {
-				// Update UI here
-				Log.i(TAG, "call: " + args);
-				Log.d(TAG, "call: " + mSocket.connected());
-				Button confirmPort = (Button) findViewById(R.id.confirm_port);
-				new Handler(Looper.getMainLooper()).post(() -> {
-					confirmPort.setBackgroundColor(Color.GREEN);
-					confirmPort.setText("CONFIRMED");
-				});
-				confirmPort.setBackgroundColor(Color.GREEN);
-				TextView tick = (TextView) findViewById(R.id.tick);
-				tick.setText( R.string.port_connected);
-				Button submit = (Button) findViewById(R.id.submit);
-				submit.setEnabled(true);
-				submit.setBackgroundColor(Color.parseColor("#FF4972"));
-				submit.setText(R.string.submit_to_server);
-				ProgressBar progressBar = findViewById(R.id.progressBar);
-				progressBar.setVisibility(View.GONE);
-			});
-
-//				JSONObject data = (JSONObject) args[0];
-//				String userPrototypeAvailable;
-//				try {
-//					userPrototypeAvailable = data.getString("label");
-//					if (userPrototypeAvailable.equals("True")) {
-//
-//					}
-//
-//				} catch (JSONException e) {
-//					Log.i(TAG, "JSON Exception failed: " + data.toString());
-//					return;
-//				}
-
-		});
-		Log.d(TAG, "connected: " + mSocket.connected());
-	}
 
 
-	private Emitter.Listener onTestMessage = args -> {
-		System.out.println(args[0]);
-		Log.i(TAG, "Received socket event");
-	};
-
-	private Emitter.Listener onReceiveLocation = args -> {
-		Log.i(TAG, "Received location event");
-		JSONObject data = (JSONObject) args[0];
-		try {
-			location = data.getString("location");
-		} catch (JSONException e) {
-			e.printStackTrace();
-		}
-
-		Button confirmLocation = (Button) findViewById(R.id.confirm_location);
-		new Handler(Looper.getMainLooper()).post(() -> {
-			confirmLocation.setBackgroundColor(Color.GREEN);
-			confirmLocation.setText("Sent");
-		});
-	};
-
-	private Emitter.Listener onTrainingCompleteMessage = args -> {
-		Log.i(TAG, "Received training complete!");
-		Log.i(TAG, "Received audio label event");
-		if (currentMode == TEST_END_TO_END_TRAINING_LATENCY_MODE) {
-			JSONObject data = (JSONObject) args[0];
-			String submitAudioTime = ""; // original submit audio time when starts training the audio
-			try {
-				submitAudioTime = data.getString("submitAudioTime");
-				// If test end2end training, there should be a record submit time from SoundRecorder
-				submitAudioTime = data.getString("submitAudioTime");
-				writeEndToEndLatencyToExternalFile(submitAudioTime, "e2e_training");
-			} catch (JSONException e) {
-				return;
-			}
-		}
-		Button submitButton = (Button) findViewById(R.id.submit);
-		ProgressBar progressBar = findViewById(R.id.progressBar);
-		submitButton.setBackgroundColor(Color.GREEN);
-		submitButton.setText(R.string.training_complete);
-		new Handler(Looper.getMainLooper()).post(() -> {
-			progressBar.setVisibility(View.GONE);
-		});
-
-	};
 
 	private void checkNetworkConnection() {
 		ConnectivityManager connMgr =
@@ -628,5 +577,8 @@ public class MainActivity extends AppCompatActivity {
 		for (char c : sound.toCharArray())
 			i+=(int)c;
 		return i;
+
 	}
+
+
 }

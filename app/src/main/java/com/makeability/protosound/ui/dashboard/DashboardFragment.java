@@ -16,13 +16,11 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TableRow;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -30,18 +28,22 @@ import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.github.nkzawa.emitter.Emitter;
-import com.github.nkzawa.socketio.client.Socket;
+import org.greenrobot.eventbus.EventBus;
+import org.pytorch.IValue;
+import org.pytorch.Module;
+import org.pytorch.Tensor;
+import com.chaquo.python.PyObject;
 import com.google.android.material.textfield.TextInputEditText;
 import com.makeability.protosound.MainActivity;
 import com.makeability.protosound.R;
-import com.makeability.protosound.utils.SocketUtil;
 import com.makeability.protosound.utils.SoundRecorder;
+import com.makeability.protosound.utils.ProtoModel;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.lang.reflect.Array;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -60,11 +62,15 @@ import java.util.Map;
 import static com.makeability.protosound.MainActivity.TEST_END_TO_END_TRAINING_LATENCY_MODE;
 
 public class DashboardFragment extends Fragment {
-
     private String TAG = "Dashboard";
+    private ProtoModel model;
+    private PyObject protosoundApp;
+    private Module module;
+    public String location;
+    public String submitAudioTime;
+
     private static final boolean TEST = true;
     private DashboardViewModel dashboardViewModel;
-    private Socket mSocket;
     private static final int RECORDER_SAMPLE_RATE = 44100;
     private static final int RECORDER_CHANNELS = AudioFormat.CHANNEL_IN_MONO;
     private static final int RECORDER_AUDIO_ENCODING = AudioFormat.ENCODING_PCM_16BIT;
@@ -79,16 +85,16 @@ public class DashboardFragment extends Fragment {
     private int countUserClass = 0;
     SoundRecorder recorder;
     int[] recordButtonList = {R.id.record_1, R.id.record_2, R.id.record_3, R.id.record_4, R.id.record_5,
-                                R.id.record_6, R.id.record_7, R.id.record_8, R.id.record_9, R.id.record_10,
-                                R.id.record_11, R.id.record_12, R.id.record_13, R.id.record_14, R.id.record_15,
-                                R.id.record_16, R.id.record_17, R.id.record_18, R.id.record_19, R.id.record_20,
-                                R.id.record_21, R.id.record_22, R.id.record_23, R.id.record_24, R.id.record_25, R.id.record_bg};
+            R.id.record_6, R.id.record_7, R.id.record_8, R.id.record_9, R.id.record_10,
+            R.id.record_11, R.id.record_12, R.id.record_13, R.id.record_14, R.id.record_15,
+            R.id.record_16, R.id.record_17, R.id.record_18, R.id.record_19, R.id.record_20,
+            R.id.record_21, R.id.record_22, R.id.record_23, R.id.record_24, R.id.record_25, R.id.record_bg};
 
     int[] playButtonList = {R.id.play_1, R.id.play_2, R.id.play_3, R.id.play_4, R.id.play_5,
-                            R.id.play_6, R.id.play_7, R.id.play_8, R.id.play_9, R.id.play_10,
-                            R.id.play_11, R.id.play_12, R.id.play_13, R.id.play_14, R.id.play_15,
-                            R.id.play_16, R.id.play_17, R.id.play_18, R.id.play_19, R.id.play_20,
-                            R.id.play_21, R.id.play_22, R.id.play_23, R.id.play_24, R.id.play_25, R.id.play_bg};
+            R.id.play_6, R.id.play_7, R.id.play_8, R.id.play_9, R.id.play_10,
+            R.id.play_11, R.id.play_12, R.id.play_13, R.id.play_14, R.id.play_15,
+            R.id.play_16, R.id.play_17, R.id.play_18, R.id.play_19, R.id.play_20,
+            R.id.play_21, R.id.play_22, R.id.play_23, R.id.play_24, R.id.play_25, R.id.play_bg};
 
     int[] rowSelectAList = {R.id.row_1_select_a, R.id.row_2_select_a, R.id.row_3_select_a, R.id.row_4_select_a, R.id.row_5_select_a};
     int[] rowSelectBList = {R.id.row_1_select_b, R.id.row_2_select_b, R.id.row_3_select_b, R.id.row_4_select_b, R.id.row_5_select_b};
@@ -105,11 +111,22 @@ public class DashboardFragment extends Fragment {
     boolean[] sampleRecorded = new boolean[26];
     int[] predefinedSamples = new int[26];
 
+    // Override onAttach to make sure Fragment is attached to an Activity first
+    // to avoid getapplicationcontext returning null
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        this.model = (ProtoModel) context.getApplicationContext();
+        this.protosoundApp = model.getProtosoundApp();
+        this.module = model.getModule();
+    }
+
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         dashboardViewModel =
                 new ViewModelProvider(this).get(DashboardViewModel.class);
         View root = inflater.inflate(R.layout.fragment_dashboard, container, false);
+
 
         Map<Integer, Integer> recordPlayMap = new HashMap<>();
         for (int i = 0; i < playButtonList.length; i++) {
@@ -125,7 +142,6 @@ public class DashboardFragment extends Fragment {
 
         TextInputEditText portNumberEditText = (TextInputEditText) root.findViewById(R.id.port_number);
         Button confirmPort = (Button) root.findViewById(R.id.confirm_port);
-        setPortNumber(portNumberEditText, confirmPort);
         TextInputEditText locationEditText = (TextInputEditText) root.findViewById(R.id.testing_location);
         Button confirmLocation = root.findViewById(R.id.confirm_location);
         setLocation(locationEditText, confirmLocation);
@@ -175,12 +191,13 @@ public class DashboardFragment extends Fragment {
         }
 
         // Disable the submit button if the port hasn't been establish
-        if (MainActivity.mSocket == null) {
-            submit.setEnabled(false);
-            submit.setText("Please complete all steps to submit");
-        } else {
-            submit.setText(R.string.submit_to_server);
-        }
+//        if (MainActivity.mSocket == null) {
+//            submit.setEnabled(false);
+//            submit.setText("Please complete all steps to submit");
+//        } else {
+
+        submit.setText(R.string.submit_to_server);
+        //}
         return root;
     }
 
@@ -203,54 +220,26 @@ public class DashboardFragment extends Fragment {
         });
 
         confirmLocation.setOnClickListener(v -> {
-            JSONObject locationPackage = new JSONObject();
-            try {
-                locationPackage.put("location", testingLocation);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-            if (MainActivity.mSocket == null) {
-                Toast.makeText(getContext(), "Please connect to a port from step 1", Toast.LENGTH_SHORT).show();
-                return;
-            }
+            //JSONObject locationPackage = new JSONObject();
+//            try {
+//                locationPackage.put("location", testingLocation);
+//            } catch (JSONException e) {
+//                e.printStackTrace();
+//            }
+//            if (MainActivity.mSocket == null) {
+//                Toast.makeText(getContext(), "Please connect to a port from step 1", Toast.LENGTH_SHORT).show();
+//                return;
+//            }
             if (testingLocation.isEmpty()) {
                 locationEditText.setError("Please enter your testing location");
             } else {
-                MainActivity.mSocket.emit("submit_location", locationPackage);
+                //MainActivity.mSocket.emit("submit_location", locationPackage);
+                protosoundApp.callAttr("submit_location", testingLocation);
+                this.location = testingLocation;
             }
         });
     }
 
-    private void setPortNumber(TextInputEditText portNumberEditText, Button confirmPort) {
-        portNumberEditText.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                String pN = s.toString();
-                if (pN.length() != 4) {
-                    portNumberEditText.setError("Port number need to have the format of 'XXXX'");
-                }
-                portNumber = pN;
-            }
-        });
-        confirmPort.setOnClickListener(v -> {
-            if (MainActivity.mSocket != null) {
-                MainActivity.mSocket.disconnect();
-            }
-            SocketUtil socketUtil = new SocketUtil(portNumber);
-            MainActivity.mSocket = socketUtil.getSocket();
-            ((MainActivity) requireActivity()).initSocket(portNumber);
-        });
-    }
 
     private void hideUIOnCreate(View root) {
         for (int rowID : rowSelectAList) {
@@ -377,10 +366,17 @@ public class DashboardFragment extends Fragment {
     }
 
 
-    private void setOnClickSubmit(final Button btn, final int id, View root){
+    private void setOnClickSubmit(final Button btn, final int id, View root) {
 
         btn.setOnClickListener(v -> {
             Log.d(TAG, "Submit to Server");
+
+            btn.setBackgroundColor(Color.GRAY);
+            btn.setText(R.string.submitted_to_server);
+            ProgressBar progressBar = root.findViewById(R.id.progressBar);
+            progressBar.setVisibility(View.VISIBLE);
+            Log.d(TAG, "SUBMIT PROGESSBAR SHOWN");
+
             try {
 
                 ConnectivityManager cm =
@@ -389,24 +385,23 @@ public class DashboardFragment extends Fragment {
                 NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
                 boolean isConnected = activeNetwork != null &&
                         activeNetwork.isConnectedOrConnecting();
-                if (!isConnected) {
-                    Toast.makeText(getActivity(), "Please check your internet connection and try again", Toast.LENGTH_SHORT).show();
-                    return;
-                }
+//                if (!isConnected) {
+//                    Toast.makeText(getActivity(), "Please check your internet connection and try again", Toast.LENGTH_SHORT).show();
+//                    return;
+//                }
                 if (!checkAllFieldsExisted()) {
                     return;
                 }
-                if (MainActivity.mSocket != null) {
-                    btn.setText(R.string.submit_to_server);
-                } else {
-                    Toast.makeText(getActivity(), "Not connect to a socket. Please connect to a socket on step 1", Toast.LENGTH_SHORT).show();
-                    return;
-                }
 
-                btn.setBackgroundColor(Color.GRAY);
-                btn.setText(R.string.submitted_to_server);
-                ProgressBar progressBar = root.findViewById(R.id.progressBar);
-                progressBar.setVisibility(View.VISIBLE);
+                //if (MainActivity.mSocket != null) {
+
+                //btn.setText(R.string.submit_to_server);
+//                } else {
+//                    Toast.makeText(getActivity(), "Not connect to a socket. Please connect to a socket on step 1", Toast.LENGTH_SHORT).show();
+//                    return;
+//                }
+
+
 
                 JSONObject soundPackage = new JSONObject();
 
@@ -419,25 +414,59 @@ public class DashboardFragment extends Fragment {
                             soundBuffer.add(num);
                         }
                         soundPackage.put("data_" + i, new JSONArray(soundBuffer));
+
                     }
                 }
                 List<String> labels = new ArrayList<>(Arrays.asList(labelList));
                 soundPackage.put("label", new JSONArray(labels));
-                Log.d(TAG, "Socket connect:" + MainActivity.mSocket.connected());
+                //Log.d(TAG, "Socket connect:" + MainActivity.mSocket.connected());
 
                 if (MainActivity.currentMode == TEST_END_TO_END_TRAINING_LATENCY_MODE) {
-                	// If test end to end training time, need to start recording the time when the submit audio starts
-					soundPackage.put("submitAudioTime", "" + System.currentTimeMillis());
-				} else {
+                    // If test end to end training time, need to start recording the time when the submit audio starts
+                    soundPackage.put("submitAudioTime", "" + System.currentTimeMillis());
+                } else {
                     soundPackage.put("submitAudioTime", 0);
                 }
                 soundPackage.put("predefinedSamples", new JSONArray(predefinedSamples));
 
-                MainActivity.mSocket.emit("submit_data", soundPackage);
+                //MainActivity.mSocket.emit("submit_data", soundPackage);
+
+                PyObject batch = protosoundApp.callAttr("submit_data", soundPackage.toString());
+                float[][][][] batchArr = batch.toJava(float[][][][].class);
+                Log.d(TAG, "SHAPE IS " + batchArr.length + " " + batchArr[0].length + " " + batchArr[0][0].length + " " + batchArr[0][0][0].length);
+
+                Tensor inputTensor = Tensor.fromBlob(flatten(batchArr), new long[]{batchArr.length, batchArr[0].length, batchArr[0][0].length, batchArr[0][0][0].length});
+                Tensor outputTensor = module.forward(IValue.from(inputTensor)).toTensor();
+                long[] outputShape = outputTensor.shape();
+                Log.d(TAG, "OUTPUT IS " + outputTensor + "and SHAPE is " + outputTensor.shape());
+
+                float[] outputArr = outputTensor.getDataAsFloatArray();
+                String submitAudioTime = protosoundApp.callAttr("train_data", outputArr, outputShape).toString();
+                this.submitAudioTime = submitAudioTime;
+                EventBus.getDefault().post(this);
             } catch (FileNotFoundException | JSONException e) {
                 e.printStackTrace();
             }
         });
+
+    }
+
+    static void flatten(Object object, List<Float> list) {
+        if (object.getClass().isArray())
+            for (int i = 0; i < Array.getLength(object); ++i)
+                flatten(Array.get(object, i), list);
+        else
+            list.add((float)object);
+    }
+
+    static float[] flatten(Object object) {
+        List<Float> list = new ArrayList<>();
+        flatten(object, list);
+        int size = list.size();
+        float[] result = new float[size];
+        for (int i = 0; i < size; ++i)
+            result[i] = list.get(i);
+        return result;
     }
 
     private void startRecording(int id) {
@@ -523,21 +552,21 @@ public class DashboardFragment extends Fragment {
         return bytes;
     }
 
-    private void sendRawAudioToServer(List<Short> soundBuffer, int id) {
-        try {
-            JSONObject jsonObject = new JSONObject();
-
-            jsonObject.put("data", new JSONArray(soundBuffer));
-            jsonObject.put("time", "" + System.currentTimeMillis());
-            Log.i(TAG, "Send raw audio to server:");
-            Log.i(TAG, "Connected: " + MainActivity.mSocket.connected());
-//            emitter
-            MainActivity.mSocket.emit("android_test");
-            MainActivity.mSocket.emit("audio_data", jsonObject);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-    }
+//    private void sendRawAudioToServer(List<Short> soundBuffer, int id) {
+//        try {
+//            JSONObject jsonObject = new JSONObject();
+//
+//            jsonObject.put("data", new JSONArray(soundBuffer));
+//            jsonObject.put("time", "" + System.currentTimeMillis());
+//            Log.i(TAG, "Send raw audio to server:");
+//            Log.i(TAG, "Connected: " + MainActivity.mSocket.connected());
+////            emitter
+//            MainActivity.mSocket.emit("android_test");
+//            MainActivity.mSocket.emit("audio_data", jsonObject);
+//        } catch (JSONException e) {
+//            e.printStackTrace();
+//        }
+//    }
 
     private void checkRecordPermission() {
 
@@ -596,37 +625,6 @@ public class DashboardFragment extends Fragment {
         }
     }
 
-    public Emitter.Listener onConnect = new Emitter.Listener() {
-        @Override
-        public void call(Object... args) {
-            Log.d(TAG, "Socket Connected!");
-        }
-    };
-
-    private Emitter.Listener onConnectError = new Emitter.Listener() {
-        @Override
-        public void call(Object... args) {
-            getActivity().runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-
-
-                }
-            });
-        }
-    };
-    private Emitter.Listener onDisconnect = new Emitter.Listener() {
-        @Override
-        public void call(Object... args) {
-            getActivity().runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-
-
-                }
-            });
-        }
-    };
 
     /**
      * Write PCM data as WAV file

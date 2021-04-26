@@ -66,9 +66,6 @@ public class HomeFragment extends Fragment {
 
 	private void setOnClickListening(ImageButton listeningBtn, RipplePulseRelativeLayout pulseLayout, TextView soundTextView) {
 //		TextView soundTextView = requireActivity().findViewById(R.id.description);
-		if (MainActivity.mSocket != null && !MainActivity.mSocket.connected()) {
-			MainActivity.mSocket.connect();
-		}
     	listeningBtn.setOnClickListener(v -> {
 			if (!IS_RECORDING) {
 				switchToStartRecord(listeningBtn, pulseLayout, soundTextView);

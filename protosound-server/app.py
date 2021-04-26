@@ -188,7 +188,7 @@ def submit_data(json_data):
         current_dir = os.path.join(LIBRARY_DATA_PATH, label)
         if not os.path.exists(current_dir):
             os.makedirs(current_dir)
-        data = json_data['data_' + str(i)]  
+        data = json_data['data_' + str(i)]
         np_data = np.asarray(data, dtype=np.int16) / 32768.0
         print(len(np_data))
         np_data = np_data[700:]
@@ -197,7 +197,7 @@ def submit_data(json_data):
         filename = os.path.join(current_dir, location + '_' + label + "_user_" + str(i % 5) + '.wav')
 
         write(filename, RATE, output)
-    
+
     # Generate CSV file and put 25 samples into one single folder
     print('Generate CSV file and put 25 samples into one single folder')
     generate_csv(LIBRARY_DATA_PATH, labels, DATA_PATH)
@@ -207,15 +207,15 @@ def submit_data(json_data):
     global support_data
     support_data = ProtoSoundDataset(DATA_PATH, df, 'filename', 'category')
     print(support_data.c2i, support_data.categories, support_data.i2c)
-    # TRAIN MODEL   
+    # TRAIN MODEL
     train_loader = DataLoader(support_data, batch_size=WAYS*SHOTS)
     batch = next(iter(train_loader))
-    # IMPORTANT: MAKE SURE THAT "classes_prototypes" AND "support_data.i2c" 
+    # IMPORTANT: MAKE SURE THAT "classes_prototypes" AND "support_data.i2c"
     # ARE GLOBAL VARIABLEs WHICH NEED TO CHANGE EVERY TIME TRAINING IS DONE
     global classes_prototypes
     classes_prototypes = personalize_model(protosound_model, batch, WAYS, SHOTS, device=device)
     print("training complete")
-    if (SHOULD_RECORD_TRAINING_TIME):                                                                           
+    if (SHOULD_RECORD_TRAINING_TIME):
         elapsed_time = time.time() - start_time
         # Write prediction time to file
         with open(TRAINING_TIME_FILE, 'a') as file:
@@ -263,7 +263,7 @@ def handle_source(json_data):
     if support_data is None or classes_prototypes is None:
         print('no training happened yet')
         return
-    
+
     output, confidence = None, None
     if (SHOULD_RECORD_PREDICTION_TIME):
         start_time = time.time()
@@ -285,7 +285,7 @@ def handle_source(json_data):
         'confidence': str(confidence[0]),
         'db': db,
         # 'recordTime': recordTime # pass the record time back if exist
-        })
+    })
 
 
 @app.route('/')

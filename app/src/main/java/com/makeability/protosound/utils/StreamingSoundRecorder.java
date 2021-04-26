@@ -32,11 +32,17 @@ import android.os.Looper;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.chaquo.python.PyObject;
+import com.chaquo.python.Python;
 import com.makeability.protosound.MainActivity;
 
+import org.greenrobot.eventbus.EventBus;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.pytorch.IValue;
+import org.pytorch.Module;
+import org.pytorch.Tensor;
 
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
@@ -47,8 +53,10 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.lang.ref.WeakReference;
+import java.lang.reflect.Array;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.nio.FloatBuffer;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.text.SimpleDateFormat;
@@ -60,6 +68,7 @@ import java.util.List;
 import java.util.Set;
 
 import static com.makeability.protosound.MainActivity.TEST_END_TO_END_PREDICTION_LATENCY_MODE;
+import static com.makeability.protosound.MainActivity.notificationChannelIsCreated;
 import static com.makeability.protosound.utils.HelperUtils.convertByteArrayToShortArray;
 import static com.makeability.protosound.utils.HelperUtils.db;
 
@@ -89,7 +98,7 @@ public class StreamingSoundRecorder {
 
 	private Set<String> connectedHostIds;
 	private int ONE_SECOND_SOUND_COUNTER = 0;
-
+	private ProtoModel model;
 
 	enum State {
 		IDLE, RECORDING, PLAYING
@@ -103,6 +112,7 @@ public class StreamingSoundRecorder {
 	public StreamingSoundRecorder(Context context, String outputFileName) {
 		mOutputFileName = outputFileName;
 		mContext = context;
+		model = (ProtoModel) context.getApplicationContext();
 	}
 
 
@@ -113,7 +123,7 @@ public class StreamingSoundRecorder {
 		if (mState != State.IDLE) {
 			return;
 		}
-		mRecordingAsyncTask = new RecordAudioAsyncTask(this);
+		mRecordingAsyncTask = new RecordAudioAsyncTask(this, model);
 		mRecordingAsyncTask.execute();
 	}
 
@@ -124,12 +134,21 @@ public class StreamingSoundRecorder {
 		}
 	}
 
-	private static class RecordAudioAsyncTask extends AsyncTask<Void, Void, Void> {
+	public static class RecordAudioAsyncTask extends AsyncTask<Void, Void, Void> {
 		private WeakReference<StreamingSoundRecorder> mSoundRecorderWeakReference;
 		private AudioRecord mAudioRecord;
+		private ProtoModel model;
+		private Module module;
+		private PyObject protosoundApp;
+		public String label;
+		public String confidence;
+		public String db;
 
-		RecordAudioAsyncTask(StreamingSoundRecorder context) {
+		RecordAudioAsyncTask(StreamingSoundRecorder context, ProtoModel model) {
 			mSoundRecorderWeakReference = new WeakReference<>(context);
+			this.model = model;
+			this.module = model.getModule();
+			this.protosoundApp = model.getProtosoundApp();
 		}
 
 		@Override
@@ -224,12 +243,49 @@ public class StreamingSoundRecorder {
 				}
 				jsonObject.put("db", db);
 				Log.i(TAG, "Sending audio data: " + soundBuffer.size());
-				MainActivity.mSocket.emit("audio_data_c2s", jsonObject);
+				//MainActivity.mSocket.emit("audio_data_c2s", jsonObject);
+
+
+				PyObject query= protosoundApp.callAttr("handle_source", jsonObject.toString());
+				float[][][][] queryArr = query.toJava(float[][][][].class);
+				Log.d(TAG, "SHAPE OF QUERY IS " + queryArr.length + " " + queryArr[0].length + " " + queryArr[0][0].length + " " + queryArr[0][0][0].length);
+
+				Tensor inputTensor = Tensor.fromBlob(flatten(queryArr), new long[]{queryArr.length, queryArr[0].length, queryArr[0][0].length, queryArr[0][0][0].length});
+				Tensor outputTensor = module.forward(IValue.from(inputTensor)).toTensor();
+				long[] outputShape = outputTensor.shape();
+				float[] outputArr = outputTensor.getDataAsFloatArray();
+				PyObject result = protosoundApp.callAttr("get_prediction", outputArr, outputShape, jsonObject.toString());
+
+				if (result != null) {
+					List<PyObject> data = new ArrayList<>(result.asList());
+					this.label = data.get(0).toString();
+					this.confidence = data.get(1).toString();
+					this.db = data.get(2).toString();
+					EventBus.getDefault().post(this);
+				}
+
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}
 		}
 
+		static void flatten(Object object, List<Float> list) {
+			if (object.getClass().isArray())
+				for (int i = 0; i < Array.getLength(object); ++i)
+					flatten(Array.get(object, i), list);
+			else
+				list.add((float)object);
+		}
+
+		static float[] flatten(Object object) {
+			List<Float> list = new ArrayList<>();
+			flatten(object, list);
+			int size = list.size();
+			float[] result = new float[size];
+			for (int i = 0; i < size; ++i)
+				result[i] = list.get(i);
+			return result;
+		}
 		@Override
 		protected void onPostExecute(Void aVoid) {
 			StreamingSoundRecorder soundRecorder = mSoundRecorderWeakReference.get();
@@ -255,4 +311,5 @@ public class StreamingSoundRecorder {
 			}
 		}
 	}
+
 }

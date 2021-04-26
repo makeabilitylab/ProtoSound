@@ -1,5 +1,6 @@
 plugins {
     id 'com.android.application'
+    id 'com.chaquo.python'
 }
 
 android {
@@ -14,6 +15,27 @@ android {
         versionName "0.93"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        ndk {
+            abiFilters "armeabi-v7a"
+        }
+        python {
+            pip {
+                install "torch"
+                install "torchvision"
+                install "pandas"
+                install "numpy"
+                install "librosa"
+                install "scipy"
+                install "tqdm"
+            }
+            //buildPython "python3"
+        }
+    }
+
+    sourceSets {
+        main {
+            python.srcDir "src/main/python"
+        }
     }
 
     buildTypes {
@@ -29,7 +51,6 @@ android {
 }
 
 dependencies {
-
     implementation 'androidx.appcompat:appcompat:1.2.0'
     implementation 'com.google.android.material:material:1.3.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
@@ -37,9 +58,6 @@ dependencies {
     implementation 'androidx.navigation:navigation-ui:2.3.3'
     implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.3.0'
     implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.3.0'
-
-    // SocketIO
-    implementation 'com.github.nkzawa:socket.io-client:0.6.0'
 
     // Scalable UI
     implementation 'com.intuit.ssp:ssp-android:1.0.6'
@@ -54,4 +72,11 @@ dependencies {
     testImplementation 'junit:junit:4.13.1'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
+
+    // Pytorch Mobile
+    implementation 'org.pytorch:pytorch_android:1.7.0'
+    implementation 'org.pytorch:pytorch_android_torchvision:1.4.0'
+
+    // EventBus
+    implementation 'org.greenrobot:eventbus:3.2.0'
 }
