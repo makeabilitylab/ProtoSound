@@ -1,6 +1,5 @@
 plugins {
     id 'com.android.application'
-    id 'com.chaquo.python'
 }
 
 android {
@@ -15,27 +14,6 @@ android {
         versionName "0.93"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-        ndk {
-            abiFilters "armeabi-v7a"
-        }
-        python {
-            pip {
-                install "torch"
-                install "torchvision"
-                install "pandas"
-                install "numpy"
-                install "librosa"
-                install "scipy"
-                install "tqdm"
-            }
-            //buildPython "python3"
-        }
-    }
-
-    sourceSets {
-        main {
-            python.srcDir "src/main/python"
-        }
     }
 
     buildTypes {
@@ -92,5 +70,4 @@ dependencies {
 //    // Apache Commons IO
 //    implementation 'org.apache.commons:commons-io:2.8'
     compile group: 'commons-io', name: 'commons-io', version: '2.8.0'
-
 }

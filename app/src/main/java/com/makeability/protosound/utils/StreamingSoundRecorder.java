@@ -17,12 +17,8 @@ package com.makeability.protosound.utils;
  */
 
 import android.content.Context;
-import android.content.Intent;
-import android.content.res.AssetFileDescriptor;
-import android.content.res.AssetManager;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
-import android.media.AudioTrack;
 import android.media.MediaRecorder;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -32,43 +28,22 @@ import android.os.Looper;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.chaquo.python.PyObject;
-import com.chaquo.python.Python;
 import com.makeability.protosound.MainActivity;
 
 import org.greenrobot.eventbus.EventBus;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.pytorch.IValue;
-import org.pytorch.Module;
-import org.pytorch.Tensor;
 
 import java.io.BufferedOutputStream;
-import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Array;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import java.nio.FloatBuffer;
-import java.nio.MappedByteBuffer;
-import java.nio.channels.FileChannel;
-import java.text.SimpleDateFormat;
-import java.time.LocalTime;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
 import static com.makeability.protosound.MainActivity.TEST_END_TO_END_PREDICTION_LATENCY_MODE;
-import static com.makeability.protosound.MainActivity.notificationChannelIsCreated;
 import static com.makeability.protosound.utils.HelperUtils.convertByteArrayToShortArray;
 import static com.makeability.protosound.utils.HelperUtils.db;
 

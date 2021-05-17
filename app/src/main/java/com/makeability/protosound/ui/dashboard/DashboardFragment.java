@@ -28,23 +28,18 @@ import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
-import org.greenrobot.eventbus.EventBus;
-import org.pytorch.IValue;
-import org.pytorch.Module;
-import org.pytorch.Tensor;
-import com.chaquo.python.PyObject;
 import com.google.android.material.textfield.TextInputEditText;
 import com.makeability.protosound.MainActivity;
 import com.makeability.protosound.R;
 import com.makeability.protosound.utils.ProtoApp;
 import com.makeability.protosound.utils.SoundRecorder;
-import com.makeability.protosound.utils.ProtoModel;
 
+import org.greenrobot.eventbus.EventBus;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.pytorch.Module;
 
-import java.lang.reflect.Array;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -59,7 +54,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 
 import static com.makeability.protosound.MainActivity.TEST_END_TO_END_TRAINING_LATENCY_MODE;
 
@@ -393,16 +387,6 @@ public class DashboardFragment extends Fragment {
                 if (!checkAllFieldsExisted()) {
                     return;
                 }
-
-                //if (MainActivity.mSocket != null) {
-
-                //btn.setText(R.string.submit_to_server);
-//                } else {
-//                    Toast.makeText(getActivity(), "Not connect to a socket. Please connect to a socket on step 1", Toast.LENGTH_SHORT).show();
-//                    return;
-//                }
-
-
 
                 JSONObject soundPackage = new JSONObject();
                 Map<Integer, List<Short>> map = new HashMap<>();
