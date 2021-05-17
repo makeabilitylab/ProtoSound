@@ -138,8 +138,6 @@ public class StreamingSoundRecorder {
 		private WeakReference<StreamingSoundRecorder> mSoundRecorderWeakReference;
 		private AudioRecord mAudioRecord;
 		private ProtoApp model;
-		private Module module;
-		private PyObject protosoundApp;
 		public String label;
 		public String confidence;
 		public String db;
@@ -147,9 +145,7 @@ public class StreamingSoundRecorder {
 		RecordAudioAsyncTask(StreamingSoundRecorder context, ProtoApp model) {
 			mSoundRecorderWeakReference = new WeakReference<>(context);
 			this.model = model;
-			this.module = model.getModule();
-			this.protosoundApp = model.getProtosoundApp();
-		}
+			}
 
 		@Override
 		protected void onPreExecute() {

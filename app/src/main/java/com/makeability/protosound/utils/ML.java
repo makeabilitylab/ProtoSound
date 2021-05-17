@@ -44,26 +44,14 @@ public class ML {
         mfccConvert.setfMin(20);
         mfccConvert.setfMax(8300);
         float[][] spec2 = mfccConvert.melSpectrogramWithComplexValueProcessing(wav);
-//        for (int i = 0; i < spec.length; i++) {
-//            for (int j = 0; j < spec[0].length; j++) {
-//                spec[i][j] = (float) spec[i][j];
-//            }
-//        }
 
-//        for (int i = 0; i < spec2.length; i++) {
-//            Log.d(TAG, "SPECMEL 1" + i + " " + Arrays.toString(spec2[i]));
-//
-//        }
         double[][] spec = new double[spec2.length][spec2[0].length];
         for (int i = 0; i < spec2.length; i++) {
             for (int j = 0; j < spec2[0].length; j++) {
                 spec[i][j] =  spec2[i][j];
             }
         }
-//        for (int i = 0; i < spec.length; i++) {
-//            Log.d(TAG, "SPECMEL 2 " + i + " " + Arrays.toString(spec[i]));
-//
-//        }
+
         spec = mfccConvert.powerToDb(spec);
         return spec;
     }
@@ -129,19 +117,7 @@ public class ML {
 
         double max =  Arrays.stream(spec).flatMapToDouble(Arrays::stream).max().getAsDouble();
         double min =  Arrays.stream(spec).flatMapToDouble(Arrays::stream).min().getAsDouble();
-//        float min = Float.MAX_VALUE;
-//        float max = Float.MIN_VALUE;
-//        for (int i = 0; i < n; i++) {
-//            for (int j = 0; j < m; j++) {
-//                if (spec[i][j] > max) {
-//                    max = (float) spec[i][j];
-//                }
-//                if (spec[i][j] < min) {
-//                    min = (float) spec[i][j];
-//                }
-//
-//            }
-//        }
+
         float[][] res = new float[n][m];
         for (int i = 0; i < n; i++)
             for (int j = 0; j < m; j++) {

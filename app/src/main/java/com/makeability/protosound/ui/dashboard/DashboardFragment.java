@@ -66,7 +66,6 @@ import static com.makeability.protosound.MainActivity.TEST_END_TO_END_TRAINING_L
 public class DashboardFragment extends Fragment {
     private String TAG = "Dashboard";
     private ProtoApp model;
-    private PyObject protosoundApp;
     private Module module;
     public String location;
     public String submitAudioTime;
@@ -119,7 +118,6 @@ public class DashboardFragment extends Fragment {
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
         this.model = (ProtoApp) context.getApplicationContext();
-        this.protosoundApp = model.getProtosoundApp();
         this.module = model.getModule();
     }
 
@@ -142,8 +140,8 @@ public class DashboardFragment extends Fragment {
         // setup port number edit text
         // setup Listener for 15 record and playback buttons
 
-        TextInputEditText portNumberEditText = (TextInputEditText) root.findViewById(R.id.port_number);
-        Button confirmPort = (Button) root.findViewById(R.id.confirm_port);
+//        TextInputEditText portNumberEditText = (TextInputEditText) root.findViewById(R.id.port_number);
+//        Button confirmPort = (Button) root.findViewById(R.id.confirm_port);
         TextInputEditText locationEditText = (TextInputEditText) root.findViewById(R.id.testing_location);
         Button confirmLocation = root.findViewById(R.id.confirm_location);
         setLocation(locationEditText, confirmLocation);

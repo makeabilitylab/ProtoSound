@@ -53,13 +53,12 @@ import java.util.Set;
 public class ProtoApp extends Application {
     private static final String TAG = "ProtoApp";
     private Module mModuleEncoder;
-    private PyObject protosoundApp;
 
     private final int RATE = 44100;
     private final int WAYS = 5;
     private final int SHOTS = 5;
     private final int BUFFER_SIZE = 3;          // originally 4
-    private final float THRESHOLD = 0.7f;      // originally 0.6
+    private final float THRESHOLD = 0.75f;      // originally 0.6
     private final boolean SHOULD_RECORD_TRAINING_TIME = true;
     private final boolean SHOULD_RECORD_PREDICTION_TIME = true;
     private String INTERNAL_STORAGE;
@@ -175,11 +174,6 @@ public class ProtoApp extends Application {
             for (int i = 0; i < backgroundNoise.length; i++) {
                 backgroundNoise[i] = backgroundNoiseList.get(i) / 32768.0;
             }
-//            double[] backgroundNoise = new double[map.get(25).length];
-//            short[] bgList = map.get(25);
-//            for (int i = 0; i < backgroundNoise.length; i++) {
-//                backgroundNoise[i] = bgList[i] / 32768.0;
-//            }
 
             Log.d(TAG, "BACKGROUNDNOISE " + Arrays.toString(backgroundNoise));
 
@@ -215,27 +209,16 @@ public class ProtoApp extends Application {
                 double[] data = new double[map.get(i).size()];
                 List<Short> dataList = map.get(i);
 
-                //JSONArray dataJSON = jsonData.getJSONArray("data_"+i);
-                //int[] data = new int[dataJSON.length()];
-//                for (int j = 0; j < dataJSON.length(); j++) {
-//                    //data[i] = ((short) dataJSON.get(i) / 32768.0);
-//                    data[i] = dataJSON.getInt(i) ;
-//                    if (data[i] > 0.0) {
-//                        Log.d(TAG, "DKM " + data[i]);
-//                    }
-//                }
                 for (int j = 0; j < data.length; j++) {
                     data[j] = dataList.get(j) / 32768.0;
                     outputWriter.write(Double.toString(data[j]));
                     outputWriter.newLine();
                 }
 
-//                Log.d(TAG, "OUTPUT " + Arrays.toString(data));
-//                Log.d(TAG, "OUTPUT LEN " + data.length);
+
                 data = Arrays.copyOfRange(data, 700, data.length);
                 double[] output = addBackgroundNoise(data, backgroundNoise);
 
-            //    Log.d(TAG, "OUTPUT LEN " + output.length);
                 String filename = currentDir + "/" + location + "_" + label + "_user_" + i % 5 + ".wav";
 
                 // Write to WAV file
@@ -295,8 +278,6 @@ public class ProtoApp extends Application {
             Log.d(TAG, "SHAPE IS " + data.length + " " + data[0].length + " " + data[0][0].length + " " + data[0][0][0].length);
 
             Tensor inputTensor = Tensor.fromBlob(flatten(data), new long[]{ data.length,data[0].length,data[0][0].length,data[0][0][0].length});
-//            Log.d(TAG, "BATCH " + Arrays.deepToString(data));
-//            Log.d(TAG, "INPUTTENSOR " + inputTensor);
             Tensor outputTensor = mModuleEncoder.forward(IValue.from(inputTensor)).toTensor();
             long[] outputShape = outputTensor.shape();
             Log.d(TAG, "OUTPUT IS " + outputTensor);
@@ -322,16 +303,15 @@ public class ProtoApp extends Application {
                     meanSupportEmbeddings[j][k] = mean;
                 }
             }
+            double elapsedTime;
             if (SHOULD_RECORD_TRAINING_TIME) {
                 double endTime = System.currentTimeMillis();
-                double elapsedTime = (endTime - startTime) / 1000.0;
+                elapsedTime = (endTime - startTime) / 1000.0;
                 FileUtils.writeStringToFile(new File(TRAINING_TIME_FILE), elapsedTime+"\n", StandardCharsets.UTF_8, true);
                 Log.d(TAG, "TRAINING TIME " + elapsedTime);
             }
 
-//            Log.d(TAG, "MEAN SUPPORT EMBEDDINGS" + Arrays.deepToString(meanSupportEmbeddings));
-//            Log.d(TAG, "MEAN SUPPORT EMBEDDINGS LEN " + meanSupportEmbeddings.length + " " + meanSupportEmbeddings[0].length);
-            return "";
+            return Double.toString(elapsedTime);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -373,45 +353,32 @@ public class ProtoApp extends Application {
             }
             double startTime = System.currentTimeMillis();
             float[][] specScaled = ML.specToImage(ML.getMelSspectrogramDb(queryFile));
-//            for (int i = 0; i < specScaled.length; i++) {
-//                Log.d(TAG, "SPECSCALED ROW " + i + " " + Arrays.toString(specScaled[i]));
-//
-//            }
+
             float[][][][] arr = new float[1][1][128][87];
             arr[0][0] = specScaled;
-            //Log.d(TAG, "QUERY DATA " + Arrays.deepToString(arr));
 
             Tensor inputTensor = Tensor.fromBlob(flatten(arr), new long[]{ arr.length,arr[0].length,arr[0][0].length,arr[0][0][0].length});
-            //Log.d(TAG, "INPUTTENSOR SHAPE " + Arrays.toString(inputTensor.shape()));
             Tensor outputTensor = mModuleEncoder.forward(IValue.from(inputTensor)).toTensor();
-//            Log.d(TAG, "OUTPUTTENSOR SHAPE " + Arrays.toString(outputTensor.shape()));
-//            Log.d(TAG, "INPUTTENSOR DTYPE " + inputTensor.dtype());
-//            Log.d(TAG, "OUTPUTTENSOR DTYPE " + outputTensor.dtype());
+
 
             float[] outputArr = outputTensor.getDataAsFloatArray();
             float[][] queryEmbedding = new float[1][outputArr.length];
             queryEmbedding[0] = outputArr;
-//            Log.d(TAG, "QUERY EMBEDDING " + Arrays.deepToString(queryEmbedding));
-//            for (int i = 0; i < 100; i++) {
-//                Log.d(TAG, "QUERY EMBEDDING FIRST 100: " + i + "_ " + outputArr[i]);
-//            }
             float[] confidences = pairwiseDistanceLogits(queryEmbedding, meanSupportEmbeddings);
             if (SHOULD_RECORD_PREDICTION_TIME) {
                 double endTime = System.currentTimeMillis();
                 double elapsedTime = (endTime - startTime) / 1000.0;
                 FileUtils.writeStringToFile(new File(PREDICTION_TIME_FILE), elapsedTime+"\n", StandardCharsets.UTF_8,true);
-                //Log.d(TAG, "PREDICTION TIME " + elapsedTime);
             }
-
-            //Log.d(TAG, "CONFIDENCES " + Arrays.toString(confidences));
 
             for (int i = 0 ; i < bufferArray.length; i++) {
                 bufferArray[i] += confidences[i];
             }
             bufferCounter++;
-            //Log.d(TAG, "BUFFER COUNTER " + bufferCounter);
+
             // Record the query for BUFFER_SIZE times, then
             // find R = d1 / d2. If R <= T, take it.
+            Log.d(TAG, "BUFFER COUNTER " + bufferCounter);
             if (bufferCounter >= BUFFER_SIZE) {
                 int bestIndex = 0;
                 float bestConfidence = -Float.MAX_VALUE;
@@ -429,25 +396,26 @@ public class ProtoApp extends Application {
                     }
                     Log.d(TAG, "BUFFER ARRAY ELEMENTS at "+ i +": " + bufferArray[i]);
                 }
-                //float avgBestConfidence = bestConfidence / BUFFER_SIZE;
-                //float avgSecondBestConfidence = secondBestConfidence / BUFFER_SIZE;
+
+                // Actually no need to divide by BUFFER_SIZE
+                float avgBestConfidence = bestConfidence / BUFFER_SIZE;
+                float avgSecondBestConfidence = secondBestConfidence / BUFFER_SIZE;
                 bufferCounter = 0;
                 Log.d(TAG, "BUFFER ARRAY PREDICTION " + Arrays.toString(bufferArray));
                 bufferArray = new float[5];
-                float ratio = bestConfidence / secondBestConfidence;
-                //Log.d(TAG, "PREDICTION RATIO: " + ratio);
+                float ratio = avgBestConfidence / avgSecondBestConfidence;
+                Log.d(TAG, "PREDICTION RATIO: " + ratio);
                 if (ratio > THRESHOLD) {
-                    Log.d(TAG, "Exit due to confidence " + ratio + " which is > " + THRESHOLD);
+                    Log.d(TAG, "Exit due to R= " + ratio + " which is > threshold of " + THRESHOLD);
                     return null;
                 }
-//                Log.d(TAG, "Making prediction...");
-//                Log.d(TAG, "AVG SECOND BEST CONFIDENCE " + avgSecondBestConfidence);
+                Log.d(TAG, "Making prediction...");
                 List<String> result = new ArrayList<>();
                 result.add(i2c.get(bestIndex)); // label
                 result.add(String.valueOf(bestConfidence));
                 result.add(dbStr);
-//                Log.d(TAG, "PREDICTION LABEL " + result.get(0));
-//                Log.d(TAG, "AVG BEST CONFIDENCE " + result.get(1));
+                Log.d(TAG, "PREDICTION LABEL " + result.get(0));
+                //Log.d(TAG, "AVG BEST CONFIDENCE " + result.get(1));
                 return result;
             }
             return null;
@@ -538,10 +506,6 @@ public class ProtoApp extends Application {
 
     public Module getModule() {
         return mModuleEncoder;
-    }
-
-    public PyObject getProtosoundApp() {
-        return protosoundApp;
     }
 
     private String assetFilePath(Context context, String assetName) {

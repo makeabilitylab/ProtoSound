@@ -73,12 +73,6 @@ import static com.makeability.protosound.utils.Constants.TEST_NUMBER_EXTRA;
 public class MainActivity extends AppCompatActivity {
 	private ProtoApp model;
 	private static final String DEBUG_TAG = "NetworkStatusExample";
-	public static final boolean TEST_MODEL_LATENCY = false;
-	public static final boolean TEST_E2E_LATENCY = false;
-	private static final String TEST_E2E_LATENCY_SERVER = "http://128.208.49.41:8789";
-	private static final String MODEL_LATENCY_SERVER = "http://128.208.49.41:8790";
-	private static final String DEFAULT_SERVER = "http://128.208.49.41:8788";
-	private static final String TEST_SERVER = "http://128.208.49.41:5000";
 	private static final String TAG = "MainActivity";
 	public static boolean notificationChannelIsCreated = false;
 	private String db = "";
@@ -313,7 +307,7 @@ public class MainActivity extends AppCompatActivity {
 	@Subscribe(threadMode = ThreadMode.MAIN)
 	public void onReceiveAudioLabelEvent(StreamingSoundRecorder.RecordAudioAsyncTask event) {
 		Log.i(TAG, "Received audio label event");
-		String db = event.db; // TODO: Hard code this number for now so we don't have to redesign notification
+		String db = event.db;
 		String audio_label = event.label;
 		String accuracy = event.confidence;
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
@@ -384,24 +378,25 @@ public class MainActivity extends AppCompatActivity {
 //	}
 
 
+	//TODO: Convert this to java
 	/**
 	 * Use this function to report checkbox feedback to user
 	 * @param predictedLabel
 	 * @param isTruePrediction
 	 */
 	private void reportUserPredictionFeedback(String predictedLabel, boolean isTruePrediction, String time) {
-		try {
-			JSONObject jsonObject = new JSONObject();
-			jsonObject.put("predictedLabel", predictedLabel);
-			jsonObject.put("location", location);
-			jsonObject.put("isTruePrediction", isTruePrediction);
-			jsonObject.put("time", time);
-
-			PyObject proto = model.getProtosoundApp();
-			proto.callAttr("audio_prediction_feedback", jsonObject.toString());
-		} catch (JSONException e) {
-			e.printStackTrace();
-		}
+//		try {
+//			JSONObject jsonObject = new JSONObject();
+//			jsonObject.put("predictedLabel", predictedLabel);
+//			jsonObject.put("location", location);
+//			jsonObject.put("isTruePrediction", isTruePrediction);
+//			jsonObject.put("time", time);
+//
+//			PyObject proto = model.getProtosoundApp();
+//			proto.callAttr("audio_prediction_feedback", jsonObject.toString());
+//		} catch (JSONException e) {
+//			e.printStackTrace();
+//		}
 	}
 
 	/**
