@@ -1,0 +1,63 @@
+19:13:39,bedroom,voice,FALSE
+19:13:44,bedroom,voice,TRUE
+19:13:49,bedroom,voice,FALSE
+19:13:52,bedroom,knocking,TRUE
+19:13:56,bedroom,voice,FALSE
+19:14:05,bedroom,doorbell,FALSE
+19:14:00,bedroom,voice,FALSE
+19:14:07,bedroom,voice,TRUE
+19:14:11,bedroom,voice,TRUE
+19:14:15,bedroom,voice,TRUE
+19:14:21,bedroom,cat_meow,TRUE
+19:14:19,bedroom,voice,FALSE
+19:14:23,bedroom,voice,FALSE
+19:14:28,bedroom,voice,TRUE
+14:20:53,kitchen,knocking,TRUE
+14:20:55,kitchen,voice,TRUE
+,newtest5,Let's start by liking this box,TRUE
+17:03:37,newtest5,knocking,TRUE
+,newtest5,Let's start by liking this box,TRUE
+17:03:41,newtest5,knocking,TRUE
+17:03:45,newtest5,knocking,TRUE
+17:03:49,newtest5,knocking,TRUE
+17:03:53,newtest5,click,FALSE
+17:03:57,newtest5,click,TRUE
+17:04:01,newtest5,click,FALSE
+,kitchen,Begin by liking this box,TRUE
+,kitchen,Begin by liking this box,TRUE
+,kitchen,Begin by liking this box,TRUE
+,kitchen,Begin by liking this box,TRUE
+,kitchen,Begin by liking this box,TRUE
+,kitchen,Begin by liking this box,FALSE
+,livingroom,Begin by liking this box,TRUE
+,livingroom,Begin by liking this box,TRUE
+,livingroom,Begin by liking this box,TRUE
+,livingroom,Begin by liking this box,TRUE
+,bedroom,Begin by liking this box,TRUE
+17:08:10,bedroom,knocking,TRUE
+17:08:14,bedroom,knocking,TRUE
+17:08:22,bedroom,knocking,TRUE
+17:08:34,bedroom,water_running,TRUE
+17:08:38,bedroom,water_running,FALSE
+17:08:42,bedroom,dog_barking,TRUE
+17:08:46,bedroom,dog_barking,TRUE
+,bedroom,Begin by liking this box,TRUE
+17:13:47,bedroom,knocking,TRUE
+17:13:51,bedroom,knocking,TRUE
+17:13:55,bedroom,knocking,TRUE
+17:13:59,bedroom,knocking,TRUE
+17:14:07,bedroom,door_bell,FALSE
+17:14:11,bedroom,door_bell,TRUE
+17:14:19,bedroom,dog_bark,FALSE
+17:14:23,bedroom,dog_bark,TRUE
+17:14:35,bedroom,dog_bark,TRUE
+17:14:39,bedroom,door_bell,TRUE
+17:14:43,bedroom,door_bell,TRUE
+17:14:47,bedroom,dog_bark,FALSE
+17:15:26,bedroom,knocking,TRUE
+17:15:34,bedroom,knocking,TRUE
+17:15:38,bedroom,knocking,TRUE
+02:58:44,bedroom,dog_bark,False
+02:58:40,bedroom,cat_meow,False
+05:13:54,bedroom,appliances,True
+,bathroom,Begin by liking this box,True

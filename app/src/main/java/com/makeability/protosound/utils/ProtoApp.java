@@ -470,17 +470,17 @@ public class ProtoApp extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        Log.d(TAG, "ProtoModel initialized.");
+        Log.d(TAG, "ProtoApp initialized.");
         INTERNAL_STORAGE = getApplicationContext().getFilesDir().getAbsolutePath();
-        LIBRARY_DATA_PATH = INTERNAL_STORAGE + "/library";
+        LIBRARY_DATA_PATH = new File(assetFilePath(this, "library")).getAbsolutePath();;
         //DATA_PATH = INTERNAL_STORAGE + "/example/meta-test-data";
-        DATA_PATH = INTERNAL_STORAGE + "/meta-test-data";
+        DATA_PATH = new File(assetFilePath(this, "meta-test-data")).getAbsolutePath();
         DATA_CSV_PATH = DATA_PATH + "/user_data.csv";
         //DATA_CSV_PATH = INTERNAL_STORAGE + "/example/meta-test-data/dj_test_data_2.csv";
-        QUERY_PATH = INTERNAL_STORAGE + "/meta-test-query";
-        USER_FEEDBACK_FILE = INTERNAL_STORAGE + "/user_feedback.csv";
-        TRAINING_TIME_FILE = INTERNAL_STORAGE + "/training_time.csv";
-        PREDICTION_TIME_FILE = INTERNAL_STORAGE + "/model_prediction_time.csv";
+        QUERY_PATH = new File(assetFilePath(this, "meta-test-query")).getAbsolutePath();
+        USER_FEEDBACK_FILE = new File(assetFilePath(this, "user_feedback.csv")).getAbsolutePath();
+        TRAINING_TIME_FILE = new File(assetFilePath(this, "training_time.csv")).getAbsolutePath();
+        PREDICTION_TIME_FILE = new File(assetFilePath(this, "model_prediction_time.csv")).getAbsolutePath();
         String moduleFileAbsoluteFilePath = "";
         if (mModuleEncoder == null) {
             moduleFileAbsoluteFilePath = new File(
