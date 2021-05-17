@@ -36,6 +36,7 @@ import com.chaquo.python.PyObject;
 import com.google.android.material.textfield.TextInputEditText;
 import com.makeability.protosound.MainActivity;
 import com.makeability.protosound.R;
+import com.makeability.protosound.utils.ProtoApp;
 import com.makeability.protosound.utils.SoundRecorder;
 import com.makeability.protosound.utils.ProtoModel;
 
@@ -59,11 +60,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+
 import static com.makeability.protosound.MainActivity.TEST_END_TO_END_TRAINING_LATENCY_MODE;
 
 public class DashboardFragment extends Fragment {
     private String TAG = "Dashboard";
-    private ProtoModel model;
+    private ProtoApp model;
     private PyObject protosoundApp;
     private Module module;
     public String location;
@@ -116,7 +118,7 @@ public class DashboardFragment extends Fragment {
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
-        this.model = (ProtoModel) context.getApplicationContext();
+        this.model = (ProtoApp) context.getApplicationContext();
         this.protosoundApp = model.getProtosoundApp();
         this.module = model.getModule();
     }
@@ -234,7 +236,8 @@ public class DashboardFragment extends Fragment {
                 locationEditText.setError("Please enter your testing location");
             } else {
                 //MainActivity.mSocket.emit("submit_location", locationPackage);
-                protosoundApp.callAttr("submit_location", testingLocation);
+                // protosoundApp.callAttr("submit_location", testingLocation);
+                model.submitLocation(testingLocation);
                 this.location = testingLocation;
             }
         });
@@ -404,7 +407,7 @@ public class DashboardFragment extends Fragment {
 
 
                 JSONObject soundPackage = new JSONObject();
-
+                Map<Integer, List<Short>> map = new HashMap<>();
                 for (int i = 0; i < recordButtonList.length; i++) {
                     if (sampleRecorded[i]) {
                         byte[] byteArray = getBytesFromPCM(VOICE_FILE_NAME + recordButtonList[i] + ".pcm");
@@ -413,8 +416,8 @@ public class DashboardFragment extends Fragment {
                         for (short num : shortArray) {
                             soundBuffer.add(num);
                         }
+                        map.put(i, soundBuffer);
                         soundPackage.put("data_" + i, new JSONArray(soundBuffer));
-
                     }
                 }
                 List<String> labels = new ArrayList<>(Arrays.asList(labelList));
@@ -429,19 +432,8 @@ public class DashboardFragment extends Fragment {
                 }
                 soundPackage.put("predefinedSamples", new JSONArray(predefinedSamples));
 
-                //MainActivity.mSocket.emit("submit_data", soundPackage);
+                String submitAudioTime = model.submitData(soundPackage, map);
 
-                PyObject batch = protosoundApp.callAttr("submit_data", soundPackage.toString());
-                float[][][][] batchArr = batch.toJava(float[][][][].class);
-                Log.d(TAG, "SHAPE IS " + batchArr.length + " " + batchArr[0].length + " " + batchArr[0][0].length + " " + batchArr[0][0][0].length);
-
-                Tensor inputTensor = Tensor.fromBlob(flatten(batchArr), new long[]{batchArr.length, batchArr[0].length, batchArr[0][0].length, batchArr[0][0][0].length});
-                Tensor outputTensor = module.forward(IValue.from(inputTensor)).toTensor();
-                long[] outputShape = outputTensor.shape();
-                Log.d(TAG, "OUTPUT IS " + outputTensor + "and SHAPE is " + outputTensor.shape());
-
-                float[] outputArr = outputTensor.getDataAsFloatArray();
-                String submitAudioTime = protosoundApp.callAttr("train_data", outputArr, outputShape).toString();
                 this.submitAudioTime = submitAudioTime;
                 EventBus.getDefault().post(this);
             } catch (FileNotFoundException | JSONException e) {
@@ -451,23 +443,7 @@ public class DashboardFragment extends Fragment {
 
     }
 
-    static void flatten(Object object, List<Float> list) {
-        if (object.getClass().isArray())
-            for (int i = 0; i < Array.getLength(object); ++i)
-                flatten(Array.get(object, i), list);
-        else
-            list.add((float)object);
-    }
 
-    static float[] flatten(Object object) {
-        List<Float> list = new ArrayList<>();
-        flatten(object, list);
-        int size = list.size();
-        float[] result = new float[size];
-        for (int i = 0; i < size; ++i)
-            result[i] = list.get(i);
-        return result;
-    }
 
     private void startRecording(int id) {
         Log.d(TAG, "startRecording: ");

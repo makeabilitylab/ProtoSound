@@ -98,7 +98,7 @@ public class StreamingSoundRecorder {
 
 	private Set<String> connectedHostIds;
 	private int ONE_SECOND_SOUND_COUNTER = 0;
-	private ProtoModel model;
+	private ProtoApp model;
 
 	enum State {
 		IDLE, RECORDING, PLAYING
@@ -112,7 +112,7 @@ public class StreamingSoundRecorder {
 	public StreamingSoundRecorder(Context context, String outputFileName) {
 		mOutputFileName = outputFileName;
 		mContext = context;
-		model = (ProtoModel) context.getApplicationContext();
+		model = (ProtoApp) context.getApplicationContext();
 	}
 
 
@@ -137,14 +137,14 @@ public class StreamingSoundRecorder {
 	public static class RecordAudioAsyncTask extends AsyncTask<Void, Void, Void> {
 		private WeakReference<StreamingSoundRecorder> mSoundRecorderWeakReference;
 		private AudioRecord mAudioRecord;
-		private ProtoModel model;
+		private ProtoApp model;
 		private Module module;
 		private PyObject protosoundApp;
 		public String label;
 		public String confidence;
 		public String db;
 
-		RecordAudioAsyncTask(StreamingSoundRecorder context, ProtoModel model) {
+		RecordAudioAsyncTask(StreamingSoundRecorder context, ProtoApp model) {
 			mSoundRecorderWeakReference = new WeakReference<>(context);
 			this.model = model;
 			this.module = model.getModule();
@@ -243,24 +243,14 @@ public class StreamingSoundRecorder {
 				}
 				jsonObject.put("db", db);
 				Log.i(TAG, "Sending audio data: " + soundBuffer.size());
-				//MainActivity.mSocket.emit("audio_data_c2s", jsonObject);
 
 
-				PyObject query= protosoundApp.callAttr("handle_source", jsonObject.toString());
-				float[][][][] queryArr = query.toJava(float[][][][].class);
-				Log.d(TAG, "SHAPE OF QUERY IS " + queryArr.length + " " + queryArr[0].length + " " + queryArr[0][0].length + " " + queryArr[0][0][0].length);
-
-				Tensor inputTensor = Tensor.fromBlob(flatten(queryArr), new long[]{queryArr.length, queryArr[0].length, queryArr[0][0].length, queryArr[0][0][0].length});
-				Tensor outputTensor = module.forward(IValue.from(inputTensor)).toTensor();
-				long[] outputShape = outputTensor.shape();
-				float[] outputArr = outputTensor.getDataAsFloatArray();
-				PyObject result = protosoundApp.callAttr("get_prediction", outputArr, outputShape, jsonObject.toString());
+				List<String> result = model.handleSource(soundBuffer, db);
 
 				if (result != null) {
-					List<PyObject> data = new ArrayList<>(result.asList());
-					this.label = data.get(0).toString();
-					this.confidence = data.get(1).toString();
-					this.db = data.get(2).toString();
+					this.label = result.get(0);
+					this.confidence = result.get(1);
+					this.db = result.get(2);
 					EventBus.getDefault().post(this);
 				}
 

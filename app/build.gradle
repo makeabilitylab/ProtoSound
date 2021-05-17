@@ -79,4 +79,18 @@ dependencies {
 
     // EventBus
     implementation 'org.greenrobot:eventbus:3.2.0'
+
+    // Apache CSV
+    implementation 'org.apache.commons:commons-csv:1.8'
+
+    // Apache Math
+    implementation 'org.apache.commons:commons-math3:3.6.1'
+
+    // Apache Commons Lang
+    implementation 'org.apache.commons:commons-lang3:3.0'
+
+//    // Apache Commons IO
+//    implementation 'org.apache.commons:commons-io:2.8'
+    compile group: 'commons-io', name: 'commons-io', version: '2.8.0'
+
 }

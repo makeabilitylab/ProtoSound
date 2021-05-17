@@ -34,8 +34,7 @@ import com.kuassivi.component.RipplePulseRelativeLayout;
 import com.makeability.protosound.ui.dashboard.DashboardFragment;
 import com.makeability.protosound.ui.home.models.AudioLabel;
 import com.makeability.protosound.ui.home.service.ForegroundService;
-import com.makeability.protosound.utils.ProtoModel;
-import com.makeability.protosound.utils.ProtoModel;
+import com.makeability.protosound.utils.ProtoApp;
 import com.makeability.protosound.utils.StreamingSoundRecorder;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -72,7 +71,7 @@ import static com.makeability.protosound.utils.Constants.PREDICTION_CHANNEL_ID;
 import static com.makeability.protosound.utils.Constants.TEST_NUMBER_EXTRA;
 
 public class MainActivity extends AppCompatActivity {
-	private ProtoModel model;
+	private ProtoApp model;
 	private static final String DEBUG_TAG = "NetworkStatusExample";
 	public static final boolean TEST_MODEL_LATENCY = false;
 	public static final boolean TEST_E2E_LATENCY = false;
@@ -241,7 +240,7 @@ public class MainActivity extends AppCompatActivity {
 		super.onCreate(savedInstanceState);
 		Log.i(TAG, "onCreate");
 		EventBus.getDefault().register(this);
-		this.model = (ProtoModel) getApplicationContext();
+		this.model = (ProtoApp) getApplicationContext();
 
 		// Get the test extra from the Entrance activity to determine which test we want to run
 		Intent intent = this.getIntent();
@@ -314,17 +313,13 @@ public class MainActivity extends AppCompatActivity {
 	@Subscribe(threadMode = ThreadMode.MAIN)
 	public void onReceiveAudioLabelEvent(StreamingSoundRecorder.RecordAudioAsyncTask event) {
 		Log.i(TAG, "Received audio label event");
-		String db = "1.0"; // TODO: Hard code this number for now so we don't have to redesign notification
-		String audio_label;
-		String accuracy = "1.0";
+		String db = event.db; // TODO: Hard code this number for now so we don't have to redesign notification
+		String audio_label = event.label;
+		String accuracy = event.confidence;
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
 		LocalTime localTime = LocalTime.now();
 		String time = formatter.format(localTime);
 		String recordTime = "";
-
-		audio_label = event.label;
-		accuracy = event.confidence;
-		db = event.db;
 		if (currentMode == TEST_END_TO_END_PREDICTION_LATENCY_MODE) {
 			// If test end2end prediction, there should be a record time to determine the original record time of this sound
 //temp comment out			recordTime =  data.getString("recordTime");

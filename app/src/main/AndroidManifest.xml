@@ -21,7 +21,7 @@
 		android:theme="@style/Theme.ProtoSound"
 		android:screenOrientation="sensorPortrait"
 		android:usesCleartextTraffic="true"
-		android:name=".utils.ProtoModel">
+		android:name=".utils.ProtoApp">
 
 		<activity android:name=".EntranceActivity"
 			android:screenOrientation="portrait">
