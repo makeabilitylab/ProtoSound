@@ -371,8 +371,9 @@ public class DashboardFragment extends Fragment {
             ProgressBar progressBar = root.findViewById(R.id.progressBar);
             progressBar.setVisibility(View.VISIBLE);
             Log.d(TAG, "SUBMIT PROGESSBAR SHOWN");
-
-            try {
+            final Handler handler = new Handler(Looper.getMainLooper());
+            handler.postDelayed(() -> {
+                try {
 
                 ConnectivityManager cm =
                         (ConnectivityManager)getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -420,9 +421,8 @@ public class DashboardFragment extends Fragment {
                 EventBus.getDefault().post(this);
             } catch (FileNotFoundException | JSONException e) {
                 e.printStackTrace();
-            }
+            }},100);
         });
-
     }
 
 
