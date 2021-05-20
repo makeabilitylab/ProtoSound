@@ -51,11 +51,15 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.text.Collator;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static com.makeability.protosound.MainActivity.TEST_END_TO_END_TRAINING_LATENCY_MODE;
 
@@ -81,6 +85,9 @@ public class DashboardFragment extends Fragment {
     private String[] labelList = {"", "", "", "", ""};
     private int countUserClass = 0;
     SoundRecorder recorder;
+    private ArrayAdapter<CharSequence> adapter;
+    private List<CharSequence> availPredefinedSamples;
+    private HashMap<Integer, CharSequence> spinnerSelection;
     int[] recordButtonList = {R.id.record_1, R.id.record_2, R.id.record_3, R.id.record_4, R.id.record_5,
             R.id.record_6, R.id.record_7, R.id.record_8, R.id.record_9, R.id.record_10,
             R.id.record_11, R.id.record_12, R.id.record_13, R.id.record_14, R.id.record_15,
@@ -94,7 +101,7 @@ public class DashboardFragment extends Fragment {
             R.id.play_21, R.id.play_22, R.id.play_23, R.id.play_24, R.id.play_25, R.id.play_bg};
 
     int[] rowSelectAList = {R.id.row_1_select_a, R.id.row_2_select_a, R.id.row_3_select_a, R.id.row_4_select_a, R.id.row_5_select_a};
-    int[] rowSelectBList = {R.id.row_1_select_b, R.id.row_2_select_b, R.id.row_3_select_b, R.id.row_4_select_b, R.id.row_5_select_b};
+    int[] rowSelectBList = {R.id.row_1_select_b, R.id.row_2_select_b, R.id.row_3_select_b, R.id.row_4_select_b, R.id.row_5_select_b};   // predefined
 
     int[] rowRecordList = {R.id.row_1_record, R.id.row_2_record, R.id.row_3_record, R.id.row_4_record, R.id.row_5_record};
     int[] rowPlayList = {R.id.row_1_play, R.id.row_2_play, R.id.row_3_play, R.id.row_4_play, R.id.row_5_play};
@@ -125,7 +132,7 @@ public class DashboardFragment extends Fragment {
                 new ViewModelProvider(this).get(DashboardViewModel.class);
         View root = inflater.inflate(R.layout.fragment_dashboard, container, false);
 
-
+        spinnerSelection = new HashMap<>();
         Map<Integer, Integer> recordPlayMap = new HashMap<>();
         for (int i = 0; i < playButtonList.length; i++) {
             if (!recordPlayMap.containsKey(playButtonList[i])) {
@@ -155,9 +162,15 @@ public class DashboardFragment extends Fragment {
         }
 
 
-        // Create an ArrayAdapter using the string array and a default spinner layout
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(requireActivity(),
+        // Create a dummyAdapter to get use getAutofillOptions() to return array of labels
+        ArrayAdapter dummyAdapter = ArrayAdapter.createFromResource(requireActivity(),
                 R.array.sound_array, android.R.layout.simple_spinner_dropdown_item);
+
+        availPredefinedSamples = new ArrayList<>(Arrays.asList(dummyAdapter.getAutofillOptions()));
+        // Create an ArrayAdapter using the string array and a default spinner layout.
+        // Register it with availPredefinedSamples to update changes
+        adapter = new ArrayAdapter(requireActivity(),android.R.layout.simple_spinner_dropdown_item,  availPredefinedSamples);
+
         // setup Spinner drop-down lists for pre-determined sounds
         for (int i = 0; i < menuList.length; i++) {
             AutoCompleteTextView spinner = (AutoCompleteTextView) root.findViewById(menuList[i]);
@@ -167,6 +180,7 @@ public class DashboardFragment extends Fragment {
             // Set Listener for spinner
             setSelectItemList(spinner, i+1);
         }
+        Log.d(TAG, "PREDEFINED, GET ITEM AT id: " + 0 +", which is: " + adapter.getItem(0));
 
         // Setup 3 edit texts for 3 classes
         for (int i = 0; i < classNameList.length; i++) {
@@ -320,8 +334,27 @@ public class DashboardFragment extends Fragment {
     private void setSelectItemList(final AutoCompleteTextView spinner, int spinner_id) {
         spinner.setOnItemClickListener((parent, view, position, id) -> {
             String selection = (String)parent.getItemAtPosition(position);
+
+            // If this spinner already selects an item,
+            // add this item back to adapter
+            if (spinnerSelection.containsKey(spinner_id)) {
+                availPredefinedSamples.add(spinnerSelection.get(spinner_id));
+                adapter.notifyDataSetChanged(); // sync availPredefinedSamples and adapter
+                spinnerSelection.remove(spinner_id);
+            }
+            // Add this new item to spinnerSelection
+            spinnerSelection.put(spinner_id, selection);
             Log.d(TAG, "spinner " + spinner_id + ": " + selection);
             labelList[spinner_id-1] = selection;
+            availPredefinedSamples.remove(position);
+            adapter.notifyDataSetChanged();
+            // sort just to keep original alphabetical order
+            adapter.sort(new Comparator<CharSequence>() {
+                @Override
+                public int compare(CharSequence s1, CharSequence s2) {
+                    return s1.toString().compareTo(s2.toString());
+                }
+            });
         });
     }
 
