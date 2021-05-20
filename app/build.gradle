@@ -12,7 +12,9 @@ android {
         targetSdkVersion 30
         versionCode 4
         versionName "0.93"
-
+        ndk {
+            abiFilters 'armeabi-v7a'
+        }
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 

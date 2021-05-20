@@ -2,6 +2,7 @@ package com.makeability.protosound.ui.dashboard;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.media.AudioFormat;
@@ -31,6 +32,7 @@ import androidx.lifecycle.ViewModelProvider;
 import com.google.android.material.textfield.TextInputEditText;
 import com.makeability.protosound.MainActivity;
 import com.makeability.protosound.R;
+import com.makeability.protosound.ui.home.service.ForegroundService;
 import com.makeability.protosound.utils.ProtoApp;
 import com.makeability.protosound.utils.SoundRecorder;
 
@@ -113,6 +115,8 @@ public class DashboardFragment extends Fragment {
         super.onAttach(context);
         this.model = (ProtoApp) context.getApplicationContext();
         this.module = model.getModule();
+//        Intent serviceIntent = new Intent(context, ForegroundService.class);
+//        context.stopService(serviceIntent);
     }
 
     public View onCreateView(@NonNull LayoutInflater inflater,

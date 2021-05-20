@@ -17,11 +17,10 @@
     <string name="play">Playback</string>
     <string name="record_11">Record 11</string>
     <string name="record_12">Record 12</string>
-    <string name="tutorial_0">Step 1: Enter a port number then click CONFIRM:</string>
-    <string name="tutorial_1">Step 2: Enter the current testing location (kitchen, bedroom, etc) then click SEND:</string>
-    <string name="tutorial_2a">Step 3: Select between two recording options:</string>
+    <string name="tutorial_1">Step 1: Enter the current testing location (kitchen, bedroom, etc) then click SEND:</string>
+    <string name="tutorial_2a">Step 2: Select <u><b>5 different sounds</b></u> with two recording options:</string>
     <string name="tutorial_2b"><b>Your choice:</b> Choose a name for your sound and record 5 samples for each sound (scroll right to see all 5 record boxes) \n <b>Pre-defined:</b> Choose an existing sound from a list.</string>
-    <string name="tutorial_3">Step 4: Record background noises</string>
+    <string name="tutorial_3">Step 3: Record background noises</string>
     <string name="record_1">Record 1</string>
     <string name="record_2">Record 2</string>
     <string name="record_3">Record 3</string>

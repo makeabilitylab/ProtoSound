@@ -32,6 +32,10 @@ public class HomeFragment extends Fragment {
 
 	private static final String TAG = "HomeFragment";
 	private HomeViewModel homeViewModel;
+	private ImageButton listeningBtn;
+	private RipplePulseRelativeLayout pulseLayout;
+	private TextView soundTextView;
+
 	/**
 	 * Recording
 	 */
@@ -50,9 +54,9 @@ public class HomeFragment extends Fragment {
                 textView.setText(s);
             }
         });
-        ImageButton listeningBtn = (ImageButton) root.findViewById(R.id.mic);
-		RipplePulseRelativeLayout pulseLayout = root.findViewById(R.id.pulseLayout);
-		TextView soundTextView = root.findViewById(R.id.description);
+        listeningBtn = (ImageButton) root.findViewById(R.id.mic);
+		pulseLayout = root.findViewById(R.id.pulseLayout);
+		soundTextView = root.findViewById(R.id.description);
 		// setup button for the first time
 		if (IS_RECORDING) {
 			switchToStartRecord(listeningBtn, pulseLayout, soundTextView);
@@ -61,8 +65,18 @@ public class HomeFragment extends Fragment {
 		}
 //		soundTextView.setText(R.string.tap_blue);
 		setOnClickListening(listeningBtn, pulseLayout, soundTextView);
+		Log.d(TAG, "ONCREATEVIEW EXECUTED");
         return root;
     }
+
+
+	@Override
+	public void onPause() {
+		super.onPause();
+		switchToStopRecord(listeningBtn, pulseLayout, soundTextView);
+		stopRecording(requireActivity());
+		IS_RECORDING = false;
+	}
 
 	private void setOnClickListening(ImageButton listeningBtn, RipplePulseRelativeLayout pulseLayout, TextView soundTextView) {
 //		TextView soundTextView = requireActivity().findViewById(R.id.description);
