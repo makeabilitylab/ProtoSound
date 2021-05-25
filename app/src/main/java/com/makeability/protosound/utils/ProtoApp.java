@@ -27,6 +27,7 @@ import java.io.Reader;
 import java.io.Writer;
 import java.lang.reflect.Array;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -176,8 +177,7 @@ public class ProtoApp extends Application {
             for (int i = 0; i < labels.length; i++) {
                 labelsDict.put(labels[i], predefinedSamples[i * 5]);
             }
-            BufferedWriter outputWriter = null;
-            outputWriter = new BufferedWriter(new FileWriter(INTERNAL_STORAGE +"/test.txt"));
+
             for (int i = 0; i < 25; i++) {
                 if (predefinedSamples[i] == 1) {
                     continue;
@@ -197,8 +197,6 @@ public class ProtoApp extends Application {
 
                 for (int j = 0; j < data.length; j++) {
                     data[j] = dataList.get(j) / 32768.0;
-                    outputWriter.write(Double.toString(data[j]));
-                    outputWriter.newLine();
                 }
 
 
@@ -472,35 +470,75 @@ public class ProtoApp extends Application {
         super.onCreate();
         Log.d(TAG, "ProtoApp initialized.");
         INTERNAL_STORAGE = getApplicationContext().getFilesDir().getAbsolutePath();
-        LIBRARY_DATA_PATH = new File(assetFilePath(this, "library")).getAbsolutePath();;
+        LIBRARY_DATA_PATH = makeDir(INTERNAL_STORAGE + "/library");
+        moveAssetToStorage(this, "library");
+
         //DATA_PATH = INTERNAL_STORAGE + "/example/meta-test-data";
-        DATA_PATH = new File(assetFilePath(this, "meta-test-data")).getAbsolutePath();
-        DATA_CSV_PATH = DATA_PATH + "/user_data.csv";
         //DATA_CSV_PATH = INTERNAL_STORAGE + "/example/meta-test-data/dj_test_data_2.csv";
-        QUERY_PATH = new File(assetFilePath(this, "meta-test-query")).getAbsolutePath();
-        USER_FEEDBACK_FILE = new File(assetFilePath(this, "user_feedback.csv")).getAbsolutePath();
-        TRAINING_TIME_FILE = new File(assetFilePath(this, "training_time.csv")).getAbsolutePath();
-        PREDICTION_TIME_FILE = new File(assetFilePath(this, "model_prediction_time.csv")).getAbsolutePath();
+        DATA_PATH = makeDir(INTERNAL_STORAGE + "/meta-test-data");
+        QUERY_PATH = makeDir(INTERNAL_STORAGE + "/meta-test-query");
+
+        DATA_CSV_PATH = INTERNAL_STORAGE + "/user_data.csv";
+        moveAssetToStorage(this, "user_data.csv");
+        USER_FEEDBACK_FILE = INTERNAL_STORAGE + "/user_feedback.csv";
+        moveAssetToStorage(this, "user_feedback.csv");
+        TRAINING_TIME_FILE = INTERNAL_STORAGE + "/training_time.csv";
+        moveAssetToStorage(this, "training_time.csv");
+        PREDICTION_TIME_FILE = INTERNAL_STORAGE + "/model_prediction_time.csv";
+        moveAssetToStorage(this, "model_prediction_time.csv");
+
         String moduleFileAbsoluteFilePath = "";
         if (mModuleEncoder == null) {
-            moduleFileAbsoluteFilePath = new File(
-                    assetFilePath(this, "protosound_10_classes_scripted.pt")).getAbsolutePath();
+            moduleFileAbsoluteFilePath = INTERNAL_STORAGE + "/protosound_10_classes_scripted.pt";
+            moveAssetToStorage(this, "protosound_10_classes_scripted.pt");
             mModuleEncoder = Module.load(moduleFileAbsoluteFilePath);	// Have a ScriptModule now
         }
-
     }
 
+    private String makeDir(String dirName) {
+        File dir = new File(dirName);
+        if (!dir.exists()) {
+            dir.mkdir();
+        }
+        return dirName;
+    }
     public Module getModule() {
         return mModuleEncoder;
     }
 
-    private String assetFilePath(Context context, String assetName) {
-        File file = new File(context.getFilesDir(), assetName);
-        if (file.exists() && file.length() > 0) {
-            return file.getAbsolutePath();
+    // If assetName is a folder, this method only accommodates the structure
+    // of folder "library" (can use recursion to support other folder structures)
+    // Otherwise, it supports files normally
+    private void moveAssetToStorage(Context context, String assetName) {
+        try {
+            String[] numFiles = context.getAssets().list(assetName);   // list out library
+            if (numFiles.length > 0) {  // A folder. Only library folder in assets
+                List<String> categories = new ArrayList<>();
+                for (String file : numFiles) {
+                    String path = LIBRARY_DATA_PATH + "/" + file;
+                    makeDir(path);
+                    String[] wavFiles = context.getAssets().list(assetName + "/" + file);
+                    for (String wavFile : wavFiles) {
+                        String inFile = assetName + "/" + file + "/" + wavFile;
+                        String outFile = path + "/" + wavFile;
+                        writeAssetFileToStorage(context, inFile , outFile);
+                    }
+                }
+            } else {    // Otherwise, other csv files and protosound.pt
+                writeAssetFileToStorage(context, assetName, INTERNAL_STORAGE + "/" + assetName );
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
+    }
 
-        try (InputStream is = context.getAssets().open(assetName)) {
+    private void writeAssetFileToStorage(Context context, String inFile, String outFile){
+        File file = new File(outFile);
+        // If file already exists in internal storage, skip
+        if (file.exists() && file.length() > 0) {
+            return;
+        }
+        try (InputStream is = context.getAssets().open(inFile)) {
             try (OutputStream os = new FileOutputStream(file)) {
                 byte[] buffer = new byte[4 * 1024];
                 int read;
@@ -509,11 +547,10 @@ public class ProtoApp extends Application {
                 }
                 os.flush();
             }
-            return file.getAbsolutePath();
         } catch (IOException e) {
-            Log.e(TAG, assetName + ": " + e.getLocalizedMessage());
+            Log.e(TAG, file + ": " + e.getLocalizedMessage());
         }
-        return null;
     }
+
 }
 
