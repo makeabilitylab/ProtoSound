@@ -2,12 +2,9 @@ package com.makeability.protosound.ui.dashboard;
 
 import android.Manifest;
 import android.content.Context;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.media.AudioFormat;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -15,9 +12,6 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -29,14 +23,16 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.google.android.material.textfield.TextInputEditText;
 import com.makeability.protosound.MainActivity;
 import com.makeability.protosound.R;
-import com.makeability.protosound.ui.home.service.ForegroundService;
+import com.makeability.protosound.ui.SharedViewModel;
 import com.makeability.protosound.utils.ProtoApp;
 import com.makeability.protosound.utils.SoundRecorder;
 
@@ -55,16 +51,13 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.text.Collator;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 
 import static com.makeability.protosound.MainActivity.TEST_END_TO_END_TRAINING_LATENCY_MODE;
 
@@ -76,7 +69,7 @@ public class DashboardFragment extends Fragment {
     public String submitAudioTime;
 
     private static final boolean TEST = true;
-    private DashboardViewModel dashboardViewModel;
+    private SharedViewModel sharedViewModel;
     private static final int RECORDER_SAMPLE_RATE = 44100;
     private static final int RECORDER_CHANNELS = AudioFormat.CHANNEL_IN_MONO;
     private static final int RECORDER_AUDIO_ENCODING = AudioFormat.ENCODING_PCM_16BIT;
@@ -133,9 +126,9 @@ public class DashboardFragment extends Fragment {
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        dashboardViewModel =
-                new ViewModelProvider(this).get(DashboardViewModel.class);
+        sharedViewModel = new ViewModelProvider(requireActivity()).get(SharedViewModel.class);
         View root = inflater.inflate(R.layout.fragment_dashboard, container, false);
+
         location = null;
         spinnerSelection = new HashMap<>();
         TextView tutorial_5 = root.findViewById(R.id.tutorial_5);
@@ -155,6 +148,14 @@ public class DashboardFragment extends Fragment {
 //        TextInputEditText portNumberEditText = (TextInputEditText) root.findViewById(R.id.port_number);
 //        Button confirmPort = (Button) root.findViewById(R.id.confirm_port);
         TextInputEditText locationEditText = (TextInputEditText) root.findViewById(R.id.testing_location);
+        sharedViewModel.getText().observe(requireActivity(), new Observer<String>() {
+            @Override
+            public void onChanged(@Nullable String s) {
+                location = s;
+                Log.d(TAG, "TEST LOCATION " + location);
+                //locationEditText.setText(s);
+            }
+        });
         Button confirmLocation = root.findViewById(R.id.confirm_location);
         setLocation(locationEditText, confirmLocation);
 
@@ -220,6 +221,20 @@ public class DashboardFragment extends Fragment {
         return root;
     }
 
+    @Override public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        TextInputEditText locationEditText = (TextInputEditText) view.findViewById(R.id.testing_location);
+        sharedViewModel.getText().observe(requireActivity(), new Observer<String>() {
+            @Override
+            public void onChanged(@Nullable String s) {
+                location = s;
+                Log.d(TAG, "TEST LOCATION " + location);
+                //locationEditText.setText(s);
+            }
+        });
+        locationEditText.setText(location);
+    }
+
     private void setLocation(TextInputEditText locationEditText, Button confirmLocation) {
         locationEditText.addTextChangedListener(new TextWatcher() {
             @Override
@@ -229,23 +244,14 @@ public class DashboardFragment extends Fragment {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                confirmLocation.setBackgroundColor(getResources().getColor(R.color.purple_200));
+                confirmLocation.setBackgroundColor(getResources().getColor(R.color.uw));
                 confirmLocation.setText(R.string.submitLocation);
+                sharedViewModel.setText(s.toString());
             }
 
             @Override
             public void afterTextChanged(Editable s) {
                 testingLocation = s.toString();
-            }
-        });
-        locationEditText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View view, boolean b) {
-                if (!b) {
-                    Toast.makeText(getContext(), "Focus Lose", Toast.LENGTH_SHORT).show();
-                }else{
-                    Toast.makeText(getContext(), "Get Focus", Toast.LENGTH_SHORT).show();
-                }
             }
         });
 

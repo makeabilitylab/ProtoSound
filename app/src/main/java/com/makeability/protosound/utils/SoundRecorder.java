@@ -16,7 +16,6 @@
 
 package com.makeability.protosound.utils;
 
-import android.app.Activity;
 import android.content.Context;
 import android.media.AudioFormat;
 import android.media.AudioManager;
@@ -27,12 +26,6 @@ import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
-import android.widget.Button;
-
-import com.makeability.protosound.MainActivity;
-import com.makeability.protosound.R;
-import com.makeability.protosound.ui.dashboard.DashboardFragment;
-import com.makeability.protosound.ui.dashboard.DashboardViewModel;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -40,8 +33,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.List;
 

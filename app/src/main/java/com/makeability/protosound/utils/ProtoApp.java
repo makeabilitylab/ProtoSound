@@ -2,7 +2,13 @@ package com.makeability.protosound.utils;
 
 import android.app.Application;
 import android.content.Context;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.util.Log;
+import android.widget.Toast;
+
+import androidx.annotation.NonNull;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
@@ -304,7 +310,19 @@ public class ProtoApp extends Application {
 
     public List<String> handleSource(List<Short> queryData, double db) {
         try {
+            if (meanSupportEmbeddings == null) {
+                new Handler(Looper.getMainLooper()).post(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(getApplicationContext(), "No training happened! Please train the model first.", Toast.LENGTH_SHORT).show();
+                    }
+                });
+
+                Log.d(TAG, "NO TRAINING HAPPENED YET");
+                return null;
+            }
             if (db < 30.0) return null;
+
             String dbStr = String.valueOf(Math.round(db));
             double[] data = new double[queryData.size()];
             for (int i = 0; i < data.length; i++) {
@@ -326,10 +344,7 @@ public class ProtoApp extends Application {
             while (framesWritten != 0);
             wavFile.close();
 
-            if (meanSupportEmbeddings == null) {
-                Log.d(TAG, "NO TRAINING HAPPENED YET");
-                return null;
-            }
+
             if (bufferCounter == 4) {
                 Log.d(TAG, "Something went wrong with buffer counter");
                 bufferCounter = 0;
@@ -390,6 +405,12 @@ public class ProtoApp extends Application {
                 float ratio = avgBestConfidence / avgSecondBestConfidence;
                 Log.d(TAG, "PREDICTION RATIO: " + ratio);
                 if (ratio > THRESHOLD) {
+                    new Handler(Looper.getMainLooper()).post(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(getApplicationContext(),"No match for query. Try again.", Toast.LENGTH_SHORT).show();
+                        }
+                    });
                     Log.d(TAG, "Exit due to R= " + ratio + " which is > threshold of " + THRESHOLD);
                     return null;
                 }

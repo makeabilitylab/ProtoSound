@@ -2,18 +2,13 @@ package com.makeability.protosound.ui.home;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageButton;
-import android.widget.LinearLayout;
-import android.widget.PopupWindow;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -26,12 +21,14 @@ import androidx.lifecycle.ViewModelProvider;
 import com.kuassivi.component.RipplePulseRelativeLayout;
 import com.makeability.protosound.MainActivity;
 import com.makeability.protosound.R;
+import com.makeability.protosound.ui.SharedViewModel;
 import com.makeability.protosound.ui.home.service.ForegroundService;
 
 public class HomeFragment extends Fragment {
 
 	private static final String TAG = "HomeFragment";
 	private HomeViewModel homeViewModel;
+	private SharedViewModel sharedViewModel;
 	private ImageButton listeningBtn;
 	private RipplePulseRelativeLayout pulseLayout;
 	private TextView soundTextView;
@@ -46,7 +43,20 @@ public class HomeFragment extends Fragment {
                              ViewGroup container, Bundle savedInstanceState) {
         homeViewModel =
                 new ViewModelProvider(this).get(HomeViewModel.class);
+		sharedViewModel = new ViewModelProvider(requireActivity()).get(SharedViewModel.class);
+
+
         View root = inflater.inflate(R.layout.fragment_home, container, false);
+		ListView listView = root.findViewById(R.id.listView);
+		sharedViewModel.getAdapter().observe(requireActivity(), new Observer<MainActivity.TimelineAdapter>() {
+			@Override
+			public void onChanged(@Nullable MainActivity.TimelineAdapter adapter) {
+				listView.setAdapter(adapter);
+				listView.setEnabled(false);
+
+				//locationEditText.setText(s);
+			}
+		});
         final TextView textView = root.findViewById(R.id.text_home);
         homeViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
             @Override

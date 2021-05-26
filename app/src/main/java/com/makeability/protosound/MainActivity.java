@@ -36,6 +36,7 @@ import android.widget.Toast;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.kuassivi.component.RipplePulseRelativeLayout;
 import com.makeability.protosound.ui.dashboard.DashboardFragment;
+import com.makeability.protosound.ui.SharedViewModel;
 import com.makeability.protosound.ui.home.models.AudioLabel;
 import com.makeability.protosound.ui.home.service.ForegroundService;
 import com.makeability.protosound.utils.ProtoApp;
@@ -44,6 +45,7 @@ import com.makeability.protosound.utils.StreamingSoundRecorder;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
@@ -55,13 +57,8 @@ import org.greenrobot.eventbus.ThreadMode;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.pytorch.Module;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.text.SimpleDateFormat;
 import java.time.LocalTime;
@@ -95,6 +92,7 @@ public class MainActivity extends AppCompatActivity {
 	private String location = "";
 	//	public ListView listView;
 	public static int currentMode = NORMAL_MODE;
+	private SharedViewModel sharedViewModel;
 
 
 	/**
@@ -240,7 +238,7 @@ public class MainActivity extends AppCompatActivity {
 		Log.i(TAG, "onCreate");
 		EventBus.getDefault().register(this);
 		this.model = (ProtoApp) getApplicationContext();
-
+		sharedViewModel = new ViewModelProvider(this).get(SharedViewModel.class);
 		// Get the test extra from the Entrance activity to determine which test we want to run
 		Intent intent = this.getIntent();
 		currentMode = intent.getIntExtra(TEST_NUMBER_EXTRA, NORMAL_MODE);
@@ -346,6 +344,10 @@ public class MainActivity extends AppCompatActivity {
 	@Subscribe(threadMode = ThreadMode.MAIN)
 	public void onReceiveAudioLabelEvent(StreamingSoundRecorder.RecordAudioAsyncTask event) {
 		Log.i(TAG, "Received audio label event");
+//		if (Objects.equals(event.label, null)) {
+//			Toast.makeText(this,"No match for query. Try again.", Toast.LENGTH_SHORT).show();
+//			return;
+//		}
 		String db = event.db;
 		String audio_label = event.label;
 		String accuracy = event.confidence;
@@ -382,6 +384,7 @@ public class MainActivity extends AppCompatActivity {
 		ListView listView = findViewById(R.id.listView);
 		new Handler(Looper.getMainLooper()).post(() -> {
 			TimelineAdapter adapter = new TimelineAdapter(timeLine, getApplicationContext());
+			sharedViewModel.setAdapter(adapter);
 			listView.setAdapter(adapter);
 			// Disable scrolling
 			listView.setEnabled(false);

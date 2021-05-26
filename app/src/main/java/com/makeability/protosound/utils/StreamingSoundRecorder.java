@@ -224,29 +224,11 @@ public class StreamingSoundRecorder {
 					this.db = result.get(2);
 					EventBus.getDefault().post(this);
 				}
-
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}
 		}
 
-		static void flatten(Object object, List<Float> list) {
-			if (object.getClass().isArray())
-				for (int i = 0; i < Array.getLength(object); ++i)
-					flatten(Array.get(object, i), list);
-			else
-				list.add((float)object);
-		}
-
-		static float[] flatten(Object object) {
-			List<Float> list = new ArrayList<>();
-			flatten(object, list);
-			int size = list.size();
-			float[] result = new float[size];
-			for (int i = 0; i < size; ++i)
-				result[i] = list.get(i);
-			return result;
-		}
 		@Override
 		protected void onPostExecute(Void aVoid) {
 			StreamingSoundRecorder soundRecorder = mSoundRecorderWeakReference.get();

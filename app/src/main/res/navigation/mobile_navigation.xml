@@ -19,7 +19,7 @@
 
     <fragment
         android:id="@+id/navigation_help"
-        android:name="com.makeability.protosound.ui.FragmentHelp"
+        android:name="com.makeability.protosound.ui.help.FragmentHelp"
         android:label="@string/title_help"
         tools:layout="@layout/fragment_help"
         />
