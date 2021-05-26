@@ -10,8 +10,8 @@ android {
         applicationId "com.makeability.protosound"
         minSdkVersion 26
         targetSdkVersion 30
-        versionCode 4
-        versionName "0.93"
+        versionCode 7
+        versionName "0.97"
         ndk {
             abiFilters 'armeabi-v7a'
         }
