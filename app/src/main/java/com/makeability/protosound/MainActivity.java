@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.Rect;
 import android.net.ConnectivityManager;
 import android.net.Network;
 import android.net.NetworkInfo;
@@ -17,10 +18,14 @@ import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.BaseAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListAdapter;
 import android.widget.ListView;
@@ -36,6 +41,7 @@ import com.makeability.protosound.ui.home.service.ForegroundService;
 import com.makeability.protosound.utils.ProtoApp;
 import com.makeability.protosound.utils.StreamingSoundRecorder;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.navigation.NavController;
@@ -259,14 +265,42 @@ public class MainActivity extends AppCompatActivity {
 		// Passing each menu ID as a set of Ids because each
 		// menu should be considered as top level destinations.
 		AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
-				R.id.navigation_home, R.id.navigation_dashboard)
+				R.id.navigation_home, R.id.navigation_dashboard, R.id.navigation_help)
 				.build();
 		NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
 		NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
 		NavigationUI.setupWithNavController(navView, navController);
+		navView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
+			@Override
+			public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+				if (item.getItemId() != navView.getSelectedItemId()) {
+					NavigationUI.onNavDestinationSelected(item, navController);
+				}
+				return true;
+			}
+		}
+		);
 
 		checkNetworkConnection();
 		//receiveAudioLabel();
+	}
+
+	// https://stackoverflow.com/questions/4828636/edittext-clear-focus-on-touch-outside/8766475
+	@Override
+	public boolean dispatchTouchEvent(MotionEvent event) {
+		if (event.getAction() == MotionEvent.ACTION_DOWN) {
+			View v = getCurrentFocus();
+			if ( v instanceof EditText) {
+				Rect outRect = new Rect();
+				v.getGlobalVisibleRect(outRect);
+				if (!outRect.contains((int)event.getRawX(), (int)event.getRawY())) {
+					v.clearFocus();
+					InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+					imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+				}
+			}
+		}
+		return super.dispatchTouchEvent( event );
 	}
 
 	@Subscribe(threadMode = ThreadMode.MAIN)
@@ -275,11 +309,11 @@ public class MainActivity extends AppCompatActivity {
 
 		location = event.location;
 
-		Button confirmLocation = (Button) findViewById(R.id.confirm_location);
-		new Handler(Looper.getMainLooper()).post(() -> {
-			confirmLocation.setBackgroundColor(Color.GREEN);
-			confirmLocation.setText("Sent");
-		});
+//		Button confirmLocation = (Button) findViewById(R.id.confirm_location);
+//		new Handler(Looper.getMainLooper()).post(() -> {
+//			confirmLocation.setBackgroundColor(Color.GREEN);
+//			confirmLocation.setText("Sent");
+//		});
 	};
 
 	@Subscribe(threadMode = ThreadMode.MAIN)
@@ -297,9 +331,15 @@ public class MainActivity extends AppCompatActivity {
 		ProgressBar progressBar = findViewById(R.id.progressBar);
 		submitButton.setBackgroundColor(Color.GREEN);
 		submitButton.setText(R.string.training_complete);
+		submitButton.setTextColor(Color.BLACK);
 		new Handler(Looper.getMainLooper()).post(() -> {
 			progressBar.setVisibility(View.GONE);
 		});
+
+		TextView tutorial_4 = findViewById(R.id.tutorial_4);
+		tutorial_4.setVisibility(View.GONE);
+		TextView tutorial_5 = findViewById(R.id.tutorial_5);
+		tutorial_5.setVisibility(View.VISIBLE);
 	}
 
 

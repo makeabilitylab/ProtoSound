@@ -15,6 +15,9 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -22,6 +25,7 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TableRow;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -59,6 +63,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 import static com.makeability.protosound.MainActivity.TEST_END_TO_END_TRAINING_LATENCY_MODE;
@@ -131,8 +136,10 @@ public class DashboardFragment extends Fragment {
         dashboardViewModel =
                 new ViewModelProvider(this).get(DashboardViewModel.class);
         View root = inflater.inflate(R.layout.fragment_dashboard, container, false);
-
+        location = null;
         spinnerSelection = new HashMap<>();
+        TextView tutorial_5 = root.findViewById(R.id.tutorial_5);
+        tutorial_5.setVisibility(View.GONE);
         Map<Integer, Integer> recordPlayMap = new HashMap<>();
         for (int i = 0; i < playButtonList.length; i++) {
             if (!recordPlayMap.containsKey(playButtonList[i])) {
@@ -222,12 +229,23 @@ public class DashboardFragment extends Fragment {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-
+                confirmLocation.setBackgroundColor(getResources().getColor(R.color.purple_200));
+                confirmLocation.setText(R.string.submitLocation);
             }
 
             @Override
             public void afterTextChanged(Editable s) {
                 testingLocation = s.toString();
+            }
+        });
+        locationEditText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View view, boolean b) {
+                if (!b) {
+                    Toast.makeText(getContext(), "Focus Lose", Toast.LENGTH_SHORT).show();
+                }else{
+                    Toast.makeText(getContext(), "Get Focus", Toast.LENGTH_SHORT).show();
+                }
             }
         });
 
@@ -249,6 +267,8 @@ public class DashboardFragment extends Fragment {
                 // protosoundApp.callAttr("submit_location", testingLocation);
                 model.submitLocation(testingLocation);
                 this.location = testingLocation;
+                confirmLocation.setBackgroundColor(Color.GREEN);
+                confirmLocation.setText(R.string.location_submitted);
             }
         });
     }
@@ -287,7 +307,7 @@ public class DashboardFragment extends Fragment {
         preDefined.setOnClickListener(v -> {
             TableRow rowSelectB = requireActivity().findViewById(rowSelectBList[id]);
             TableRow rowSelection = requireActivity().findViewById(selection[id]);
-            TableRow rowPlay = requireActivity().findViewById(rowPlayList[4]);
+            TableRow rowPlay = requireActivity().findViewById(rowPlayList[id]);
             rowPlay.setVisibility(View.INVISIBLE);
             rowSelectB.setVisibility(View.VISIBLE);
             rowSelection.setVisibility(View.GONE);
@@ -327,12 +347,16 @@ public class DashboardFragment extends Fragment {
                 }
                 Log.d(TAG, "EditText: " + labelName);
                 labelList[id - 1] = labelName;
+                checkUserChoiceComplete(id-1);
             }
         });
     }
 
     private void setSelectItemList(final AutoCompleteTextView spinner, int spinner_id) {
         spinner.setOnItemClickListener((parent, view, position, id) -> {
+            String selection_title_id = "selection_title_" + spinner_id;
+            TextView selection_title = requireActivity().findViewById(getResources().getIdentifier(selection_title_id, "id", getContext().getPackageName()));
+            selection_title.setTextColor(Color.GREEN);
             String selection = (String)parent.getItemAtPosition(position);
 
             // If this spinner already selects an item,
@@ -378,6 +402,7 @@ public class DashboardFragment extends Fragment {
                 //Do something after 1200ms
                 btn.setBackgroundColor(Color.GREEN);
                 btn.setText(R.string.done);
+                btn.setTextColor(Color.BLACK);
                 for (int rid : recordButtonList) {
                     if (rid != id) {
                         Button record = requireActivity().findViewById(rid);
@@ -385,7 +410,26 @@ public class DashboardFragment extends Fragment {
                     }
                 }
             }, 1200);
+
+            int row = order / 5;
+            checkUserChoiceComplete(row);
+
         });
+    }
+
+
+    // Check if user has recorded 5 sounds and given a label, then
+    // set the title (e.g. Sound 1) to be green
+    private void checkUserChoiceComplete(int row) {
+        if (row == 5) return;   // row is only from 0->4. Row 5 is background noise
+        for (int i = row * 5; i < row * 5 + 5; i++) {
+            if (!sampleRecorded[i] || Objects.equals(labelList[row], "")) {
+                return;
+            }
+        }
+        String selection_title_id = "selection_title_" + String.valueOf(row+1);
+        TextView selection_title = requireActivity().findViewById(getResources().getIdentifier(selection_title_id, "id", getContext().getPackageName()));
+        selection_title.setTextColor(Color.GREEN);
     }
 
     private void setOnClickPlay(final Button btn, final int id){
@@ -401,31 +445,18 @@ public class DashboardFragment extends Fragment {
     private void setOnClickSubmit(final Button btn, final int id, View root) {
 
         btn.setOnClickListener(v -> {
+            if (!checkAllFieldsExisted()) {
+                return;
+            }
             Log.d(TAG, "Submit to Server");
 
             btn.setBackgroundColor(Color.GRAY);
-            btn.setText(R.string.submitted_to_server);
+            btn.setText(R.string.training_data);
             ProgressBar progressBar = root.findViewById(R.id.progressBar);
             progressBar.setVisibility(View.VISIBLE);
-            Log.d(TAG, "SUBMIT PROGESSBAR SHOWN");
             final Handler handler = new Handler(Looper.getMainLooper());
             handler.postDelayed(() -> {
                 try {
-
-                ConnectivityManager cm =
-                        (ConnectivityManager)getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
-
-                NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
-                boolean isConnected = activeNetwork != null &&
-                        activeNetwork.isConnectedOrConnecting();
-//                if (!isConnected) {
-//                    Toast.makeText(getActivity(), "Please check your internet connection and try again", Toast.LENGTH_SHORT).show();
-//                    return;
-//                }
-                if (!checkAllFieldsExisted()) {
-                    return;
-                }
-
                 JSONObject soundPackage = new JSONObject();
                 Map<Integer, List<Short>> map = new HashMap<>();
                 for (int i = 0; i < recordButtonList.length; i++) {
@@ -496,17 +527,22 @@ public class DashboardFragment extends Fragment {
 //                return false;
 //            }
 //        }
+
+        if (location == null) {
+            Toast.makeText(requireActivity(), "Missing location from Step 1.", Toast.LENGTH_SHORT).show();
+            return false;
+        }
         for (boolean recordedSample : sampleRecorded) {
             if (!recordedSample) {
                 Log.d(TAG, "record not exist");
-                Toast.makeText(requireActivity(), "Missing one or more recordings", Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireActivity(), "Missing one or more user-defined recordings from Step 2.", Toast.LENGTH_SHORT).show();
                 return false;
             }
         }
         for (int i = 0; i < labelList.length; i++) {
             if (labelList[i].isEmpty()) {
                 Log.d(TAG, "Label not exist: " + i);
-                Toast.makeText(requireActivity(), "Missing one or more labels", Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireActivity(), "Missing one or more user-defined labels from Step 2.", Toast.LENGTH_SHORT).show();
                 return false;
             }
         }

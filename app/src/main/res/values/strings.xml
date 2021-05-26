@@ -1,7 +1,8 @@
 <resources>
     <string name="app_name">ProtoSound</string>
     <string name="title_home">Evaluate</string>
-    <string name="title_dashboard">Record</string>
+    <string name="title_dashboard">Train</string>
+    <string name="title_help">Help</string>
     <string name="title_notifications">About</string>
     <string name="class_1">Sound 1:</string>
     <string name="class_2">Sound 2:</string>
@@ -17,10 +18,12 @@
     <string name="play">Playback</string>
     <string name="record_11">Record 11</string>
     <string name="record_12">Record 12</string>
-    <string name="tutorial_1">Step 1: Enter the current testing location (kitchen, bedroom, etc) then click SEND:</string>
-    <string name="tutorial_2a">Step 2: Select <u><b>5 different sounds</b></u> with two recording options:</string>
-    <string name="tutorial_2b"><b>Your choice:</b> Choose a name for your sound and record 5 samples for each sound (scroll right to see all 5 record boxes) \n <b>Pre-defined:</b> Choose an existing sound from a list.</string>
-    <string name="tutorial_3">Step 3: Record background noises</string>
+    <string name="tutorial_1"><b><font color="yellow">Step 1:</font></b> Enter the current testing location (kitchen, bedroom, etc.) then click SUBMIT:</string>
+    <string name="tutorial_2a"><b><font color="yellow">Step 2:</font></b> Select <u><b>5 different sounds</b></u>.\nFor each sound, choose either option:</string>
+    <string name="tutorial_2b"><b>_ Your choice:</b> Record 5 samples and provide a name. Each sample is 1 second long. (Scroll right to see all 5 "Record" boxes) \n\n _ <b>Pre-defined:</b> Choose a sound from a list of 9 provided sounds.</string>
+    <string name="tutorial_3"><b><font color="yellow">Step 3:</font></b> Record background noises</string>
+    <string name="tutorial_4"><font color="yellow">Complete the steps above before training the model</font></string>
+    <string name="tutorial_5"><font color="yellow">Click on "Evaluate" to predict your sounds</font></string>
     <string name="record_1">Record 1</string>
     <string name="record_2">Record 2</string>
     <string name="record_3">Record 3</string>
@@ -57,15 +60,19 @@
     <string name="confirm">Confirm</string>
     <string name="port_connected">Port connected!</string>
     <string name="mic">mic</string>
-    <string name="tap_blue">Tap the blue icon to begin listen</string>
+    <string name="tap_blue">Start predicting</string>
     <string name="training_complete">Training completed</string>
     <string name="recording">Recording</string>
     <string name="done">Recorded</string>
-    <string name="submitted_to_server">Submitted to server</string>
+    <string name="training_data">Training data</string>
     <string name="submit_to_server">TRAIN MODEL</string>
     <string name="user_choice">Your choice</string>
     <string name="pre_defined">Pre-defined</string>
     <string name="greeting"><b>Welcome to ProtoSound</b></string>
-    <string name="send">send</string>
+    <string name="submitLocation">Submit</string>
+    <string name="location_submitted">Location submitted</string>
+    <string name="select_predefined">Tap to select</string>
+    <string name="record_background_noise">Record Background Noise</string>
 
+    <string name="hello_blank_fragment">WHAT THE FUCK</string>
 </resources>
