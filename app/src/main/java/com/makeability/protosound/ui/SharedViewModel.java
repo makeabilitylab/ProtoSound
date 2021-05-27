@@ -15,10 +15,13 @@ import java.util.Map;
 public class SharedViewModel extends ViewModel {
 
     private static final String TAG = "DashboardViewModel";
-    private MutableLiveData<String> mText = new MutableLiveData<>();
+    private MutableLiveData<String> mText = new MutableLiveData<>();    // location
+    private MutableLiveData<Boolean> mLocationSubmitted = new MutableLiveData<>();
     private MutableLiveData<MainActivity.TimelineAdapter> mAdapter = new MutableLiveData<>();   // predictions timeline
-    private MutableLiveData<Map<Integer, Boolean>> mUserChoiceMap = new MutableLiveData<>();  // user choice for sounds
+    private MutableLiveData<Map<Integer, Integer>> mUserChoiceMap = new MutableLiveData<>();  // user choice for sounds
     private MutableLiveData<int[]> mScrollPos = new MutableLiveData<>();    // ScrollView position
+    private MutableLiveData<int[]> mHorizontalScrollPos = new MutableLiveData<>();    // HorizontalScrollView position
+
     private MutableLiveData<boolean[]> mSampleRecorded = new MutableLiveData<>();   // 26 recorded states
 
     private MutableLiveData<String[]> mLabelList = new MutableLiveData<>(); // sound labels
@@ -28,11 +31,18 @@ public class SharedViewModel extends ViewModel {
     private MutableLiveData<List<CharSequence>> mAvailPredefinedSamples = new MutableLiveData<>();
     public void setText(String text) {
         mText.setValue(text);
-        Log.d(TAG, "VIEWMODEL TEXT VALUE: " + mText.getValue());
     }
 
     public LiveData<String> getText() {
         return mText;
+    }
+
+    public LiveData<Boolean> getMLocationSubmitted() {
+        return mLocationSubmitted;
+    }
+
+    public void setMLocationSubmitted(boolean mLocationSubmitted) {
+        this.mLocationSubmitted.setValue(mLocationSubmitted);
     }
 
     public void setAdapter(MainActivity.TimelineAdapter adapter) {
@@ -43,11 +53,11 @@ public class SharedViewModel extends ViewModel {
     }
 
 
-    public LiveData<Map<Integer, Boolean>> getMUserChoiceMap() {
+    public LiveData<Map<Integer, Integer>> getMUserChoiceMap() {
         return mUserChoiceMap;
     }
 
-    public void setMUserChoiceMap(Map<Integer, Boolean> map) {
+    public void setMUserChoiceMap(Map<Integer, Integer> map) {
         mUserChoiceMap.setValue(map);
     }
 
@@ -57,6 +67,14 @@ public class SharedViewModel extends ViewModel {
 
     public void setMScrollPos(int[] scrollPos) {
         mScrollPos.setValue(scrollPos);
+    }
+
+    public LiveData<int[]> getMHorizontalScrollPos() {
+        return mHorizontalScrollPos;
+    }
+
+    public void setMHorizontalScrollPos(int[] mHorizontalScrollPos) {
+        this.mHorizontalScrollPos.setValue(mHorizontalScrollPos);
     }
 
     public LiveData<boolean[]> getMSampleRecorded() {
@@ -91,4 +109,6 @@ public class SharedViewModel extends ViewModel {
     public void setMAvailPredefinedSamples(List<CharSequence> mAvailPredefinedSamples) {
         this.mAvailPredefinedSamples.setValue(mAvailPredefinedSamples);
     }
+
+
 }

@@ -1,6 +1,7 @@
 package com.makeability.protosound.ui.dashboard;
 
 import android.Manifest;
+import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
@@ -17,6 +18,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
+import android.widget.HorizontalScrollView;
 import android.widget.ProgressBar;
 import android.widget.ScrollView;
 import android.widget.TableRow;
@@ -89,8 +91,11 @@ public class DashboardFragment extends Fragment {
     private Map<Integer, CharSequence> spinnerSelection;
 
     // Saved state
+    private boolean locationSubmitted;
     private int[] scrollPos;
-    private Map<Integer, Boolean> userChoiceMap;    // true if YOUR CHOICE
+    private int[] horizontalScrollPos;
+    private Map<Integer, Integer> userChoiceMap;    // 0 is YOUR CHOICE chosen, 1 is PRE-DEFINED, 2 is "Choose again
+                                                    // so displays YOUR CHOICE and PRE-DEFINED
     private Map<Integer, String> selectANameMap;    // Name for YOUR CHOICE sounds
 
 
@@ -114,6 +119,8 @@ public class DashboardFragment extends Fragment {
 
     int[] selectAButtonList = {R.id.select_1a, R.id.select_2a, R.id.select_3a, R.id.select_4a, R.id.select_5a};
     int[] selectBButtonList = {R.id.select_1b, R.id.select_2b, R.id.select_3b, R.id.select_4b, R.id.select_5b};
+    int[] selectAgainAButtonList = {R.id.select_again_1a, R.id.select_again_2a, R.id.select_again_3a, R.id.select_again_4a, R.id.select_again_5a};
+    int[] selectAgainBButtonList = {R.id.select_again_1b, R.id.select_again_2b, R.id.select_again_3b, R.id.select_again_4b, R.id.select_again_5b};
     int[] selection = {R.id.selection_1, R.id.selection_2, R.id.selection_3, R.id.selection_4, R.id.selection_5};
     int[] menuList = {R.id.menu_1, R.id.menu_2, R.id.menu_3, R.id.menu_4, R.id.menu_5};
     int[] classNameList = {R.id.class_1, R.id.class_2, R.id.class_3, R.id.class_4, R.id.class_5};
@@ -138,8 +145,10 @@ public class DashboardFragment extends Fragment {
         View root = inflater.inflate(R.layout.fragment_dashboard, container, false);
 
         location = null;
+        locationSubmitted = false;
         spinnerSelection = new HashMap<>();
         scrollPos = new int[2];
+        horizontalScrollPos = new int[2];
         userChoiceMap = new HashMap<>();
         selectANameMap = new HashMap<>();
         TextView tutorial_5 = root.findViewById(R.id.tutorial_5);
@@ -177,7 +186,18 @@ public class DashboardFragment extends Fragment {
 
         for (int pid : playButtonList) {
             Button play = root.findViewById(pid);
+            play.setEnabled(false);
             setOnClickPlay(play, recordPlayMap.get(pid));
+        }
+
+        for (int i = 0; i < selectAgainAButtonList.length; i++) {
+            Button again = root.findViewById(selectAgainAButtonList[i]);
+            setOnClickAgainA(again, i);
+        }
+
+        for (int i = 0; i < selectAgainBButtonList.length; i++) {
+            Button again = root.findViewById(selectAgainBButtonList[i]);
+            setOnClickAgainB(again, i);
         }
 
 
@@ -232,11 +252,21 @@ public class DashboardFragment extends Fragment {
                 scrollPos = mScrollPos;
             }
         });
+
+        // Restore HorizontalScrollView position
+        sharedViewModel.getMHorizontalScrollPos().observe(requireActivity(), new Observer<int[]>() {
+            @Override
+            public void onChanged(@Nullable int[] mHorizontalPos) {
+                horizontalScrollPos = mHorizontalPos;
+            }
+        });
         ScrollView scrollView = requireActivity().findViewById(R.id.scrollView2);
+        HorizontalScrollView horizontalScrollView = requireActivity().findViewById(R.id.horizontalScrollView);
         scrollView.post(new Runnable() {
             @Override
             public void run() {
                 scrollView.scrollTo(scrollPos[0], scrollPos[1]);
+                horizontalScrollView.scrollTo(horizontalScrollPos[0], horizontalScrollPos[1]);
             }
         });
 
@@ -249,6 +279,21 @@ public class DashboardFragment extends Fragment {
             }
         });
         locationEditText.setText(location);
+
+        // Restore location button
+        sharedViewModel.getMLocationSubmitted().observe(requireActivity(), new Observer<Boolean>() {
+            @Override
+            public void onChanged(Boolean mLocationSubmitted) {
+                locationSubmitted = mLocationSubmitted;
+            }
+        });
+
+
+        if (locationSubmitted) {
+            Button confirmLocation = requireActivity().findViewById(R.id.confirm_location);
+            confirmLocation.setBackgroundColor(Color.GREEN);
+            confirmLocation.setText(R.string.location_submitted);
+        }
 
         // Restore labelList of sound names
         sharedViewModel.getMLabelList().observe(requireActivity(), new Observer<String[]>() {
@@ -277,36 +322,40 @@ public class DashboardFragment extends Fragment {
         adapter = new ArrayAdapter(requireActivity(),android.R.layout.simple_spinner_dropdown_item,  availPredefinedSamples);
 
         // Restore user choice for each sound
-        sharedViewModel.getMUserChoiceMap().observe(requireActivity(), new Observer<Map<Integer, Boolean>>() {
+        sharedViewModel.getMUserChoiceMap().observe(requireActivity(), new Observer<Map<Integer, Integer>>() {
             @Override
-            public void onChanged(@Nullable Map<Integer, Boolean> map) {
+            public void onChanged(@Nullable Map<Integer, Integer> map) {
                 userChoiceMap = map;
             }
         });
         for (Integer id: userChoiceMap.keySet()) {
-            if (userChoiceMap.get(id)) {
+            if (userChoiceMap.get(id) == 0) {
                 // Restore YOUR CHOICE's UI
                 TableRow rowRecord = requireActivity().findViewById(rowRecordList[id]);
                 TableRow rowPlay = requireActivity().findViewById(rowPlayList[id]);
                 TableRow rowSelectA = requireActivity().findViewById(rowSelectAList[id]);
                 TableRow rowSelection = requireActivity().findViewById(selection[id]);
+                Button selectAgainA = requireActivity().findViewById(selectAgainAButtonList[id]);
                 rowRecord.setVisibility(View.VISIBLE);
                 rowPlay.setVisibility(View.VISIBLE);
                 rowSelectA.setVisibility(View.VISIBLE);
                 rowSelection.setVisibility(View.GONE);
+                selectAgainA.setVisibility(View.VISIBLE);
 
                 // Restore YOUR CHOICE sound name
                 String classID = "class_" + (id+1);
                 TextInputEditText className = requireActivity().findViewById(getResources().getIdentifier(classID, "id", getContext().getPackageName()));
                 className.setText(labelList[id]);
-            } else {
+            } else if (userChoiceMap.get(id) == 1) {
                 // Restore PRE-DEFINED's UI
                 TableRow rowSelectB = requireActivity().findViewById(rowSelectBList[id]);
                 TableRow rowSelection = requireActivity().findViewById(selection[id]);
                 TableRow rowPlay = requireActivity().findViewById(rowPlayList[id]);
+                Button selectAgainB = requireActivity().findViewById(selectAgainBButtonList[id]);
                 rowPlay.setVisibility(View.INVISIBLE);
                 rowSelectB.setVisibility(View.VISIBLE);
                 rowSelection.setVisibility(View.GONE);
+                selectAgainB.setVisibility(View.VISIBLE);
                 for (int i = id * 5; i < id * 5 + 5; i++) {
                     sampleRecorded[i] = true;
                     predefinedSamples[i] = 1;
@@ -315,6 +364,9 @@ public class DashboardFragment extends Fragment {
                 AutoCompleteTextView spinner = (AutoCompleteTextView) requireActivity().findViewById(menuList[id]);
                 spinner.setText(spinnerSelection.get(id+1));
                 spinner.setAdapter(adapter);
+            } else {
+                TableRow rowSelection = requireActivity().findViewById(selection[id]);
+                rowSelection.setVisibility(View.VISIBLE);
             }
         }
 
@@ -338,12 +390,17 @@ public class DashboardFragment extends Fragment {
 
         // Restore "Record" states
         for (int i = 0; i < recordButtonList.length; i++) {
-            if (sampleRecorded[i]) {
-                Button btn = requireActivity().findViewById(recordButtonList[i]);
-                btn.setBackgroundColor(Color.GREEN);
-                btn.setText(R.string.done);
-                btn.setTextColor(Color.BLACK);
+            int row = i / 5;
+            if (sampleRecorded[i] && (userChoiceMap.containsKey(row) && userChoiceMap.get(row) == 0 || i == 25) )
+            { // Only restore "Record" for YOUR CHOICE, or when
+                Button recordBtn = requireActivity().findViewById(recordButtonList[i]);
+                recordBtn.setBackgroundColor(Color.GREEN);
+                recordBtn.setText(R.string.done);
+                recordBtn.setTextColor(Color.BLACK);
                 recorder = new SoundRecorder(this.requireContext(), VOICE_FILE_NAME + i + ".pcm", mListener);
+
+                Button playBtn = requireActivity().findViewById(playButtonList[i]);
+                playBtn.setEnabled(true);
             }
             checkUserChoiceComplete(i / 5);    // Check completion for "Sound i"
         }
@@ -352,9 +409,15 @@ public class DashboardFragment extends Fragment {
     @Override
     public void onPause() {
         super.onPause();
+        sharedViewModel.setMLocationSubmitted(locationSubmitted);   // save locationSubmitted
+
         ScrollView scrollView = requireActivity().findViewById(R.id.scrollView2);
         int[] pos = new int[]{scrollView.getScrollX(), scrollView.getScrollY()};
-        sharedViewModel.setMScrollPos(pos);
+        sharedViewModel.setMScrollPos(pos); // save ScrollView pos
+
+        HorizontalScrollView horizontalScrollView = requireActivity().findViewById(R.id.horizontalScrollView);
+        int[] horizontalPos = new int[]{horizontalScrollView.getScrollX(), horizontalScrollView.getScrollY()};
+        sharedViewModel.setMHorizontalScrollPos(horizontalPos); // save HorizontalScrollView pos
     }
 
     private void setLocation(TextInputEditText locationEditText, Button confirmLocation) {
@@ -368,7 +431,9 @@ public class DashboardFragment extends Fragment {
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 confirmLocation.setBackgroundColor(getResources().getColor(R.color.uw));
                 confirmLocation.setText(R.string.submitLocation);
-                sharedViewModel.setText(s.toString());
+                locationSubmitted = false;
+                sharedViewModel.setText(s.toString()); // save location
+
             }
 
             @Override
@@ -383,6 +448,7 @@ public class DashboardFragment extends Fragment {
             } else {
                 model.submitLocation(testingLocation);
                 this.location = testingLocation;
+                sharedViewModel.setMLocationSubmitted(true);
                 confirmLocation.setBackgroundColor(Color.GREEN);
                 confirmLocation.setText(R.string.location_submitted);
             }
@@ -407,6 +473,16 @@ public class DashboardFragment extends Fragment {
             TableRow tableRow = root.findViewById(rowID);
             tableRow.setVisibility(View.GONE);
         }
+
+        for (int btnID : selectAgainAButtonList) {
+            Button btn = root.findViewById(btnID);
+            btn.setVisibility(View.GONE);
+        }
+
+        for (int btnID : selectAgainBButtonList) {
+            Button btn = root.findViewById(btnID);
+            btn.setVisibility(View.GONE);
+        }
     }
 
     private void setUIVisibility(Button userChoice, Button preDefined, int id) {
@@ -415,27 +491,115 @@ public class DashboardFragment extends Fragment {
             TableRow rowPlay = requireActivity().findViewById(rowPlayList[id]);
             TableRow rowSelectA = requireActivity().findViewById(rowSelectAList[id]);
             TableRow rowSelection = requireActivity().findViewById(selection[id]);
+            Button selectAgainA = requireActivity().findViewById(selectAgainAButtonList[id]);
             rowRecord.setVisibility(View.VISIBLE);
             rowPlay.setVisibility(View.VISIBLE);
             rowSelectA.setVisibility(View.VISIBLE);
             rowSelection.setVisibility(View.GONE);
-            userChoiceMap.put(id, true);
+            selectAgainA.setVisibility(View.VISIBLE);
+            userChoiceMap.put(id, 0);
             sharedViewModel.setMUserChoiceMap(userChoiceMap);
         });
         preDefined.setOnClickListener(v -> {
             TableRow rowSelectB = requireActivity().findViewById(rowSelectBList[id]);
             TableRow rowSelection = requireActivity().findViewById(selection[id]);
-            TableRow rowPlay = requireActivity().findViewById(rowPlayList[id]);
+            TableRow rowPlay = requireActivity().findViewById(rowPlayList[id]);   // for some reason need this so that no
+                                                                                    // UI issue when selecting 5 pre-defined
+            Button selectAgainB = requireActivity().findViewById(selectAgainBButtonList[id]);
             rowPlay.setVisibility(View.INVISIBLE);
             rowSelectB.setVisibility(View.VISIBLE);
             rowSelection.setVisibility(View.GONE);
-            for (int i = id * 5; i < id * 5 + 5; i++) {
-                sampleRecorded[i] = true;
-                predefinedSamples[i] = 1;
-            }
-            userChoiceMap.put(id, false);
+            selectAgainB.setVisibility(View.VISIBLE);
+//            for (int i = id * 5; i < id * 5 + 5; i++) {
+//                sampleRecorded[i] = true;
+//                predefinedSamples[i] = 1;
+//            }
+            userChoiceMap.put(id, 1);
             sharedViewModel.setMUserChoiceMap(userChoiceMap);
             sharedViewModel.setMSampleRecorded(sampleRecorded);
+        });
+    }
+
+    // listener for "Choose again" for PRE-DEFINED
+    private void setOnClickAgainB(Button againB, int i) {
+        againB.setOnClickListener(v-> {
+            userChoiceMap.put(i, 2);
+            labelList[i] = "";
+            for (int j = i * 5; j < i * 5 + 5; j++) {
+                sampleRecorded[j] = false;
+                predefinedSamples[j] = 0;
+            }
+            checkUserChoiceComplete(i);
+
+            if (spinnerSelection.containsKey(i+1)) {
+                availPredefinedSamples.add(spinnerSelection.get(i+1));
+                spinnerSelection.remove(i+1);
+
+                // reset adapter to this new availPredefinedSamples
+                adapter = new ArrayAdapter(requireActivity(),android.R.layout.simple_spinner_dropdown_item,  availPredefinedSamples);
+                adapter.sort(new Comparator<CharSequence>() {
+                    @Override
+                    public int compare(CharSequence s1, CharSequence s2) {
+                        return s1.toString().compareTo(s2.toString());
+                    }
+                });
+                AutoCompleteTextView spinner = requireActivity().findViewById(menuList[i]);
+                spinner.setText("");
+
+                // need to reset spinner's listener
+                for (int j = 0; j < menuList.length; j++) {
+                    AutoCompleteTextView spinner2 = (AutoCompleteTextView) requireActivity().findViewById(menuList[j]);
+                    spinner2.setAdapter(adapter);
+                    setSelectItemList(spinner2, j+1);
+                }
+                sharedViewModel.setMAvailPredefinedSamples(availPredefinedSamples);
+                sharedViewModel.setMSpinnerSelection(spinnerSelection);
+            }
+
+            sharedViewModel.setMLabelList(labelList);   // save labelList
+            sharedViewModel.setMSampleRecorded(sampleRecorded); // save sampleRecorded
+
+            TableRow rowSelectB = requireActivity().findViewById(rowSelectBList[i]);
+            TableRow rowSelection = requireActivity().findViewById(selection[i]);
+            rowSelectB.setVisibility(View.GONE);
+            rowSelection.setVisibility(View.VISIBLE);
+            againB.setVisibility(View.GONE);
+        });
+    }
+
+    // listener for "Choose again" for YOUR CHOICE
+    private void setOnClickAgainA(Button againA, int i) {
+        againA.setOnClickListener(v-> {
+            // Reset state
+            userChoiceMap.put(i, 2);
+            labelList[i] = "";
+            // Clear sound name
+            TextInputEditText classTextField = (TextInputEditText) requireActivity().findViewById(classNameList[i]);
+            classTextField.setText("");
+            for (int j = i * 5; j < i * 5 + 5; j++) {
+                sampleRecorded[j] = false;
+                Button recordBtn = requireActivity().findViewById(recordButtonList[j]);
+                recordBtn.setBackgroundColor(Color.TRANSPARENT);
+                String record_id = "record_" + (j % 5 + 1);
+                recordBtn.setTextColor(getResources().getColor(R.color.uw));
+                recordBtn.setText(getResources().getIdentifier(record_id, "string", getContext().getPackageName()));
+
+                Button playBtn = requireActivity().findViewById(playButtonList[j]);
+                playBtn.setEnabled(false);
+            }
+            checkUserChoiceComplete(i);
+            sharedViewModel.setMLabelList(labelList);   // save labelList
+            sharedViewModel.setMSampleRecorded(sampleRecorded); // save sampleRecorded
+
+            TableRow rowSelectA = requireActivity().findViewById(rowSelectAList[i]);
+            TableRow rowSelection = requireActivity().findViewById(selection[i]);
+            TableRow rowPlay = requireActivity().findViewById(rowPlayList[i]);
+            TableRow rowRecord = requireActivity().findViewById(rowRecordList[i]);
+            rowSelectA.setVisibility(View.GONE);
+            rowSelection.setVisibility(View.VISIBLE);
+            rowPlay.setVisibility(View.GONE);
+            rowRecord.setVisibility(View.GONE);
+            againA.setVisibility(View.GONE);
         });
     }
 
@@ -496,12 +660,11 @@ public class DashboardFragment extends Fragment {
             spinnerSelection.put(spinner_id, selection);
             sharedViewModel.setMSpinnerSelection(spinnerSelection);  // Save spinnerSelection
 
-            Log.d(TAG, "spinner " + spinner_id + ": " + selection);
-
             labelList[spinner_id-1] = selection;
             sharedViewModel.setMLabelList(labelList);   // Save labelList
-
-            availPredefinedSamples.remove(position);
+            //Log.d(TAG, "PREDEF BEFORE REMOVE " + Arrays.toString(availPredefinedSamples.toArray()));
+            availPredefinedSamples.remove(selection);
+            //Log.d(TAG, "PREDEF AFTER REMOVE " + Arrays.toString(availPredefinedSamples.toArray()));
             sharedViewModel.setMAvailPredefinedSamples(availPredefinedSamples); // Save availPredefinedSamples
             adapter.notifyDataSetChanged();
             // sort just to keep original alphabetical order
@@ -511,6 +674,12 @@ public class DashboardFragment extends Fragment {
                     return s1.toString().compareTo(s2.toString());
                 }
             });
+            spinner.setAdapter(adapter);
+
+            for (int i = (spinner_id - 1) * 5; i < (spinner_id-1) * 5 + 5; i++) {
+                sampleRecorded[i] = true;
+                predefinedSamples[i] = 1;
+            }
         });
     }
 
@@ -529,7 +698,8 @@ public class DashboardFragment extends Fragment {
                 }
             }
             sampleRecorded[order] = true;
-            sharedViewModel.setMSampleRecorded(sampleRecorded);
+            sharedViewModel.setMSampleRecorded(sampleRecorded); // save sampleRecorded
+
             final Handler handler = new Handler(Looper.getMainLooper());
             handler.postDelayed(() -> {
                 //Do something after 1200ms
@@ -544,6 +714,9 @@ public class DashboardFragment extends Fragment {
                 }
             }, 1200);
 
+            Button play = requireActivity().findViewById(playButtonList[order]);
+            play.setEnabled(true);
+
             int row = order / 5;
             checkUserChoiceComplete(row);
 
@@ -557,6 +730,14 @@ public class DashboardFragment extends Fragment {
         if (row == 5) return;   // row is only from 0->4. Row 5 is background noise
         for (int i = row * 5; i < row * 5 + 5; i++) {
             if (!sampleRecorded[i] || Objects.equals(labelList[row], "")) {
+                String selection_title_id = "selection_title_" + (row+1);
+                TextView selection_title = requireActivity().findViewById(getResources().getIdentifier(selection_title_id, "id", getContext().getPackageName()));
+                if (selection_title != null)  {
+                    Log.d(TAG," TEXT WHITE");
+                    selection_title.setTextColor(Color.WHITE);
+                }
+                Log.d(TAG," EXECUTED");
+                Log.d(TAG, "LABEL LIST: " + Arrays.toString(labelList));
                 return;
             }
         }
@@ -573,7 +754,6 @@ public class DashboardFragment extends Fragment {
             startPlay(id);
         });
     }
-
 
     private void setOnClickSubmit(final Button btn, final int id, View root) {
 
@@ -661,7 +841,7 @@ public class DashboardFragment extends Fragment {
 //            }
 //        }
 
-        if (location == null) {
+        if (!locationSubmitted) {
             Toast.makeText(requireActivity(), "Missing location from Step 1.", Toast.LENGTH_SHORT).show();
             return false;
         }

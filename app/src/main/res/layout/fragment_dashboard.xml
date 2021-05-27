@@ -128,12 +128,12 @@
                 app:layout_constraintTop_toTopOf="parent">
 
                 <TableLayout
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="match_parent">
 
                     <TextView
                         android:id="@+id/selection_title_1"
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:paddingTop="@dimen/_15sdp"
                         android:text="@string/class_1"
@@ -190,6 +190,11 @@
                                 android:layout_height="wrap_content"
                                 android:hint="@string/class_1_predefined"
                                 android:inputType="none" />
+                            <Button
+                                android:id="@+id/select_again_1b"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/choose_again" />
 
 
                         </com.google.android.material.textfield.TextInputLayout>
@@ -328,12 +333,18 @@
                             android:text="@string/play" />
 
                     </TableRow>
+                    <Button
+                        android:id="@+id/select_again_1a"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="@dimen/_500sdp"
+                        android:text="@string/choose_again" />
 
                     <TextView
                         android:id="@+id/selection_title_2"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:paddingTop="@dimen/_5sdp"
+                        android:paddingTop="@dimen/_15sdp"
                         android:text="@string/class_2"
                         android:textSize="@dimen/_15ssp" />
 
@@ -382,6 +393,11 @@
                                 android:layout_height="wrap_content"
                                 android:hint="@string/class_2_predefined"
                                 android:inputType="none" />
+                            <Button
+                                android:id="@+id/select_again_2b"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/choose_again" />
 
                         </com.google.android.material.textfield.TextInputLayout>
                     </TableRow>
@@ -515,12 +531,18 @@
                             android:text="@string/play" />
 
                     </TableRow>
+                    <Button
+                        android:id="@+id/select_again_2a"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="@dimen/_500sdp"
+                        android:text="@string/choose_again" />
 
                     <TextView
                         android:id="@+id/selection_title_3"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:paddingTop="@dimen/_5sdp"
+                        android:paddingTop="@dimen/_15sdp"
                         android:text="@string/class_3"
                         android:textSize="@dimen/_15ssp" />
 
@@ -568,6 +590,11 @@
                                 android:layout_height="wrap_content"
                                 android:hint="@string/class_3_predefined"
                                 android:inputType="none" />
+                            <Button
+                                android:id="@+id/select_again_3b"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/choose_again" />
 
                         </com.google.android.material.textfield.TextInputLayout>
                     </TableRow>
@@ -701,12 +728,18 @@
                             android:text="@string/play" />
 
                     </TableRow>
+                    <Button
+                        android:id="@+id/select_again_3a"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="@dimen/_500sdp"
+                        android:text="@string/choose_again" />
 
                     <TextView
                         android:id="@+id/selection_title_4"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:paddingTop="@dimen/_5sdp"
+                        android:paddingTop="@dimen/_15sdp"
                         android:text="@string/class_4"
                         android:textSize="@dimen/_15ssp" />
 
@@ -755,6 +788,11 @@
                                 android:layout_height="wrap_content"
                                 android:hint="@string/class_4_predefined"
                                 android:inputType="none" />
+                            <Button
+                                android:id="@+id/select_again_4b"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/choose_again" />
 
                         </com.google.android.material.textfield.TextInputLayout>
                     </TableRow>
@@ -888,14 +926,21 @@
                             android:text="@string/play" />
 
                     </TableRow>
+                    <Button
+                        android:id="@+id/select_again_4a"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="@dimen/_500sdp"
+                        android:text="@string/choose_again" />
 
                     <TextView
                         android:id="@+id/selection_title_5"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:paddingTop="@dimen/_5sdp"
+                        android:paddingTop="@dimen/_15sdp"
                         android:text="@string/class_5"
                         android:textSize="@dimen/_15ssp"/>
+
 
                     <TableRow
                         android:id="@+id/selection_5"
@@ -943,6 +988,11 @@
                                 android:layout_height="wrap_content"
                                 android:hint="@string/class_5_predefined"
                                 android:inputType="none" />
+                            <Button
+                                android:id="@+id/select_again_5b"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/choose_again" />
 
                         </com.google.android.material.textfield.TextInputLayout>
                     </TableRow>
@@ -1015,6 +1065,7 @@
                             android:text="@string/record_4" />
 
                         <Button
+                            style="?attr/materialButtonOutlinedStyle"
                             android:id="@+id/record_25"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -1027,8 +1078,7 @@
                     <TableRow
                         android:id="@+id/row_5_play"
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:paddingBottom="@dimen/_30sdp">
+                        android:layout_height="match_parent">
 
                         <Button
                             android:id="@+id/play_21"
@@ -1076,6 +1126,12 @@
                             android:text="@string/play" />
 
                     </TableRow>
+                    <Button
+                        android:id="@+id/select_again_5a"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="@dimen/_500sdp"
+                        android:text="@string/choose_again" />
                 </TableLayout>
             </HorizontalScrollView>
 
@@ -1084,7 +1140,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:breakStrategy="high_quality"
-                android:paddingTop="@dimen/_15sdp"
+                android:paddingTop="@dimen/_16sdp"
                 android:paddingBottom="@dimen/_15sdp"
                 android:text="@string/tutorial_3"
                 android:textSize="@dimen/_17ssp" />
