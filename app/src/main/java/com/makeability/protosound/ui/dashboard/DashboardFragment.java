@@ -18,6 +18,7 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.ProgressBar;
+import android.widget.ScrollView;
 import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -85,7 +86,14 @@ public class DashboardFragment extends Fragment {
     SoundRecorder recorder;
     private ArrayAdapter<CharSequence> adapter;
     private List<CharSequence> availPredefinedSamples;
-    private HashMap<Integer, CharSequence> spinnerSelection;
+    private Map<Integer, CharSequence> spinnerSelection;
+
+    // Saved state
+    private int[] scrollPos;
+    private Map<Integer, Boolean> userChoiceMap;    // true if YOUR CHOICE
+    private Map<Integer, String> selectANameMap;    // Name for YOUR CHOICE sounds
+
+
     int[] recordButtonList = {R.id.record_1, R.id.record_2, R.id.record_3, R.id.record_4, R.id.record_5,
             R.id.record_6, R.id.record_7, R.id.record_8, R.id.record_9, R.id.record_10,
             R.id.record_11, R.id.record_12, R.id.record_13, R.id.record_14, R.id.record_15,
@@ -131,6 +139,9 @@ public class DashboardFragment extends Fragment {
 
         location = null;
         spinnerSelection = new HashMap<>();
+        scrollPos = new int[2];
+        userChoiceMap = new HashMap<>();
+        selectANameMap = new HashMap<>();
         TextView tutorial_5 = root.findViewById(R.id.tutorial_5);
         tutorial_5.setVisibility(View.GONE);
         Map<Integer, Integer> recordPlayMap = new HashMap<>();
@@ -148,14 +159,14 @@ public class DashboardFragment extends Fragment {
 //        TextInputEditText portNumberEditText = (TextInputEditText) root.findViewById(R.id.port_number);
 //        Button confirmPort = (Button) root.findViewById(R.id.confirm_port);
         TextInputEditText locationEditText = (TextInputEditText) root.findViewById(R.id.testing_location);
-        sharedViewModel.getText().observe(requireActivity(), new Observer<String>() {
-            @Override
-            public void onChanged(@Nullable String s) {
-                location = s;
-                Log.d(TAG, "TEST LOCATION " + location);
-                //locationEditText.setText(s);
-            }
-        });
+//        sharedViewModel.getText().observe(requireActivity(), new Observer<String>() {
+//            @Override
+//            public void onChanged(@Nullable String s) {
+//                location = s;
+//                Log.d(TAG, "TEST LOCATION " + location);
+//                //locationEditText.setText(s);
+//            }
+//        });
         Button confirmLocation = root.findViewById(R.id.confirm_location);
         setLocation(locationEditText, confirmLocation);
 
@@ -179,15 +190,6 @@ public class DashboardFragment extends Fragment {
         // Register it with availPredefinedSamples to update changes
         adapter = new ArrayAdapter(requireActivity(),android.R.layout.simple_spinner_dropdown_item,  availPredefinedSamples);
 
-        // setup Spinner drop-down lists for pre-determined sounds
-        for (int i = 0; i < menuList.length; i++) {
-            AutoCompleteTextView spinner = (AutoCompleteTextView) root.findViewById(menuList[i]);
-            // Specify the layout to use when the list of choices appears
-            // Apply the adapter to the spinner
-            spinner.setAdapter(adapter);
-            // Set Listener for spinner
-            setSelectItemList(spinner, i+1);
-        }
         Log.d(TAG, "PREDEFINED, GET ITEM AT id: " + 0 +", which is: " + adapter.getItem(0));
 
         // Setup 3 edit texts for 3 classes
@@ -223,16 +225,136 @@ public class DashboardFragment extends Fragment {
 
     @Override public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        // Restore ScrollView position
+        sharedViewModel.getMScrollPos().observe(requireActivity(), new Observer<int[]>() {
+            @Override
+            public void onChanged(@Nullable int[] mScrollPos) {
+                scrollPos = mScrollPos;
+            }
+        });
+        ScrollView scrollView = requireActivity().findViewById(R.id.scrollView2);
+        scrollView.post(new Runnable() {
+            @Override
+            public void run() {
+                scrollView.scrollTo(scrollPos[0], scrollPos[1]);
+            }
+        });
+
+        // Restore location entered
         TextInputEditText locationEditText = (TextInputEditText) view.findViewById(R.id.testing_location);
         sharedViewModel.getText().observe(requireActivity(), new Observer<String>() {
             @Override
-            public void onChanged(@Nullable String s) {
-                location = s;
-                Log.d(TAG, "TEST LOCATION " + location);
-                //locationEditText.setText(s);
+            public void onChanged(@Nullable String mLocation) {
+                location = mLocation;
             }
         });
         locationEditText.setText(location);
+
+        // Restore labelList of sound names
+        sharedViewModel.getMLabelList().observe(requireActivity(), new Observer<String[]>() {
+            @Override
+            public void onChanged(String[] mLabelList) {
+                labelList = mLabelList;
+            }
+        });
+
+        // Restore spinnerSelection, helper variable for pre-defined samples
+        sharedViewModel.getMSpinnerSelection().observe(requireActivity(), new Observer<Map<Integer, CharSequence>>() {
+            @Override
+            public void onChanged(Map<Integer, CharSequence> mSpinnerSelection) {
+                spinnerSelection = mSpinnerSelection;
+            }
+        });
+
+        // Restore availPredefinedSamples, helper variable for pre-defined samples
+        sharedViewModel.getMAvailPredefinedSamples().observe(requireActivity(), new Observer<List<CharSequence>>() {
+            @Override
+            public void onChanged(List<CharSequence> mAvailPredefinedSamples) {
+                availPredefinedSamples = mAvailPredefinedSamples;
+            }
+        });
+        // Restore array adapter
+        adapter = new ArrayAdapter(requireActivity(),android.R.layout.simple_spinner_dropdown_item,  availPredefinedSamples);
+
+        // Restore user choice for each sound
+        sharedViewModel.getMUserChoiceMap().observe(requireActivity(), new Observer<Map<Integer, Boolean>>() {
+            @Override
+            public void onChanged(@Nullable Map<Integer, Boolean> map) {
+                userChoiceMap = map;
+            }
+        });
+        for (Integer id: userChoiceMap.keySet()) {
+            if (userChoiceMap.get(id)) {
+                // Restore YOUR CHOICE's UI
+                TableRow rowRecord = requireActivity().findViewById(rowRecordList[id]);
+                TableRow rowPlay = requireActivity().findViewById(rowPlayList[id]);
+                TableRow rowSelectA = requireActivity().findViewById(rowSelectAList[id]);
+                TableRow rowSelection = requireActivity().findViewById(selection[id]);
+                rowRecord.setVisibility(View.VISIBLE);
+                rowPlay.setVisibility(View.VISIBLE);
+                rowSelectA.setVisibility(View.VISIBLE);
+                rowSelection.setVisibility(View.GONE);
+
+                // Restore YOUR CHOICE sound name
+                String classID = "class_" + (id+1);
+                TextInputEditText className = requireActivity().findViewById(getResources().getIdentifier(classID, "id", getContext().getPackageName()));
+                className.setText(labelList[id]);
+            } else {
+                // Restore PRE-DEFINED's UI
+                TableRow rowSelectB = requireActivity().findViewById(rowSelectBList[id]);
+                TableRow rowSelection = requireActivity().findViewById(selection[id]);
+                TableRow rowPlay = requireActivity().findViewById(rowPlayList[id]);
+                rowPlay.setVisibility(View.INVISIBLE);
+                rowSelectB.setVisibility(View.VISIBLE);
+                rowSelection.setVisibility(View.GONE);
+                for (int i = id * 5; i < id * 5 + 5; i++) {
+                    sampleRecorded[i] = true;
+                    predefinedSamples[i] = 1;
+                }
+
+                AutoCompleteTextView spinner = (AutoCompleteTextView) requireActivity().findViewById(menuList[id]);
+                spinner.setText(spinnerSelection.get(id+1));
+                spinner.setAdapter(adapter);
+            }
+        }
+
+        // setup Spinner drop-down lists for pre-determined sounds
+        for (int i = 0; i < menuList.length; i++) {
+            AutoCompleteTextView spinner = (AutoCompleteTextView) requireActivity().findViewById(menuList[i]);
+            // Specify the layout to use when the list of choices appears
+            // Apply the adapter to the spinner
+            spinner.setAdapter(adapter);
+            // Set Listener for spinner
+            setSelectItemList(spinner, i+1);
+        }
+
+        // Restore "Record" states
+        sharedViewModel.getMSampleRecorded().observe(requireActivity(), new Observer<boolean[]>() {
+            @Override
+            public void onChanged(boolean[] mSampleRecorded) {
+                sampleRecorded = mSampleRecorded;
+            }
+        });
+
+        // Restore "Record" states
+        for (int i = 0; i < recordButtonList.length; i++) {
+            if (sampleRecorded[i]) {
+                Button btn = requireActivity().findViewById(recordButtonList[i]);
+                btn.setBackgroundColor(Color.GREEN);
+                btn.setText(R.string.done);
+                btn.setTextColor(Color.BLACK);
+                recorder = new SoundRecorder(this.requireContext(), VOICE_FILE_NAME + i + ".pcm", mListener);
+            }
+            checkUserChoiceComplete(i / 5);    // Check completion for "Sound i"
+        }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        ScrollView scrollView = requireActivity().findViewById(R.id.scrollView2);
+        int[] pos = new int[]{scrollView.getScrollX(), scrollView.getScrollY()};
+        sharedViewModel.setMScrollPos(pos);
     }
 
     private void setLocation(TextInputEditText locationEditText, Button confirmLocation) {
@@ -256,21 +378,9 @@ public class DashboardFragment extends Fragment {
         });
 
         confirmLocation.setOnClickListener(v -> {
-            //JSONObject locationPackage = new JSONObject();
-//            try {
-//                locationPackage.put("location", testingLocation);
-//            } catch (JSONException e) {
-//                e.printStackTrace();
-//            }
-//            if (MainActivity.mSocket == null) {
-//                Toast.makeText(getContext(), "Please connect to a port from step 1", Toast.LENGTH_SHORT).show();
-//                return;
-//            }
             if (testingLocation.isEmpty()) {
                 locationEditText.setError("Please enter your testing location");
             } else {
-                //MainActivity.mSocket.emit("submit_location", locationPackage);
-                // protosoundApp.callAttr("submit_location", testingLocation);
                 model.submitLocation(testingLocation);
                 this.location = testingLocation;
                 confirmLocation.setBackgroundColor(Color.GREEN);
@@ -309,6 +419,8 @@ public class DashboardFragment extends Fragment {
             rowPlay.setVisibility(View.VISIBLE);
             rowSelectA.setVisibility(View.VISIBLE);
             rowSelection.setVisibility(View.GONE);
+            userChoiceMap.put(id, true);
+            sharedViewModel.setMUserChoiceMap(userChoiceMap);
         });
         preDefined.setOnClickListener(v -> {
             TableRow rowSelectB = requireActivity().findViewById(rowSelectBList[id]);
@@ -321,6 +433,9 @@ public class DashboardFragment extends Fragment {
                 sampleRecorded[i] = true;
                 predefinedSamples[i] = 1;
             }
+            userChoiceMap.put(id, false);
+            sharedViewModel.setMUserChoiceMap(userChoiceMap);
+            sharedViewModel.setMSampleRecorded(sampleRecorded);
         });
     }
 
@@ -353,6 +468,7 @@ public class DashboardFragment extends Fragment {
                 }
                 Log.d(TAG, "EditText: " + labelName);
                 labelList[id - 1] = labelName;
+                sharedViewModel.setMLabelList(labelList);
                 checkUserChoiceComplete(id-1);
             }
         });
@@ -369,14 +485,24 @@ public class DashboardFragment extends Fragment {
             // add this item back to adapter
             if (spinnerSelection.containsKey(spinner_id)) {
                 availPredefinedSamples.add(spinnerSelection.get(spinner_id));
+                sharedViewModel.setMAvailPredefinedSamples(availPredefinedSamples); // Save availPredefinedSamples
+
                 adapter.notifyDataSetChanged(); // sync availPredefinedSamples and adapter
+
                 spinnerSelection.remove(spinner_id);
+                sharedViewModel.setMSpinnerSelection(spinnerSelection); // Save spinnerSelection
             }
             // Add this new item to spinnerSelection
             spinnerSelection.put(spinner_id, selection);
+            sharedViewModel.setMSpinnerSelection(spinnerSelection);  // Save spinnerSelection
+
             Log.d(TAG, "spinner " + spinner_id + ": " + selection);
+
             labelList[spinner_id-1] = selection;
+            sharedViewModel.setMLabelList(labelList);   // Save labelList
+
             availPredefinedSamples.remove(position);
+            sharedViewModel.setMAvailPredefinedSamples(availPredefinedSamples); // Save availPredefinedSamples
             adapter.notifyDataSetChanged();
             // sort just to keep original alphabetical order
             adapter.sort(new Comparator<CharSequence>() {
@@ -403,6 +529,7 @@ public class DashboardFragment extends Fragment {
                 }
             }
             sampleRecorded[order] = true;
+            sharedViewModel.setMSampleRecorded(sampleRecorded);
             final Handler handler = new Handler(Looper.getMainLooper());
             handler.postDelayed(() -> {
                 //Do something after 1200ms
@@ -433,7 +560,7 @@ public class DashboardFragment extends Fragment {
                 return;
             }
         }
-        String selection_title_id = "selection_title_" + String.valueOf(row+1);
+        String selection_title_id = "selection_title_" + (row+1);
         TextView selection_title = requireActivity().findViewById(getResources().getIdentifier(selection_title_id, "id", getContext().getPackageName()));
         selection_title.setTextColor(Color.GREEN);
     }

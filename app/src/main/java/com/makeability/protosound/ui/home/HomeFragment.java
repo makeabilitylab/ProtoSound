@@ -53,8 +53,6 @@ public class HomeFragment extends Fragment {
 			public void onChanged(@Nullable MainActivity.TimelineAdapter adapter) {
 				listView.setAdapter(adapter);
 				listView.setEnabled(false);
-
-				//locationEditText.setText(s);
 			}
 		});
         final TextView textView = root.findViewById(R.id.text_home);
