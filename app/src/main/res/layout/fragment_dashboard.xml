@@ -130,19 +130,26 @@
                 <TableLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent">
-
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
                     <TextView
                         android:id="@+id/selection_title_1"
-                        android:layout_width="match_parent"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:paddingTop="@dimen/_15sdp"
                         android:text="@string/class_1"
                         android:textSize="@dimen/_15ssp" />
 
-<!--                    <ImageView-->
-<!--                        android:id="@+id/check_mark" -->
-<!--                        android:layout_width="2dp"-->
-<!--                        app:srcCompat="@android:drawable/checkbox_on_background" />-->
+                    <ImageView
+                        android:id="@+id/check_mark_1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="@dimen/_50sdp"
+                        android:layout_gravity="bottom"
+                        app:srcCompat="@android:drawable/checkbox_on_background" />
+                    </LinearLayout>
+
 
                     <TableRow
                         android:id="@+id/selection_1"
@@ -340,6 +347,10 @@
                         android:layout_marginEnd="@dimen/_500sdp"
                         android:text="@string/choose_again" />
 
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
                     <TextView
                         android:id="@+id/selection_title_2"
                         android:layout_width="wrap_content"
@@ -347,6 +358,13 @@
                         android:paddingTop="@dimen/_15sdp"
                         android:text="@string/class_2"
                         android:textSize="@dimen/_15ssp" />
+                    <ImageView
+                        android:id="@+id/check_mark_2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="@dimen/_50sdp"
+                        android:layout_gravity="bottom"
+                        app:srcCompat="@android:drawable/checkbox_on_background" />
+                </LinearLayout>
 
                     <TableRow
                         android:id="@+id/selection_2"
@@ -538,6 +556,10 @@
                         android:layout_marginEnd="@dimen/_500sdp"
                         android:text="@string/choose_again" />
 
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
                     <TextView
                         android:id="@+id/selection_title_3"
                         android:layout_width="wrap_content"
@@ -545,6 +567,13 @@
                         android:paddingTop="@dimen/_15sdp"
                         android:text="@string/class_3"
                         android:textSize="@dimen/_15ssp" />
+                    <ImageView
+                        android:id="@+id/check_mark_3"
+                        android:layout_width="wrap_content"
+                        android:layout_height="@dimen/_50sdp"
+                        android:layout_gravity="bottom"
+                        app:srcCompat="@android:drawable/checkbox_on_background" />
+                </LinearLayout>
 
                     <TableRow
                         android:id="@+id/selection_3"
@@ -735,6 +764,11 @@
                         android:layout_marginEnd="@dimen/_500sdp"
                         android:text="@string/choose_again" />
 
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
                     <TextView
                         android:id="@+id/selection_title_4"
                         android:layout_width="wrap_content"
@@ -742,7 +776,13 @@
                         android:paddingTop="@dimen/_15sdp"
                         android:text="@string/class_4"
                         android:textSize="@dimen/_15ssp" />
-
+                    <ImageView
+                        android:id="@+id/check_mark_4"
+                        android:layout_width="wrap_content"
+                        android:layout_height="@dimen/_50sdp"
+                        android:layout_gravity="bottom"
+                        app:srcCompat="@android:drawable/checkbox_on_background" />
+                </LinearLayout>
                     <TableRow
                         android:id="@+id/selection_4"
                         android:layout_width="match_parent"
@@ -933,6 +973,10 @@
                         android:layout_marginEnd="@dimen/_500sdp"
                         android:text="@string/choose_again" />
 
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
                     <TextView
                         android:id="@+id/selection_title_5"
                         android:layout_width="wrap_content"
@@ -940,6 +984,13 @@
                         android:paddingTop="@dimen/_15sdp"
                         android:text="@string/class_5"
                         android:textSize="@dimen/_15ssp"/>
+                    <ImageView
+                    android:id="@+id/check_mark_5"
+                    android:layout_width="wrap_content"
+                    android:layout_height="@dimen/_50sdp"
+                    android:layout_gravity="bottom"
+                    app:srcCompat="@android:drawable/checkbox_on_background" />
+                        </LinearLayout>
 
 
                     <TableRow

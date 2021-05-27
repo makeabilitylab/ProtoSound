@@ -19,6 +19,7 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.HorizontalScrollView;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.ScrollView;
 import android.widget.TableRow;
@@ -124,7 +125,7 @@ public class DashboardFragment extends Fragment {
     int[] selection = {R.id.selection_1, R.id.selection_2, R.id.selection_3, R.id.selection_4, R.id.selection_5};
     int[] menuList = {R.id.menu_1, R.id.menu_2, R.id.menu_3, R.id.menu_4, R.id.menu_5};
     int[] classNameList = {R.id.class_1, R.id.class_2, R.id.class_3, R.id.class_4, R.id.class_5};
-
+    int[] finishSoundList = {R.id.check_mark_1, R.id.check_mark_2, R.id.check_mark_3, R.id.check_mark_4, R.id.check_mark_5};
     boolean[] sampleRecorded = new boolean[26];
     int[] predefinedSamples = new int[26];
 
@@ -377,7 +378,7 @@ public class DashboardFragment extends Fragment {
             // Apply the adapter to the spinner
             spinner.setAdapter(adapter);
             // Set Listener for spinner
-            setSelectItemList(spinner, i+1);
+            setSelectItemList(spinner, i);
         }
 
         // Restore "Record" states
@@ -483,6 +484,11 @@ public class DashboardFragment extends Fragment {
             Button btn = root.findViewById(btnID);
             btn.setVisibility(View.GONE);
         }
+
+        for (int finishID: finishSoundList) {
+            ImageView finish = root.findViewById(finishID);
+            finish.setVisibility(View.GONE);
+        }
     }
 
     private void setUIVisibility(Button userChoice, Button preDefined, int id) {
@@ -550,7 +556,7 @@ public class DashboardFragment extends Fragment {
                 for (int j = 0; j < menuList.length; j++) {
                     AutoCompleteTextView spinner2 = (AutoCompleteTextView) requireActivity().findViewById(menuList[j]);
                     spinner2.setAdapter(adapter);
-                    setSelectItemList(spinner2, j+1);
+                    setSelectItemList(spinner2, j);
                 }
                 sharedViewModel.setMAvailPredefinedSamples(availPredefinedSamples);
                 sharedViewModel.setMSpinnerSelection(spinnerSelection);
@@ -640,9 +646,12 @@ public class DashboardFragment extends Fragment {
 
     private void setSelectItemList(final AutoCompleteTextView spinner, int spinner_id) {
         spinner.setOnItemClickListener((parent, view, position, id) -> {
-            String selection_title_id = "selection_title_" + spinner_id;
+            String selection_title_id = "selection_title_" + (spinner_id+1);
             TextView selection_title = requireActivity().findViewById(getResources().getIdentifier(selection_title_id, "id", getContext().getPackageName()));
             selection_title.setTextColor(Color.GREEN);
+            ImageView finish = requireActivity().findViewById(finishSoundList[spinner_id]);
+            finish.setVisibility(View.VISIBLE);
+
             String selection = (String)parent.getItemAtPosition(position);
 
             // If this spinner already selects an item,
@@ -660,7 +669,7 @@ public class DashboardFragment extends Fragment {
             spinnerSelection.put(spinner_id, selection);
             sharedViewModel.setMSpinnerSelection(spinnerSelection);  // Save spinnerSelection
 
-            labelList[spinner_id-1] = selection;
+            labelList[spinner_id] = selection;
             sharedViewModel.setMLabelList(labelList);   // Save labelList
             //Log.d(TAG, "PREDEF BEFORE REMOVE " + Arrays.toString(availPredefinedSamples.toArray()));
             availPredefinedSamples.remove(selection);
@@ -676,7 +685,7 @@ public class DashboardFragment extends Fragment {
             });
             spinner.setAdapter(adapter);
 
-            for (int i = (spinner_id - 1) * 5; i < (spinner_id-1) * 5 + 5; i++) {
+            for (int i = spinner_id * 5; i < spinner_id * 5 + 5; i++) {
                 sampleRecorded[i] = true;
                 predefinedSamples[i] = 1;
             }
@@ -728,22 +737,25 @@ public class DashboardFragment extends Fragment {
     // set the title (e.g. Sound 1) to be green
     private void checkUserChoiceComplete(int row) {
         if (row == 5) return;   // row is only from 0->4. Row 5 is background noise
+        ImageView finish = requireActivity().findViewById(finishSoundList[row]);
         for (int i = row * 5; i < row * 5 + 5; i++) {
             if (!sampleRecorded[i] || Objects.equals(labelList[row], "")) {
                 String selection_title_id = "selection_title_" + (row+1);
                 TextView selection_title = requireActivity().findViewById(getResources().getIdentifier(selection_title_id, "id", getContext().getPackageName()));
-                if (selection_title != null)  {
-                    Log.d(TAG," TEXT WHITE");
+                if (selection_title != null && finish != null)  {
+
                     selection_title.setTextColor(Color.WHITE);
+
+                    finish.setVisibility(View.GONE);
                 }
-                Log.d(TAG," EXECUTED");
-                Log.d(TAG, "LABEL LIST: " + Arrays.toString(labelList));
                 return;
             }
         }
         String selection_title_id = "selection_title_" + (row+1);
         TextView selection_title = requireActivity().findViewById(getResources().getIdentifier(selection_title_id, "id", getContext().getPackageName()));
         selection_title.setTextColor(Color.GREEN);
+
+        finish.setVisibility(View.VISIBLE);
     }
 
     private void setOnClickPlay(final Button btn, final int id){
