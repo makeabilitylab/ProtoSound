@@ -142,13 +142,13 @@
                         android:text="@string/class_1"
                         android:textSize="@dimen/_15ssp" />
 
-                    <ImageView
-                        android:id="@+id/check_mark_1"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="bottom"
-                        android:paddingStart="@dimen/_5sdp"
-                        app:srcCompat="@drawable/ic_baseline_check_circle_outline_24" />
+                        <ImageView
+                            android:id="@+id/check_mark_1"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="bottom"
+                            android:paddingStart="@dimen/_5sdp"
+                            app:srcCompat="@drawable/ic_baseline_check_circle_24" />
                     </LinearLayout>
 
 
@@ -365,7 +365,7 @@
                             android:layout_height="wrap_content"
                             android:layout_gravity="bottom"
                             android:paddingStart="@dimen/_5sdp"
-                            app:srcCompat="@drawable/ic_baseline_check_circle_outline_24" />
+                            app:srcCompat="@drawable/ic_baseline_check_circle_24" />
                     </LinearLayout>
 
                     <TableRow
@@ -575,7 +575,7 @@
                             android:layout_height="wrap_content"
                             android:layout_gravity="bottom"
                             android:paddingStart="@dimen/_5sdp"
-                            app:srcCompat="@drawable/ic_baseline_check_circle_outline_24" />
+                            app:srcCompat="@drawable/ic_baseline_check_circle_24" />
                     </LinearLayout>
 
                     <TableRow
@@ -785,7 +785,7 @@
                             android:layout_height="wrap_content"
                             android:layout_gravity="bottom"
                             android:paddingStart="@dimen/_5sdp"
-                            app:srcCompat="@drawable/ic_baseline_check_circle_outline_24" />
+                            app:srcCompat="@drawable/ic_baseline_check_circle_24" />
                     </LinearLayout>
                     <TableRow
                         android:id="@+id/selection_4"
@@ -994,7 +994,7 @@
                             android:layout_height="wrap_content"
                             android:layout_gravity="bottom"
                             android:paddingStart="@dimen/_5sdp"
-                            app:srcCompat="@drawable/ic_baseline_check_circle_outline_24" />
+                            app:srcCompat="@drawable/ic_baseline_check_circle_24" />
                     </LinearLayout>
 
 
