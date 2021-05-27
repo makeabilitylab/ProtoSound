@@ -10,6 +10,8 @@
         android:layout_height="match_parent"
         android:text="@string/hello_blank_fragment"
         android:breakStrategy="high_quality"
+        android:layout_marginStart="@dimen/_10sdp"
+        android:layout_marginEnd="@dimen/_10sdp"
         android:textSize="@dimen/_16ssp"/>
 
 </FrameLayout>

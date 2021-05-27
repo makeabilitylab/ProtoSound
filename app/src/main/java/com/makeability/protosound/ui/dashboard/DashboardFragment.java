@@ -648,9 +648,10 @@ public class DashboardFragment extends Fragment {
         spinner.setOnItemClickListener((parent, view, position, id) -> {
             String selection_title_id = "selection_title_" + (spinner_id+1);
             TextView selection_title = requireActivity().findViewById(getResources().getIdentifier(selection_title_id, "id", getContext().getPackageName()));
-            selection_title.setTextColor(Color.GREEN);
+//            selection_title.setTextColor(Color.GREEN);
             ImageView finish = requireActivity().findViewById(finishSoundList[spinner_id]);
             finish.setVisibility(View.VISIBLE);
+            finish.setColorFilter(Color.GREEN);
 
             String selection = (String)parent.getItemAtPosition(position);
 
@@ -753,9 +754,10 @@ public class DashboardFragment extends Fragment {
         }
         String selection_title_id = "selection_title_" + (row+1);
         TextView selection_title = requireActivity().findViewById(getResources().getIdentifier(selection_title_id, "id", getContext().getPackageName()));
-        selection_title.setTextColor(Color.GREEN);
+//        selection_title.setTextColor(Color.GREEN);
 
         finish.setVisibility(View.VISIBLE);
+        finish.setColorFilter(Color.GREEN);
     }
 
     private void setOnClickPlay(final Button btn, final int id){

@@ -145,9 +145,10 @@
                     <ImageView
                         android:id="@+id/check_mark_1"
                         android:layout_width="wrap_content"
-                        android:layout_height="@dimen/_50sdp"
+                        android:layout_height="wrap_content"
                         android:layout_gravity="bottom"
-                        app:srcCompat="@android:drawable/checkbox_on_background" />
+                        android:paddingStart="@dimen/_5sdp"
+                        app:srcCompat="@drawable/ic_baseline_check_circle_outline_24" />
                     </LinearLayout>
 
 
@@ -358,13 +359,14 @@
                         android:paddingTop="@dimen/_15sdp"
                         android:text="@string/class_2"
                         android:textSize="@dimen/_15ssp" />
-                    <ImageView
-                        android:id="@+id/check_mark_2"
-                        android:layout_width="wrap_content"
-                        android:layout_height="@dimen/_50sdp"
-                        android:layout_gravity="bottom"
-                        app:srcCompat="@android:drawable/checkbox_on_background" />
-                </LinearLayout>
+                        <ImageView
+                            android:id="@+id/check_mark_2"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="bottom"
+                            android:paddingStart="@dimen/_5sdp"
+                            app:srcCompat="@drawable/ic_baseline_check_circle_outline_24" />
+                    </LinearLayout>
 
                     <TableRow
                         android:id="@+id/selection_2"
@@ -567,13 +569,14 @@
                         android:paddingTop="@dimen/_15sdp"
                         android:text="@string/class_3"
                         android:textSize="@dimen/_15ssp" />
-                    <ImageView
-                        android:id="@+id/check_mark_3"
-                        android:layout_width="wrap_content"
-                        android:layout_height="@dimen/_50sdp"
-                        android:layout_gravity="bottom"
-                        app:srcCompat="@android:drawable/checkbox_on_background" />
-                </LinearLayout>
+                        <ImageView
+                            android:id="@+id/check_mark_3"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="bottom"
+                            android:paddingStart="@dimen/_5sdp"
+                            app:srcCompat="@drawable/ic_baseline_check_circle_outline_24" />
+                    </LinearLayout>
 
                     <TableRow
                         android:id="@+id/selection_3"
@@ -776,13 +779,14 @@
                         android:paddingTop="@dimen/_15sdp"
                         android:text="@string/class_4"
                         android:textSize="@dimen/_15ssp" />
-                    <ImageView
-                        android:id="@+id/check_mark_4"
-                        android:layout_width="wrap_content"
-                        android:layout_height="@dimen/_50sdp"
-                        android:layout_gravity="bottom"
-                        app:srcCompat="@android:drawable/checkbox_on_background" />
-                </LinearLayout>
+                        <ImageView
+                            android:id="@+id/check_mark_4"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="bottom"
+                            android:paddingStart="@dimen/_5sdp"
+                            app:srcCompat="@drawable/ic_baseline_check_circle_outline_24" />
+                    </LinearLayout>
                     <TableRow
                         android:id="@+id/selection_4"
                         android:layout_width="match_parent"
@@ -984,13 +988,14 @@
                         android:paddingTop="@dimen/_15sdp"
                         android:text="@string/class_5"
                         android:textSize="@dimen/_15ssp"/>
-                    <ImageView
-                    android:id="@+id/check_mark_5"
-                    android:layout_width="wrap_content"
-                    android:layout_height="@dimen/_50sdp"
-                    android:layout_gravity="bottom"
-                    app:srcCompat="@android:drawable/checkbox_on_background" />
-                        </LinearLayout>
+                        <ImageView
+                            android:id="@+id/check_mark_5"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="bottom"
+                            android:paddingStart="@dimen/_5sdp"
+                            app:srcCompat="@drawable/ic_baseline_check_circle_outline_24" />
+                    </LinearLayout>
 
 
                     <TableRow
