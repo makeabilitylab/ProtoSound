@@ -23,9 +23,11 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.AutoCompleteTextView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.HorizontalScrollView;
 import android.widget.ImageButton;
 import android.widget.ListAdapter;
 import android.widget.ListView;
@@ -289,11 +291,13 @@ public class MainActivity extends AppCompatActivity {
 	public boolean dispatchTouchEvent(MotionEvent event) {
 		if (event.getAction() == MotionEvent.ACTION_DOWN) {
 			View v = getCurrentFocus();
-			if ( v instanceof EditText) {
+			if (v instanceof EditText) {
 				Rect outRect = new Rect();
 				v.getGlobalVisibleRect(outRect);
-				if (!outRect.contains((int)event.getRawX(), (int)event.getRawY())) {
+				if (!outRect.contains((int)event.getRawX(), (int)event.getRawY())) {	// Outside EditText
 					v.clearFocus();
+					v.setFocusableInTouchMode(false);	// Avoid focusing on EditText when scrolling is focused
+					// Hide keyboard
 					InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
 					imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
 				}
