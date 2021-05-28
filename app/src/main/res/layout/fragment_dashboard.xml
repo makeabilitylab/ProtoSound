@@ -20,7 +20,7 @@
 
     <ScrollView
         android:id="@+id/scrollView2"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingStart="@dimen/_5sdp"
         android:paddingEnd="@dimen/_5sdp"
@@ -69,8 +69,9 @@
                 android:textSize="@dimen/_17ssp" />
 
             <com.google.android.material.textfield.TextInputLayout
-                android:layout_width="match_parent"
+                android:layout_width="@dimen/_225sdp"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/_16sdp"
                 android:hint="@string/hint0b"
                 app:endIconMode="clear_text">
 
@@ -85,22 +86,12 @@
 
             </com.google.android.material.textfield.TextInputLayout>
 
-            <LinearLayout
+            <Button
+                android:id="@+id/confirm_location"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
-
-                <Button
-                    android:id="@+id/confirm_location"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/submitLocation" />
-
-                <TextView
-                    android:layout_width="@dimen/_220sdp"
-                    android:layout_height="@dimen/_25sdp"
-                    android:gravity="center" />
-            </LinearLayout>
+                android:layout_marginStart="@dimen/_16sdp"
+                android:text="@string/submitLocation" />
 
             <TextView
                 android:id="@+id/tutorial_2a"

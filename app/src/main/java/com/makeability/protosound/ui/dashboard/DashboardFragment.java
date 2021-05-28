@@ -349,9 +349,7 @@ public class DashboardFragment extends Fragment {
                 // Restore PRE-DEFINED's UI
                 LinearLayout rowSelectB = requireActivity().findViewById(rowSelectBList[id]);
                 LinearLayout rowSelection = requireActivity().findViewById(selection[id]);
-                LinearLayout rowPlay = requireActivity().findViewById(rowPlayList[id]);
                 Button selectAgainB = requireActivity().findViewById(selectAgainBButtonList[id]);
-                rowPlay.setVisibility(View.INVISIBLE);
                 rowSelectB.setVisibility(View.VISIBLE);
                 rowSelection.setVisibility(View.GONE);
                 selectAgainB.setVisibility(View.VISIBLE);
@@ -472,17 +470,11 @@ public class DashboardFragment extends Fragment {
         preDefined.setOnClickListener(v -> {
             LinearLayout rowSelectB = requireActivity().findViewById(rowSelectBList[id]);
             LinearLayout rowSelection = requireActivity().findViewById(selection[id]);
-            LinearLayout rowPlay = requireActivity().findViewById(rowPlayList[id]);   // for some reason need this so that no
-                                                                                    // UI issue when selecting 5 pre-defined
             Button selectAgainB = requireActivity().findViewById(selectAgainBButtonList[id]);
-            //rowPlay.setVisibility(View.INVISIBLE);
             rowSelectB.setVisibility(View.VISIBLE);
             rowSelection.setVisibility(View.GONE);
             selectAgainB.setVisibility(View.VISIBLE);
-//            for (int i = id * 5; i < id * 5 + 5; i++) {
-//                sampleRecorded[i] = true;
-//                predefinedSamples[i] = 1;
-//            }
+
             userChoiceMap.put(id, 1);
             sharedViewModel.setMUserChoiceMap(userChoiceMap);
             sharedViewModel.setMSampleRecorded(sampleRecorded);
