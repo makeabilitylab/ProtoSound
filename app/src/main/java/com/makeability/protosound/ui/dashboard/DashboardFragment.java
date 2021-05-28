@@ -23,9 +23,9 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.ScrollView;
-import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -330,10 +330,10 @@ public class DashboardFragment extends Fragment {
             Integer choice = userChoiceMap.get(id);
             if (choice!= null && choice == 0) {
                 // Restore YOUR CHOICE's UI
-                TableRow rowRecord = requireActivity().findViewById(rowRecordList[id]);
-                TableRow rowPlay = requireActivity().findViewById(rowPlayList[id]);
-                TableRow rowSelectA = requireActivity().findViewById(rowSelectAList[id]);
-                TableRow rowSelection = requireActivity().findViewById(selection[id]);
+                LinearLayout rowRecord = requireActivity().findViewById(rowRecordList[id]);
+                LinearLayout rowPlay = requireActivity().findViewById(rowPlayList[id]);
+                LinearLayout rowSelectA = requireActivity().findViewById(rowSelectAList[id]);
+                LinearLayout rowSelection = requireActivity().findViewById(selection[id]);
                 Button selectAgainA = requireActivity().findViewById(selectAgainAButtonList[id]);
                 rowRecord.setVisibility(View.VISIBLE);
                 rowPlay.setVisibility(View.VISIBLE);
@@ -347,9 +347,9 @@ public class DashboardFragment extends Fragment {
                 className.setText(labelList[id]);
             } else if (choice!= null && choice == 1) {
                 // Restore PRE-DEFINED's UI
-                TableRow rowSelectB = requireActivity().findViewById(rowSelectBList[id]);
-                TableRow rowSelection = requireActivity().findViewById(selection[id]);
-                TableRow rowPlay = requireActivity().findViewById(rowPlayList[id]);
+                LinearLayout rowSelectB = requireActivity().findViewById(rowSelectBList[id]);
+                LinearLayout rowSelection = requireActivity().findViewById(selection[id]);
+                LinearLayout rowPlay = requireActivity().findViewById(rowPlayList[id]);
                 Button selectAgainB = requireActivity().findViewById(selectAgainBButtonList[id]);
                 rowPlay.setVisibility(View.INVISIBLE);
                 rowSelectB.setVisibility(View.VISIBLE);
@@ -364,7 +364,7 @@ public class DashboardFragment extends Fragment {
                 spinner.setText(spinnerSelection.get(id));
                 spinner.setAdapter(adapter);
             } else {
-                TableRow rowSelection = requireActivity().findViewById(selection[id]);
+                LinearLayout rowSelection = requireActivity().findViewById(selection[id]);
                 rowSelection.setVisibility(View.VISIBLE);
             }
         }
@@ -422,20 +422,20 @@ public class DashboardFragment extends Fragment {
 
     private void hideUIOnCreate(View root) {
         for (int rowID : rowSelectAList) {
-            TableRow tableRow = root.findViewById(rowID);
-            tableRow.setVisibility(View.GONE);
+            LinearLayout ll = root.findViewById(rowID);
+            ll.setVisibility(View.GONE);
         }
         for (int rowID : rowSelectBList) {
-            TableRow tableRow = root.findViewById(rowID);
-            tableRow.setVisibility(View.GONE);
+            LinearLayout ll = root.findViewById(rowID);
+            ll.setVisibility(View.GONE);
         }
         for (int rowID : rowRecordList) {
-            TableRow tableRow = root.findViewById(rowID);
-            tableRow.setVisibility(View.GONE);
+            LinearLayout ll = root.findViewById(rowID);
+            ll.setVisibility(View.GONE);
         }
         for (int rowID : rowPlayList) {
-            TableRow tableRow = root.findViewById(rowID);
-            tableRow.setVisibility(View.GONE);
+            LinearLayout ll = root.findViewById(rowID);
+            ll.setVisibility(View.GONE);
         }
 
         for (int btnID : selectAgainAButtonList) {
@@ -456,10 +456,10 @@ public class DashboardFragment extends Fragment {
 
     private void setUIVisibility(Button userChoice, Button preDefined, int id) {
         userChoice.setOnClickListener(v -> {
-            TableRow rowRecord = requireActivity().findViewById(rowRecordList[id]);
-            TableRow rowPlay = requireActivity().findViewById(rowPlayList[id]);
-            TableRow rowSelectA = requireActivity().findViewById(rowSelectAList[id]);
-            TableRow rowSelection = requireActivity().findViewById(selection[id]);
+            LinearLayout rowRecord = requireActivity().findViewById(rowRecordList[id]);
+            LinearLayout rowPlay = requireActivity().findViewById(rowPlayList[id]);
+            LinearLayout rowSelectA = requireActivity().findViewById(rowSelectAList[id]);
+            LinearLayout rowSelection = requireActivity().findViewById(selection[id]);
             Button selectAgainA = requireActivity().findViewById(selectAgainAButtonList[id]);
             rowRecord.setVisibility(View.VISIBLE);
             rowPlay.setVisibility(View.VISIBLE);
@@ -470,12 +470,12 @@ public class DashboardFragment extends Fragment {
             sharedViewModel.setMUserChoiceMap(userChoiceMap);
         });
         preDefined.setOnClickListener(v -> {
-            TableRow rowSelectB = requireActivity().findViewById(rowSelectBList[id]);
-            TableRow rowSelection = requireActivity().findViewById(selection[id]);
-            TableRow rowPlay = requireActivity().findViewById(rowPlayList[id]);   // for some reason need this so that no
+            LinearLayout rowSelectB = requireActivity().findViewById(rowSelectBList[id]);
+            LinearLayout rowSelection = requireActivity().findViewById(selection[id]);
+            LinearLayout rowPlay = requireActivity().findViewById(rowPlayList[id]);   // for some reason need this so that no
                                                                                     // UI issue when selecting 5 pre-defined
             Button selectAgainB = requireActivity().findViewById(selectAgainBButtonList[id]);
-            rowPlay.setVisibility(View.INVISIBLE);
+            //rowPlay.setVisibility(View.INVISIBLE);
             rowSelectB.setVisibility(View.VISIBLE);
             rowSelection.setVisibility(View.GONE);
             selectAgainB.setVisibility(View.VISIBLE);
@@ -513,10 +513,10 @@ public class DashboardFragment extends Fragment {
             sharedViewModel.setMLabelList(labelList);   // save labelList
             sharedViewModel.setMSampleRecorded(sampleRecorded); // save sampleRecorded
 
-            TableRow rowSelectA = requireActivity().findViewById(rowSelectAList[i]);
-            TableRow rowSelection = requireActivity().findViewById(selection[i]);
-            TableRow rowPlay = requireActivity().findViewById(rowPlayList[i]);
-            TableRow rowRecord = requireActivity().findViewById(rowRecordList[i]);
+            LinearLayout rowSelectA = requireActivity().findViewById(rowSelectAList[i]);
+            LinearLayout rowSelection = requireActivity().findViewById(selection[i]);
+            LinearLayout rowPlay = requireActivity().findViewById(rowPlayList[i]);
+            LinearLayout rowRecord = requireActivity().findViewById(rowRecordList[i]);
             rowSelectA.setVisibility(View.GONE);
             rowSelection.setVisibility(View.VISIBLE);
             rowPlay.setVisibility(View.GONE);
@@ -564,10 +564,10 @@ public class DashboardFragment extends Fragment {
             sharedViewModel.setMLabelList(labelList);   // save labelList
             sharedViewModel.setMSampleRecorded(sampleRecorded); // save sampleRecorded
 
-            TableRow rowSelectB = requireActivity().findViewById(rowSelectBList[i]);
-            TableRow rowSelection = requireActivity().findViewById(selection[i]);
-            TableRow rowSelectA = requireActivity().findViewById(rowSelectAList[i]);
-            TableRow rowPlay = requireActivity().findViewById(rowPlayList[i]);
+            LinearLayout rowSelectB = requireActivity().findViewById(rowSelectBList[i]);
+            LinearLayout rowSelection = requireActivity().findViewById(selection[i]);
+            LinearLayout rowSelectA = requireActivity().findViewById(rowSelectAList[i]);
+            LinearLayout rowPlay = requireActivity().findViewById(rowPlayList[i]);
             rowSelectB.setVisibility(View.GONE);
             rowSelectA.setVisibility(View.GONE);
             rowPlay.setVisibility(View.GONE);

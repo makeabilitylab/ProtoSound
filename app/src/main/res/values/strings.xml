@@ -90,5 +90,5 @@
             for another second before returning the result)
         </font>
     </string>
-    <string name="choose_again">Choose again</string>
+    <string name="choose_again">Back</string>
 </resources>

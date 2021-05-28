@@ -125,248 +125,262 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
                 <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
                     android:focusableInTouchMode="false"
                     android:focusable="true"
                     android:descendantFocusability="beforeDescendants"
+                    android:orientation="vertical">
 
-                    android:orientation="horizontal">
-
-                    <TableLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent">
                         <LinearLayout
-                            android:layout_width="wrap_content"
+                            android:id="@+id/sound_1"
+                            android:layout_width="@dimen/_500sdp"
                             android:layout_height="wrap_content"
-                            android:orientation="horizontal">
-                        <TextView
-                            android:id="@+id/selection_title_1"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:paddingTop="@dimen/_15sdp"
-                            android:text="@string/class_1"
-                            android:textSize="@dimen/_15ssp" />
-
-                            <ImageView
-                                android:id="@+id/check_mark_1"
+                            android:orientation="vertical">
+                            <LinearLayout
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_gravity="bottom"
-                                android:paddingStart="@dimen/_5sdp"
-                                app:srcCompat="@drawable/ic_baseline_check_circle_24" />
-                        </LinearLayout>
-
-
-                        <TableRow
-                            android:id="@+id/selection_1"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent">
-
-                            <Button
-                                style="?attr/materialButtonOutlinedStyle"
-                                android:id="@+id/select_1a"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginStart="16dp"
-                                android:text="@string/user_choice" />
-
-                            <Button
-                                android:id="@+id/select_1b"
-                                style="?attr/materialButtonOutlinedStyle"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginStart="16dp"
-                                android:text="@string/pre_defined" />
-
-
-                        </TableRow>
-
-                        <TableRow
-                            android:id="@+id/row_1_select_b"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent">
-
-                            <com.google.android.material.textfield.TextInputLayout
-                                style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox.Dense.ExposedDropdownMenu"
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:layout_span="2">
-
+                                android:orientation="horizontal">
                                 <TextView
-                                    android:layout_width="match_parent"
-                                    android:layout_height="wrap_content"
-                                    android:text="@string/select_predefined" />
-
-                                <AutoCompleteTextView
-                                    android:id="@+id/menu_1"
-                                    android:layout_width="match_parent"
-                                    android:layout_height="wrap_content"
-                                    android:hint="@string/class_1_predefined"
-                                    android:inputType="none"
-                                    android:focusableInTouchMode="false"/>
-                                <Button
-                                    android:id="@+id/select_again_1b"
+                                    android:id="@+id/selection_title_1"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:text="@string/choose_again" />
+                                    android:paddingTop="@dimen/_15sdp"
+                                    android:text="@string/class_1"
+                                    android:textSize="@dimen/_15ssp" />
+
+                                <ImageView
+                                    android:id="@+id/check_mark_1"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_gravity="bottom"
+                                    android:paddingStart="@dimen/_5sdp"
+                                    app:srcCompat="@drawable/ic_baseline_check_circle_24" />
+                            </LinearLayout>
 
 
-                            </com.google.android.material.textfield.TextInputLayout>
-                        </TableRow>
-
-
-                        <TableRow
-                            android:id="@+id/row_1_select_a"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent">
-
-                            <com.google.android.material.textfield.TextInputLayout
+                            <LinearLayout
+                                android:id="@+id/selection_1"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:layout_span="2"
-                                android:hint="@string/hint1"
-                                android:paddingTop="@dimen/_15sdp"
-                                android:paddingEnd="@dimen/_6sdp"
-                                android:paddingBottom="@dimen/_15sdp">
+                                android:orientation="horizontal">
 
-                                <com.google.android.material.textfield.TextInputEditText
-                                    android:id="@+id/class_1"
+                                <Button
+                                    style="?attr/materialButtonOutlinedStyle"
+                                    android:id="@+id/select_1a"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginStart="@dimen/_16sdp"
+                                    android:text="@string/user_choice" />
+
+                                <Button
+                                    android:id="@+id/select_1b"
+                                    style="?attr/materialButtonOutlinedStyle"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginStart="@dimen/_16sdp"
+                                    android:text="@string/pre_defined" />
+
+
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:id="@+id/row_1_select_b"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="vertical">
+
+                                <com.google.android.material.textfield.TextInputLayout
+                                    style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox.Dense.ExposedDropdownMenu"
                                     android:layout_width="match_parent"
                                     android:layout_height="match_parent"
-                                    android:digits="0123456789 ,qwertzuiopasdfghjklyxcvbnm"
-                                    android:imeOptions="actionDone"
-                                    android:inputType="text"
-                                    android:singleLine="true"
-                                    android:focusableInTouchMode="false"/>
+                                    android:layout_marginStart="@dimen/_16sdp">
 
-                            </com.google.android.material.textfield.TextInputLayout>
+                                    <TextView
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:text="@string/select_predefined" />
 
-                        </TableRow>
+                                    <AutoCompleteTextView
+                                        android:id="@+id/menu_1"
+                                        android:layout_width="@dimen/_225sdp"
+                                        android:layout_height="wrap_content"
+                                        android:hint="@string/class_1_predefined"
+                                        android:inputType="none"
+                                        android:focusableInTouchMode="false"/>
+                                    <Button
+                                        android:id="@+id/select_again_1b"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="@string/choose_again" />
 
-                        <TableRow
-                            android:id="@+id/row_1_record"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent">
 
-                            <Button
-                                style="?attr/materialButtonOutlinedStyle"
-                                android:id="@+id/record_1"
-                                android:layout_width="wrap_content"
+                                </com.google.android.material.textfield.TextInputLayout>
+                            </LinearLayout>
+
+
+                            <LinearLayout
+                                android:id="@+id/row_1_select_a"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content">
+
+                                <com.google.android.material.textfield.TextInputLayout
+                                    android:layout_width="@dimen/_225sdp"
+                                    android:layout_height="wrap_content"
+                                    android:hint="@string/hint1"
+                                    android:paddingTop="@dimen/_15sdp"
+                                    android:paddingBottom="@dimen/_15sdp"
+                                    android:layout_marginStart="@dimen/_16sdp">
+
+                                    <com.google.android.material.textfield.TextInputEditText
+                                        android:id="@+id/class_1"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="match_parent"
+                                        android:digits="0123456789 ,qwertzuiopasdfghjklyxcvbnm"
+                                        android:imeOptions="actionDone"
+                                        android:inputType="text"
+                                        android:singleLine="true"
+                                        android:focusableInTouchMode="false"/>
+
+                                </com.google.android.material.textfield.TextInputLayout>
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:text="@string/record_1"
-                                android:layout_marginStart= "@dimen/_8sdp"
-                                android:layout_marginEnd="@dimen/_8sdp" />
+                                android:orientation="vertical">
+                                <LinearLayout
+                                    android:id="@+id/row_1_record"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="horizontal">
+
+                                    <Button
+                                        style="?attr/materialButtonOutlinedStyle"
+                                        android:id="@+id/record_1"
+                                        android:layout_height="wrap_content"
+                                        android:text="@string/record_1"
+                                        android:layout_width="@dimen/_85sdp"
+                                        android:layout_marginStart="@dimen/_16sdp"
+                                        android:textSize="@dimen/_9ssp"/>
 
 
-                            <Button
-                                style="?attr/materialButtonOutlinedStyle"
-                                android:id="@+id/record_2"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="@string/record_2"
-                                android:layout_marginStart="@dimen/_8sdp"
-                                android:layout_marginEnd="@dimen/_8sdp" />
+                                    <Button
+                                        style="?attr/materialButtonOutlinedStyle"
+                                        android:id="@+id/record_2"
+                                        android:layout_height="wrap_content"
+                                        android:text="@string/record_2"
+                                        android:layout_width="@dimen/_85sdp"
+                                        android:layout_marginStart="@dimen/_16sdp"
+                                        android:textSize="@dimen/_9ssp" />
 
-                            <Button
-                                style="?attr/materialButtonOutlinedStyle"
-                                android:id="@+id/record_3"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginStart="@dimen/_8sdp"
-                                android:layout_marginEnd="@dimen/_8sdp"
-                                android:text="@string/record_3" />
+                                    <Button
+                                        style="?attr/materialButtonOutlinedStyle"
+                                        android:id="@+id/record_3"
+                                        android:layout_height="wrap_content"
+                                        android:layout_width="@dimen/_85sdp"
+                                        android:layout_marginStart="@dimen/_16sdp"
+                                        android:textSize="@dimen/_9ssp"
+                                        android:text="@string/record_3" />
 
-                            <Button
-                                style="?attr/materialButtonOutlinedStyle"
-                                android:id="@+id/record_4"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginStart="@dimen/_8sdp"
-                                android:layout_marginEnd="@dimen/_8sdp"
-                                android:text="@string/record_4" />
+                                    <Button
+                                        style="?attr/materialButtonOutlinedStyle"
+                                        android:id="@+id/record_4"
+                                        android:layout_height="wrap_content"
+                                        android:layout_width="@dimen/_85sdp"
+                                        android:layout_marginStart="@dimen/_16sdp"
+                                        android:textSize="@dimen/_9ssp"
+                                        android:text="@string/record_4" />
 
-                            <Button
-                                style="?attr/materialButtonOutlinedStyle"
-                                android:id="@+id/record_5"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginStart="@dimen/_8sdp"
-                                android:layout_marginEnd="@dimen/_8sdp"
-                                android:text="@string/record_5" />
+                                    <Button
+                                        style="?attr/materialButtonOutlinedStyle"
+                                        android:id="@+id/record_5"
+                                        android:layout_height="wrap_content"
+                                        android:layout_width="@dimen/_85sdp"
+                                        android:layout_marginStart="@dimen/_16sdp"
+                                        android:textSize="@dimen/_9ssp"
+                                        android:text="@string/record_5" />
 
-                        </TableRow>
+                                </LinearLayout>
 
-                        <TableRow
-                            android:id="@+id/row_1_play"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent">
+                                <LinearLayout
+                                    android:id="@+id/row_1_play"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="horizontal">
 
-                            <Button
-                                android:id="@+id/play_1"
-                                style="?attr/materialButtonOutlinedStyle"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginStart= "@dimen/_12sdp"
-                                android:layout_marginEnd="@dimen/_12sdp"
-                                android:text="@string/play" />
+                                    <Button
+                                        android:id="@+id/play_1"
+                                        style="?attr/materialButtonOutlinedStyle"
+                                        android:layout_height="wrap_content"
+                                        android:layout_width="@dimen/_85sdp"
+                                        android:layout_marginStart="@dimen/_16sdp"
+                                        android:textSize="@dimen/_9ssp"
+                                        android:text="@string/play" />
 
-                            <Button
-                                android:id="@+id/play_2"
-                                style="?attr/materialButtonOutlinedStyle"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginStart= "@dimen/_12sdp"
-                                android:layout_marginEnd="@dimen/_12sdp"
-                                android:text="@string/play"/>
+                                    <Button
+                                        android:id="@+id/play_2"
+                                        style="?attr/materialButtonOutlinedStyle"
+                                        android:layout_height="wrap_content"
+                                        android:layout_width="@dimen/_85sdp"
+                                        android:layout_marginStart="@dimen/_16sdp"
+                                        android:textSize="@dimen/_9ssp"
+                                        android:text="@string/play"/>
 
-                            <Button
-                                android:id="@+id/play_3"
-                                style="?attr/materialButtonOutlinedStyle"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginStart= "@dimen/_12sdp"
-                                android:layout_marginEnd="@dimen/_12sdp"
-                                android:text="@string/play"
-                                />
+                                    <Button
+                                        android:id="@+id/play_3"
+                                        style="?attr/materialButtonOutlinedStyle"
+                                        android:layout_height="wrap_content"
+                                        android:layout_width="@dimen/_85sdp"
+                                        android:layout_marginStart="@dimen/_16sdp"
+                                        android:textSize="@dimen/_9ssp"
+                                        android:text="@string/play" />
 
-                            <Button
-                                android:id="@+id/play_4"
-                                style="?attr/materialButtonOutlinedStyle"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginStart= "@dimen/_12sdp"
-                                android:layout_marginEnd="@dimen/_12sdp"
-                                android:text="@string/play" />
+                                    <Button
+                                        android:id="@+id/play_4"
+                                        style="?attr/materialButtonOutlinedStyle"
+                                        android:layout_height="wrap_content"
+                                        android:layout_width="@dimen/_85sdp"
+                                        android:layout_marginStart="@dimen/_16sdp"
+                                        android:textSize="@dimen/_9ssp"
+                                        android:text="@string/play" />
 
-                            <Button
-                                android:id="@+id/play_5"
-                                style="?attr/materialButtonOutlinedStyle"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginStart= "@dimen/_12sdp"
-                                android:layout_marginEnd="@dimen/_12sdp"
-                                android:text="@string/play" />
+                                    <Button
+                                        android:id="@+id/play_5"
+                                        style="?attr/materialButtonOutlinedStyle"
+                                        android:layout_height="wrap_content"
+                                        android:layout_width="@dimen/_85sdp"
+                                        android:layout_marginStart="@dimen/_16sdp"
+                                        android:textSize="@dimen/_9ssp"
+                                        android:text="@string/play" />
 
-                        </TableRow>
-                        <Button
-                            android:id="@+id/select_again_1a"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginEnd="@dimen/_500sdp"
-                            android:text="@string/choose_again" />
+                                </LinearLayout>
+                                <Button
+                                    android:id="@+id/select_again_1a"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/choose_again"
+                                    android:layout_marginStart="@dimen/_16sdp"/>
+                            </LinearLayout>
+                        </LinearLayout>
 
+                    <LinearLayout
+                        android:id="@+id/sound_2"
+                        android:layout_width="@dimen/_500sdp"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
                         <LinearLayout
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:orientation="horizontal">
-                        <TextView
-                            android:id="@+id/selection_title_2"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:paddingTop="@dimen/_15sdp"
-                            android:text="@string/class_2"
-                            android:textSize="@dimen/_15ssp" />
+                            <TextView
+                                android:id="@+id/selection_title_2"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:paddingTop="@dimen/_15sdp"
+                                android:text="@string/class_2"
+                                android:textSize="@dimen/_15ssp" />
+
                             <ImageView
                                 android:id="@+id/check_mark_2"
                                 android:layout_width="wrap_content"
@@ -376,17 +390,19 @@
                                 app:srcCompat="@drawable/ic_baseline_check_circle_24" />
                         </LinearLayout>
 
-                        <TableRow
+
+                        <LinearLayout
                             android:id="@+id/selection_2"
                             android:layout_width="match_parent"
-                            android:layout_height="match_parent">
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal">
 
                             <Button
                                 style="?attr/materialButtonOutlinedStyle"
                                 android:id="@+id/select_2a"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_marginStart="16dp"
+                                android:layout_marginStart="@dimen/_16sdp"
                                 android:text="@string/user_choice" />
 
                             <Button
@@ -394,21 +410,23 @@
                                 style="?attr/materialButtonOutlinedStyle"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_marginStart="16dp"
+                                android:layout_marginStart="@dimen/_16sdp"
                                 android:text="@string/pre_defined" />
 
-                        </TableRow>
 
-                        <TableRow
+                        </LinearLayout>
+
+                        <LinearLayout
                             android:id="@+id/row_2_select_b"
                             android:layout_width="match_parent"
-                            android:layout_height="match_parent">
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical">
 
                             <com.google.android.material.textfield.TextInputLayout
                                 style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox.Dense.ExposedDropdownMenu"
                                 android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_span="2">
+                                android:layout_height="match_parent"
+                                android:layout_marginStart="@dimen/_16sdp">
 
                                 <TextView
                                     android:layout_width="match_parent"
@@ -417,7 +435,7 @@
 
                                 <AutoCompleteTextView
                                     android:id="@+id/menu_2"
-                                    android:layout_width="match_parent"
+                                    android:layout_width="@dimen/_225sdp"
                                     android:layout_height="wrap_content"
                                     android:hint="@string/class_2_predefined"
                                     android:inputType="none"
@@ -428,27 +446,28 @@
                                     android:layout_height="wrap_content"
                                     android:text="@string/choose_again" />
 
-                            </com.google.android.material.textfield.TextInputLayout>
-                        </TableRow>
 
-                        <TableRow
+                            </com.google.android.material.textfield.TextInputLayout>
+                        </LinearLayout>
+
+
+                        <LinearLayout
                             android:id="@+id/row_2_select_a"
                             android:layout_width="match_parent"
-                            android:layout_height="match_parent">
+                            android:layout_height="wrap_content">
 
                             <com.google.android.material.textfield.TextInputLayout
-                                android:layout_width="match_parent"
+                                android:layout_width="@dimen/_225sdp"
                                 android:layout_height="wrap_content"
-                                android:layout_span="2"
                                 android:hint="@string/hint2"
                                 android:paddingTop="@dimen/_15sdp"
-                                android:paddingEnd="@dimen/_6sdp"
-                                android:paddingBottom="@dimen/_15sdp">
+                                android:paddingBottom="@dimen/_15sdp"
+                                android:layout_marginStart="@dimen/_16sdp">
 
                                 <com.google.android.material.textfield.TextInputEditText
                                     android:id="@+id/class_2"
                                     android:layout_width="match_parent"
-                                    android:layout_height="wrap_content"
+                                    android:layout_height="match_parent"
                                     android:digits="0123456789 ,qwertzuiopasdfghjklyxcvbnm"
                                     android:imeOptions="actionDone"
                                     android:inputType="text"
@@ -456,129 +475,145 @@
                                     android:focusableInTouchMode="false"/>
 
                             </com.google.android.material.textfield.TextInputLayout>
-                        </TableRow>
+                        </LinearLayout>
 
-                        <TableRow
-                            android:id="@+id/row_2_record"
+                        <LinearLayout
                             android:layout_width="match_parent"
-                            android:layout_height="match_parent">
-
-                            <Button
-                                style="?attr/materialButtonOutlinedStyle"
-                                android:id="@+id/record_6"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginStart= "@dimen/_8sdp"
-                                android:layout_marginEnd="@dimen/_8sdp"
-                                android:text="@string/record_1" />
-
-                            <Button
-                                style="?attr/materialButtonOutlinedStyle"
-                                android:id="@+id/record_7"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginStart= "@dimen/_8sdp"
-                                android:layout_marginEnd="@dimen/_8sdp"
-                                android:text="@string/record_2" />
-
-                            <Button
-                                style="?attr/materialButtonOutlinedStyle"
-                                android:id="@+id/record_8"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginStart= "@dimen/_8sdp"
-                                android:layout_marginEnd="@dimen/_8sdp"
-                                android:text="@string/record_3" />
-
-                            <Button
-                                style="?attr/materialButtonOutlinedStyle"
-                                android:id="@+id/record_9"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginStart= "@dimen/_8sdp"
-                                android:layout_marginEnd="@dimen/_8sdp"
-                                android:text="@string/record_4" />
-
-                            <Button
-                                style="?attr/materialButtonOutlinedStyle"
-                                android:id="@+id/record_10"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginStart= "@dimen/_8sdp"
-                                android:layout_marginEnd="@dimen/_8sdp"
-                                android:text="@string/record_5" />
-
-                        </TableRow>
-
-                        <TableRow
-                            android:id="@+id/row_2_play"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent">
-
-                            <Button
-                                android:id="@+id/play_6"
-                                style="?attr/materialButtonOutlinedStyle"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginStart= "@dimen/_12sdp"
-                                android:layout_marginEnd="@dimen/_12sdp"
-                                android:text="@string/play" />
-
-                            <Button
-                                android:id="@+id/play_7"
-                                style="?attr/materialButtonOutlinedStyle"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginStart= "@dimen/_12sdp"
-                                android:layout_marginEnd="@dimen/_12sdp"
-                                android:text="@string/play" />
-
-                            <Button
-                                android:id="@+id/play_8"
-                                style="?attr/materialButtonOutlinedStyle"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginStart= "@dimen/_12sdp"
-                                android:layout_marginEnd="@dimen/_12sdp"
-                                android:text="@string/play" />
-
-                            <Button
-                                android:id="@+id/play_9"
-                                style="?attr/materialButtonOutlinedStyle"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginStart= "@dimen/_12sdp"
-                                android:layout_marginEnd="@dimen/_12sdp"
-                                android:text="@string/play" />
-
-                            <Button
-                                android:id="@+id/play_10"
-                                style="?attr/materialButtonOutlinedStyle"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginStart= "@dimen/_12sdp"
-                                android:layout_marginEnd="@dimen/_12sdp"
-                                android:text="@string/play" />
-
-                        </TableRow>
-                        <Button
-                            android:id="@+id/select_again_2a"
-                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginEnd="@dimen/_500sdp"
-                            android:text="@string/choose_again" />
+                            android:orientation="vertical">
+                            <LinearLayout
+                                android:id="@+id/row_2_record"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal">
 
+                                <Button
+                                    style="?attr/materialButtonOutlinedStyle"
+                                    android:id="@+id/record_6"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/record_1"
+                                    android:layout_width="@dimen/_85sdp"
+                                    android:layout_marginStart="@dimen/_16sdp"
+                                    android:textSize="@dimen/_9ssp"/>
+
+
+                                <Button
+                                    style="?attr/materialButtonOutlinedStyle"
+                                    android:id="@+id/record_7"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/record_2"
+                                    android:layout_width="@dimen/_85sdp"
+                                    android:layout_marginStart="@dimen/_16sdp"
+                                    android:textSize="@dimen/_9ssp" />
+
+                                <Button
+                                    style="?attr/materialButtonOutlinedStyle"
+                                    android:id="@+id/record_8"
+                                    android:layout_height="wrap_content"
+                                    android:layout_width="@dimen/_85sdp"
+                                    android:layout_marginStart="@dimen/_16sdp"
+                                    android:textSize="@dimen/_9ssp"
+                                    android:text="@string/record_3" />
+
+                                <Button
+                                    style="?attr/materialButtonOutlinedStyle"
+                                    android:id="@+id/record_9"
+                                    android:layout_width="@dimen/_85sdp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginStart="@dimen/_16sdp"
+                                    android:textSize="@dimen/_9ssp"
+                                    android:text="@string/record_4" />
+
+                                <Button
+                                    style="?attr/materialButtonOutlinedStyle"
+                                    android:id="@+id/record_10"
+                                    android:layout_height="wrap_content"
+                                    android:layout_width="@dimen/_85sdp"
+                                    android:layout_marginStart="@dimen/_16sdp"
+                                    android:textSize="@dimen/_9ssp"
+                                    android:text="@string/record_5" />
+
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:id="@+id/row_2_play"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal">
+
+                                <Button
+                                    android:id="@+id/play_6"
+                                    style="?attr/materialButtonOutlinedStyle"
+                                    android:layout_height="wrap_content"
+                                    android:layout_width="@dimen/_85sdp"
+                                    android:layout_marginStart="@dimen/_16sdp"
+                                    android:textSize="@dimen/_9ssp"
+                                    android:text="@string/play" />
+
+                                <Button
+                                    android:id="@+id/play_7"
+                                    style="?attr/materialButtonOutlinedStyle"
+                                    android:layout_height="wrap_content"
+                                    android:layout_width="@dimen/_85sdp"
+                                    android:layout_marginStart="@dimen/_16sdp"
+                                    android:textSize="@dimen/_9ssp"
+                                    android:text="@string/play"/>
+
+                                <Button
+                                    android:id="@+id/play_8"
+                                    style="?attr/materialButtonOutlinedStyle"
+                                    android:layout_height="wrap_content"
+                                    android:layout_width="@dimen/_85sdp"
+                                    android:layout_marginStart="@dimen/_16sdp"
+                                    android:textSize="@dimen/_9ssp"
+                                    android:text="@string/play"
+                                    />
+
+                                <Button
+                                    android:id="@+id/play_9"
+                                    style="?attr/materialButtonOutlinedStyle"
+                                    android:layout_height="wrap_content"
+                                    android:layout_width="@dimen/_85sdp"
+                                    android:layout_marginStart="@dimen/_16sdp"
+                                    android:textSize="@dimen/_9ssp"
+                                    android:text="@string/play" />
+
+                                <Button
+                                    android:id="@+id/play_10"
+                                    style="?attr/materialButtonOutlinedStyle"
+                                    android:layout_height="wrap_content"
+                                    android:layout_width="@dimen/_85sdp"
+                                    android:layout_marginStart="@dimen/_16sdp"
+                                    android:textSize="@dimen/_9ssp"
+                                    android:text="@string/play" />
+
+                            </LinearLayout>
+                            <Button
+                                android:id="@+id/select_again_2a"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/choose_again"
+                                android:layout_marginStart="@dimen/_16sdp"/>
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/sound_3"
+                        android:layout_width="@dimen/_500sdp"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
                         <LinearLayout
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:orientation="horizontal">
-                        <TextView
-                            android:id="@+id/selection_title_3"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:paddingTop="@dimen/_15sdp"
-                            android:text="@string/class_3"
-                            android:textSize="@dimen/_15ssp" />
+                            <TextView
+                                android:id="@+id/selection_title_3"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:paddingTop="@dimen/_15sdp"
+                                android:text="@string/class_3"
+                                android:textSize="@dimen/_15ssp" />
+
                             <ImageView
                                 android:id="@+id/check_mark_3"
                                 android:layout_width="wrap_content"
@@ -588,17 +623,19 @@
                                 app:srcCompat="@drawable/ic_baseline_check_circle_24" />
                         </LinearLayout>
 
-                        <TableRow
+
+                        <LinearLayout
                             android:id="@+id/selection_3"
                             android:layout_width="match_parent"
-                            android:layout_height="match_parent">
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal">
 
                             <Button
                                 style="?attr/materialButtonOutlinedStyle"
                                 android:id="@+id/select_3a"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_marginStart="16dp"
+                                android:layout_marginStart="@dimen/_16sdp"
                                 android:text="@string/user_choice" />
 
                             <Button
@@ -606,20 +643,23 @@
                                 style="?attr/materialButtonOutlinedStyle"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_marginStart="16dp"
+                                android:layout_marginStart="@dimen/_16sdp"
                                 android:text="@string/pre_defined" />
-                        </TableRow>
 
-                        <TableRow
+
+                        </LinearLayout>
+
+                        <LinearLayout
                             android:id="@+id/row_3_select_b"
                             android:layout_width="match_parent"
-                            android:layout_height="match_parent">
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical">
 
                             <com.google.android.material.textfield.TextInputLayout
                                 style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox.Dense.ExposedDropdownMenu"
                                 android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_span="2">
+                                android:layout_height="match_parent"
+                                android:layout_marginStart="@dimen/_16sdp">
 
                                 <TextView
                                     android:layout_width="match_parent"
@@ -628,7 +668,7 @@
 
                                 <AutoCompleteTextView
                                     android:id="@+id/menu_3"
-                                    android:layout_width="match_parent"
+                                    android:layout_width="@dimen/_225sdp"
                                     android:layout_height="wrap_content"
                                     android:hint="@string/class_3_predefined"
                                     android:inputType="none"
@@ -639,27 +679,28 @@
                                     android:layout_height="wrap_content"
                                     android:text="@string/choose_again" />
 
-                            </com.google.android.material.textfield.TextInputLayout>
-                        </TableRow>
 
-                        <TableRow
+                            </com.google.android.material.textfield.TextInputLayout>
+                        </LinearLayout>
+
+
+                        <LinearLayout
                             android:id="@+id/row_3_select_a"
                             android:layout_width="match_parent"
-                            android:layout_height="match_parent">
+                            android:layout_height="wrap_content">
 
                             <com.google.android.material.textfield.TextInputLayout
-                                android:layout_width="match_parent"
+                                android:layout_width="@dimen/_225sdp"
                                 android:layout_height="wrap_content"
-                                android:layout_span="2"
                                 android:hint="@string/hint3"
                                 android:paddingTop="@dimen/_15sdp"
-                                android:paddingEnd="@dimen/_6sdp"
-                                android:paddingBottom="@dimen/_15sdp">
+                                android:paddingBottom="@dimen/_15sdp"
+                                android:layout_marginStart="@dimen/_16sdp">
 
                                 <com.google.android.material.textfield.TextInputEditText
                                     android:id="@+id/class_3"
                                     android:layout_width="match_parent"
-                                    android:layout_height="wrap_content"
+                                    android:layout_height="match_parent"
                                     android:digits="0123456789 ,qwertzuiopasdfghjklyxcvbnm"
                                     android:imeOptions="actionDone"
                                     android:inputType="text"
@@ -667,130 +708,145 @@
                                     android:focusableInTouchMode="false"/>
 
                             </com.google.android.material.textfield.TextInputLayout>
-                        </TableRow>
+                        </LinearLayout>
 
-                        <TableRow
-                            android:id="@+id/row_3_record"
+                        <LinearLayout
                             android:layout_width="match_parent"
-                            android:layout_height="match_parent">
-
-                            <Button
-                                style="?attr/materialButtonOutlinedStyle"
-                                android:id="@+id/record_11"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginStart= "@dimen/_8sdp"
-                                android:layout_marginEnd="@dimen/_8sdp"
-                                android:text="@string/record_1" />
-
-                            <Button
-                                style="?attr/materialButtonOutlinedStyle"
-                                android:id="@+id/record_12"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginStart= "@dimen/_8sdp"
-                                android:layout_marginEnd="@dimen/_8sdp"
-                                android:text="@string/record_2" />
-
-                            <Button
-                                style="?attr/materialButtonOutlinedStyle"
-                                android:id="@+id/record_13"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginStart= "@dimen/_8sdp"
-                                android:layout_marginEnd="@dimen/_8sdp"
-                                android:text="@string/record_3" />
-
-                            <Button
-                                style="?attr/materialButtonOutlinedStyle"
-                                android:id="@+id/record_14"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginStart= "@dimen/_8sdp"
-                                android:layout_marginEnd="@dimen/_8sdp"
-                                android:text="@string/record_4" />
-
-                            <Button
-                                style="?attr/materialButtonOutlinedStyle"
-                                android:id="@+id/record_15"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginStart= "@dimen/_8sdp"
-                                android:layout_marginEnd="@dimen/_8sdp"
-                                android:text="@string/record_5" />
-
-                        </TableRow>
-
-                        <TableRow
-                            android:id="@+id/row_3_play"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent">
-
-                            <Button
-                                android:id="@+id/play_11"
-                                style="?attr/materialButtonOutlinedStyle"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginStart= "@dimen/_12sdp"
-                                android:layout_marginEnd="@dimen/_12sdp"
-                                android:text="@string/play" />
-
-                            <Button
-                                android:id="@+id/play_12"
-                                style="?attr/materialButtonOutlinedStyle"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginStart= "@dimen/_12sdp"
-                                android:layout_marginEnd="@dimen/_12sdp"
-                                android:text="@string/play" />
-
-                            <Button
-                                android:id="@+id/play_13"
-                                style="?attr/materialButtonOutlinedStyle"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginStart= "@dimen/_12sdp"
-                                android:layout_marginEnd="@dimen/_12sdp"
-                                android:text="@string/play" />
-
-                            <Button
-                                android:id="@+id/play_14"
-                                style="?attr/materialButtonOutlinedStyle"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginStart= "@dimen/_12sdp"
-                                android:layout_marginEnd="@dimen/_12sdp"
-                                android:text="@string/play" />
-
-                            <Button
-                                android:id="@+id/play_15"
-                                style="?attr/materialButtonOutlinedStyle"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginStart= "@dimen/_12sdp"
-                                android:layout_marginEnd="@dimen/_12sdp"
-                                android:text="@string/play" />
-
-                        </TableRow>
-                        <Button
-                            android:id="@+id/select_again_3a"
-                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginEnd="@dimen/_500sdp"
-                            android:text="@string/choose_again" />
+                            android:orientation="vertical">
+                            <LinearLayout
+                                android:id="@+id/row_3_record"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal">
+
+                                <Button
+                                    style="?attr/materialButtonOutlinedStyle"
+                                    android:id="@+id/record_11"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/record_1"
+                                    android:layout_width="@dimen/_85sdp"
+                                    android:layout_marginStart="@dimen/_16sdp"
+                                    android:textSize="@dimen/_9ssp"/>
 
 
+                                <Button
+                                    style="?attr/materialButtonOutlinedStyle"
+                                    android:id="@+id/record_12"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/record_2"
+                                    android:layout_width="@dimen/_85sdp"
+                                    android:layout_marginStart="@dimen/_16sdp"
+                                    android:textSize="@dimen/_9ssp" />
+
+                                <Button
+                                    style="?attr/materialButtonOutlinedStyle"
+                                    android:id="@+id/record_13"
+                                    android:layout_height="wrap_content"
+                                    android:layout_width="@dimen/_85sdp"
+                                    android:layout_marginStart="@dimen/_16sdp"
+                                    android:textSize="@dimen/_9ssp"
+                                    android:text="@string/record_3" />
+
+                                <Button
+                                    style="?attr/materialButtonOutlinedStyle"
+                                    android:id="@+id/record_14"
+                                    android:layout_height="wrap_content"
+                                    android:layout_width="@dimen/_85sdp"
+                                    android:layout_marginStart="@dimen/_16sdp"
+                                    android:textSize="@dimen/_9ssp"
+                                    android:text="@string/record_4" />
+
+                                <Button
+                                    style="?attr/materialButtonOutlinedStyle"
+                                    android:id="@+id/record_15"
+                                    android:layout_height="wrap_content"
+                                    android:layout_width="@dimen/_85sdp"
+                                    android:layout_marginStart="@dimen/_16sdp"
+                                    android:textSize="@dimen/_9ssp"
+                                    android:text="@string/record_5" />
+
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:id="@+id/row_3_play"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal">
+
+                                <Button
+                                    android:id="@+id/play_11"
+                                    style="?attr/materialButtonOutlinedStyle"
+                                    android:layout_height="wrap_content"
+                                    android:layout_width="@dimen/_85sdp"
+                                    android:layout_marginStart="@dimen/_16sdp"
+                                    android:textSize="@dimen/_9ssp"
+                                    android:text="@string/play" />
+
+                                <Button
+                                    android:id="@+id/play_12"
+                                    style="?attr/materialButtonOutlinedStyle"
+                                    android:layout_height="wrap_content"
+                                    android:layout_width="@dimen/_85sdp"
+                                    android:layout_marginStart="@dimen/_16sdp"
+                                    android:textSize="@dimen/_9ssp"
+                                    android:text="@string/play"/>
+
+                                <Button
+                                    android:id="@+id/play_13"
+                                    style="?attr/materialButtonOutlinedStyle"
+                                    android:layout_height="wrap_content"
+                                    android:layout_width="@dimen/_85sdp"
+                                    android:layout_marginStart="@dimen/_16sdp"
+                                    android:textSize="@dimen/_9ssp"
+                                    android:text="@string/play"
+                                    />
+
+                                <Button
+                                    android:id="@+id/play_14"
+                                    style="?attr/materialButtonOutlinedStyle"
+                                    android:layout_height="wrap_content"
+                                    android:layout_width="@dimen/_85sdp"
+                                    android:layout_marginStart="@dimen/_16sdp"
+                                    android:textSize="@dimen/_9ssp"
+                                    android:text="@string/play" />
+
+                                <Button
+                                    android:id="@+id/play_15"
+                                    style="?attr/materialButtonOutlinedStyle"
+                                    android:layout_height="wrap_content"
+                                    android:layout_width="@dimen/_85sdp"
+                                    android:layout_marginStart="@dimen/_16sdp"
+                                    android:textSize="@dimen/_9ssp"
+                                    android:text="@string/play" />
+
+                            </LinearLayout>
+                            <Button
+                                android:id="@+id/select_again_3a"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/choose_again"
+                                android:layout_marginStart="@dimen/_16sdp"/>
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/sound_4"
+                        android:layout_width="@dimen/_500sdp"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
                         <LinearLayout
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:orientation="horizontal">
-                        <TextView
-                            android:id="@+id/selection_title_4"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:paddingTop="@dimen/_15sdp"
-                            android:text="@string/class_4"
-                            android:textSize="@dimen/_15ssp" />
+                            <TextView
+                                android:id="@+id/selection_title_4"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:paddingTop="@dimen/_15sdp"
+                                android:text="@string/class_4"
+                                android:textSize="@dimen/_15ssp" />
+
                             <ImageView
                                 android:id="@+id/check_mark_4"
                                 android:layout_width="wrap_content"
@@ -799,17 +855,20 @@
                                 android:paddingStart="@dimen/_5sdp"
                                 app:srcCompat="@drawable/ic_baseline_check_circle_24" />
                         </LinearLayout>
-                        <TableRow
+
+
+                        <LinearLayout
                             android:id="@+id/selection_4"
                             android:layout_width="match_parent"
-                            android:layout_height="match_parent">
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal">
 
                             <Button
                                 style="?attr/materialButtonOutlinedStyle"
                                 android:id="@+id/select_4a"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_marginStart="16dp"
+                                android:layout_marginStart="@dimen/_16sdp"
                                 android:text="@string/user_choice" />
 
                             <Button
@@ -817,21 +876,23 @@
                                 style="?attr/materialButtonOutlinedStyle"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_marginStart="16dp"
+                                android:layout_marginStart="@dimen/_16sdp"
                                 android:text="@string/pre_defined" />
 
-                        </TableRow>
 
-                        <TableRow
+                        </LinearLayout>
+
+                        <LinearLayout
                             android:id="@+id/row_4_select_b"
                             android:layout_width="match_parent"
-                            android:layout_height="match_parent">
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical">
 
                             <com.google.android.material.textfield.TextInputLayout
                                 style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox.Dense.ExposedDropdownMenu"
                                 android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_span="2">
+                                android:layout_height="match_parent"
+                                android:layout_marginStart="@dimen/_16sdp">
 
                                 <TextView
                                     android:layout_width="match_parent"
@@ -840,7 +901,7 @@
 
                                 <AutoCompleteTextView
                                     android:id="@+id/menu_4"
-                                    android:layout_width="match_parent"
+                                    android:layout_width="@dimen/_225sdp"
                                     android:layout_height="wrap_content"
                                     android:hint="@string/class_4_predefined"
                                     android:inputType="none"
@@ -851,27 +912,28 @@
                                     android:layout_height="wrap_content"
                                     android:text="@string/choose_again" />
 
-                            </com.google.android.material.textfield.TextInputLayout>
-                        </TableRow>
 
-                        <TableRow
+                            </com.google.android.material.textfield.TextInputLayout>
+                        </LinearLayout>
+
+
+                        <LinearLayout
                             android:id="@+id/row_4_select_a"
                             android:layout_width="match_parent"
-                            android:layout_height="match_parent">
+                            android:layout_height="wrap_content">
 
                             <com.google.android.material.textfield.TextInputLayout
-                                android:layout_width="match_parent"
+                                android:layout_width="@dimen/_225sdp"
                                 android:layout_height="wrap_content"
-                                android:layout_span="2"
                                 android:hint="@string/hint4"
                                 android:paddingTop="@dimen/_15sdp"
-                                android:paddingEnd="@dimen/_6sdp"
-                                android:paddingBottom="@dimen/_15sdp">
+                                android:paddingBottom="@dimen/_15sdp"
+                                android:layout_marginStart="@dimen/_16sdp">
 
                                 <com.google.android.material.textfield.TextInputEditText
                                     android:id="@+id/class_4"
                                     android:layout_width="match_parent"
-                                    android:layout_height="wrap_content"
+                                    android:layout_height="match_parent"
                                     android:digits="0123456789 ,qwertzuiopasdfghjklyxcvbnm"
                                     android:imeOptions="actionDone"
                                     android:inputType="text"
@@ -879,129 +941,145 @@
                                     android:focusableInTouchMode="false"/>
 
                             </com.google.android.material.textfield.TextInputLayout>
-                        </TableRow>
+                        </LinearLayout>
 
-                        <TableRow
-                            android:id="@+id/row_4_record"
+                        <LinearLayout
                             android:layout_width="match_parent"
-                            android:layout_height="match_parent">
-
-                            <Button
-                                style="?attr/materialButtonOutlinedStyle"
-                                android:id="@+id/record_16"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginStart= "@dimen/_8sdp"
-                                android:layout_marginEnd="@dimen/_8sdp"
-                                android:text="@string/record_1" />
-
-                            <Button
-                                style="?attr/materialButtonOutlinedStyle"
-                                android:id="@+id/record_17"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginStart= "@dimen/_8sdp"
-                                android:layout_marginEnd="@dimen/_8sdp"
-                                android:text="@string/record_2" />
-
-                            <Button
-                                style="?attr/materialButtonOutlinedStyle"
-                                android:id="@+id/record_18"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginStart= "@dimen/_8sdp"
-                                android:layout_marginEnd="@dimen/_8sdp"
-                                android:text="@string/record_3" />
-
-                            <Button
-                                style="?attr/materialButtonOutlinedStyle"
-                                android:id="@+id/record_19"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginStart= "@dimen/_8sdp"
-                                android:layout_marginEnd="@dimen/_8sdp"
-                                android:text="@string/record_4" />
-
-                            <Button
-                                style="?attr/materialButtonOutlinedStyle"
-                                android:id="@+id/record_20"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginStart= "@dimen/_8sdp"
-                                android:layout_marginEnd="@dimen/_8sdp"
-                                android:text="@string/record_5" />
-
-                        </TableRow>
-
-                        <TableRow
-                            android:id="@+id/row_4_play"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent">
-
-                            <Button
-                                android:id="@+id/play_16"
-                                style="?attr/materialButtonOutlinedStyle"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginStart= "@dimen/_12sdp"
-                                android:layout_marginEnd="@dimen/_12sdp"
-                                android:text="@string/play" />
-
-                            <Button
-                                android:id="@+id/play_17"
-                                style="?attr/materialButtonOutlinedStyle"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginStart= "@dimen/_12sdp"
-                                android:layout_marginEnd="@dimen/_12sdp"
-                                android:text="@string/play" />
-
-                            <Button
-                                android:id="@+id/play_18"
-                                style="?attr/materialButtonOutlinedStyle"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginStart= "@dimen/_12sdp"
-                                android:layout_marginEnd="@dimen/_12sdp"
-                                android:text="@string/play" />
-
-                            <Button
-                                android:id="@+id/play_19"
-                                style="?attr/materialButtonOutlinedStyle"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginStart= "@dimen/_12sdp"
-                                android:layout_marginEnd="@dimen/_12sdp"
-                                android:text="@string/play" />
-
-                            <Button
-                                android:id="@+id/play_20"
-                                style="?attr/materialButtonOutlinedStyle"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginStart= "@dimen/_12sdp"
-                                android:layout_marginEnd="@dimen/_12sdp"
-                                android:text="@string/play" />
-
-                        </TableRow>
-                        <Button
-                            android:id="@+id/select_again_4a"
-                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginEnd="@dimen/_500sdp"
-                            android:text="@string/choose_again" />
+                            android:orientation="vertical">
+                            <LinearLayout
+                                android:id="@+id/row_4_record"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal">
 
+                                <Button
+                                    style="?attr/materialButtonOutlinedStyle"
+                                    android:id="@+id/record_16"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/record_1"
+                                    android:layout_width="@dimen/_85sdp"
+                                    android:layout_marginStart="@dimen/_16sdp"
+                                    android:textSize="@dimen/_9ssp"/>
+
+
+                                <Button
+                                    style="?attr/materialButtonOutlinedStyle"
+                                    android:id="@+id/record_17"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/record_2"
+                                    android:layout_width="@dimen/_85sdp"
+                                    android:layout_marginStart="@dimen/_16sdp"
+                                    android:textSize="@dimen/_9ssp" />
+
+                                <Button
+                                    style="?attr/materialButtonOutlinedStyle"
+                                    android:id="@+id/record_18"
+                                    android:layout_height="wrap_content"
+                                    android:layout_width="@dimen/_85sdp"
+                                    android:layout_marginStart="@dimen/_16sdp"
+                                    android:textSize="@dimen/_9ssp"
+                                    android:text="@string/record_3" />
+
+                                <Button
+                                    style="?attr/materialButtonOutlinedStyle"
+                                    android:id="@+id/record_19"
+                                    android:layout_height="wrap_content"
+                                    android:layout_width="@dimen/_85sdp"
+                                    android:layout_marginStart="@dimen/_16sdp"
+                                    android:textSize="@dimen/_9ssp"
+                                    android:text="@string/record_4" />
+
+                                <Button
+                                    style="?attr/materialButtonOutlinedStyle"
+                                    android:id="@+id/record_20"
+                                    android:layout_height="wrap_content"
+                                    android:layout_width="@dimen/_85sdp"
+                                    android:layout_marginStart="@dimen/_16sdp"
+                                    android:textSize="@dimen/_9ssp"
+                                    android:text="@string/record_5" />
+
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:id="@+id/row_4_play"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal">
+
+                                <Button
+                                    android:id="@+id/play_16"
+                                    style="?attr/materialButtonOutlinedStyle"
+                                    android:layout_height="wrap_content"
+                                    android:layout_width="@dimen/_85sdp"
+                                    android:layout_marginStart="@dimen/_16sdp"
+                                    android:textSize="@dimen/_9ssp"
+                                    android:text="@string/play" />
+
+                                <Button
+                                    android:id="@+id/play_17"
+                                    style="?attr/materialButtonOutlinedStyle"
+                                    android:layout_height="wrap_content"
+                                    android:layout_width="@dimen/_85sdp"
+                                    android:layout_marginStart="@dimen/_16sdp"
+                                    android:textSize="@dimen/_9ssp"
+                                    android:text="@string/play"/>
+
+                                <Button
+                                    android:id="@+id/play_18"
+                                    style="?attr/materialButtonOutlinedStyle"
+                                    android:layout_height="wrap_content"
+                                    android:layout_width="@dimen/_85sdp"
+                                    android:layout_marginStart="@dimen/_16sdp"
+                                    android:textSize="@dimen/_9ssp"
+                                    android:text="@string/play"
+                                    />
+
+                                <Button
+                                    android:id="@+id/play_19"
+                                    style="?attr/materialButtonOutlinedStyle"
+                                    android:layout_height="wrap_content"
+                                    android:layout_width="@dimen/_85sdp"
+                                    android:layout_marginStart="@dimen/_16sdp"
+                                    android:textSize="@dimen/_9ssp"
+                                    android:text="@string/play" />
+
+                                <Button
+                                    android:id="@+id/play_20"
+                                    style="?attr/materialButtonOutlinedStyle"
+                                    android:layout_height="wrap_content"
+                                    android:layout_width="@dimen/_85sdp"
+                                    android:layout_marginStart="@dimen/_16sdp"
+                                    android:textSize="@dimen/_9ssp"
+                                    android:text="@string/play" />
+
+                            </LinearLayout>
+                            <Button
+                                android:id="@+id/select_again_4a"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/choose_again"
+                                android:layout_marginStart="@dimen/_16sdp"/>
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/sound_5"
+                        android:layout_width="@dimen/_500sdp"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
                         <LinearLayout
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:orientation="horizontal">
-                        <TextView
-                            android:id="@+id/selection_title_5"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:paddingTop="@dimen/_15sdp"
-                            android:text="@string/class_5"
-                            android:textSize="@dimen/_15ssp"/>
+                            <TextView
+                                android:id="@+id/selection_title_5"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:paddingTop="@dimen/_15sdp"
+                                android:text="@string/class_5"
+                                android:textSize="@dimen/_15ssp" />
+
                             <ImageView
                                 android:id="@+id/check_mark_5"
                                 android:layout_width="wrap_content"
@@ -1012,18 +1090,18 @@
                         </LinearLayout>
 
 
-                        <TableRow
+                        <LinearLayout
                             android:id="@+id/selection_5"
                             android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:paddingBottom="@dimen/_20sdp">
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal">
 
                             <Button
                                 style="?attr/materialButtonOutlinedStyle"
                                 android:id="@+id/select_5a"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_marginStart="16dp"
+                                android:layout_marginStart="@dimen/_16sdp"
                                 android:text="@string/user_choice" />
 
                             <Button
@@ -1031,21 +1109,23 @@
                                 style="?attr/materialButtonOutlinedStyle"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_marginStart="16dp"
+                                android:layout_marginStart="@dimen/_16sdp"
                                 android:text="@string/pre_defined" />
 
-                        </TableRow>
 
-                        <TableRow
+                        </LinearLayout>
+
+                        <LinearLayout
                             android:id="@+id/row_5_select_b"
                             android:layout_width="match_parent"
-                            android:layout_height="match_parent">
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical">
 
                             <com.google.android.material.textfield.TextInputLayout
                                 style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox.Dense.ExposedDropdownMenu"
                                 android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_span="2">
+                                android:layout_height="match_parent"
+                                android:layout_marginStart="@dimen/_16sdp">
 
                                 <TextView
                                     android:layout_width="match_parent"
@@ -1054,7 +1134,7 @@
 
                                 <AutoCompleteTextView
                                     android:id="@+id/menu_5"
-                                    android:layout_width="match_parent"
+                                    android:layout_width="@dimen/_225sdp"
                                     android:layout_height="wrap_content"
                                     android:hint="@string/class_5_predefined"
                                     android:inputType="none"
@@ -1065,27 +1145,28 @@
                                     android:layout_height="wrap_content"
                                     android:text="@string/choose_again" />
 
-                            </com.google.android.material.textfield.TextInputLayout>
-                        </TableRow>
 
-                        <TableRow
+                            </com.google.android.material.textfield.TextInputLayout>
+                        </LinearLayout>
+
+
+                        <LinearLayout
                             android:id="@+id/row_5_select_a"
                             android:layout_width="match_parent"
-                            android:layout_height="match_parent">
+                            android:layout_height="wrap_content">
 
                             <com.google.android.material.textfield.TextInputLayout
-                                android:layout_width="match_parent"
+                                android:layout_width="@dimen/_225sdp"
                                 android:layout_height="wrap_content"
-                                android:layout_span="2"
                                 android:hint="@string/hint5"
                                 android:paddingTop="@dimen/_15sdp"
-                                android:paddingEnd="@dimen/_6sdp"
-                                android:paddingBottom="@dimen/_15sdp">
+                                android:paddingBottom="@dimen/_15sdp"
+                                android:layout_marginStart="@dimen/_16sdp">
 
                                 <com.google.android.material.textfield.TextInputEditText
                                     android:id="@+id/class_5"
                                     android:layout_width="match_parent"
-                                    android:layout_height="wrap_content"
+                                    android:layout_height="match_parent"
                                     android:digits="0123456789 ,qwertzuiopasdfghjklyxcvbnm"
                                     android:imeOptions="actionDone"
                                     android:inputType="text"
@@ -1093,118 +1174,128 @@
                                     android:focusableInTouchMode="false"/>
 
                             </com.google.android.material.textfield.TextInputLayout>
-                        </TableRow>
+                        </LinearLayout>
 
-                        <TableRow
-                            android:id="@+id/row_5_record"
+                        <LinearLayout
                             android:layout_width="match_parent"
-                            android:layout_height="match_parent">
-
-                            <Button
-                                style="?attr/materialButtonOutlinedStyle"
-                                android:id="@+id/record_21"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginStart= "@dimen/_8sdp"
-                                android:layout_marginEnd="@dimen/_8sdp"
-                                android:text="@string/record_1" />
-
-                            <Button
-                                style="?attr/materialButtonOutlinedStyle"
-                                android:id="@+id/record_22"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginStart= "@dimen/_8sdp"
-                                android:layout_marginEnd="@dimen/_8sdp"
-                                android:text="@string/record_2" />
-
-                            <Button
-                                style="?attr/materialButtonOutlinedStyle"
-                                android:id="@+id/record_23"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginStart= "@dimen/_8sdp"
-                                android:layout_marginEnd="@dimen/_8sdp"
-                                android:text="@string/record_3" />
-
-                            <Button
-                                style="?attr/materialButtonOutlinedStyle"
-                                android:id="@+id/record_24"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginStart= "@dimen/_8sdp"
-                                android:layout_marginEnd="@dimen/_8sdp"
-                                android:text="@string/record_4" />
-
-                            <Button
-                                style="?attr/materialButtonOutlinedStyle"
-                                android:id="@+id/record_25"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginStart= "@dimen/_8sdp"
-                                android:layout_marginEnd="@dimen/_8sdp"
-                                android:text="@string/record_5" />
-
-                        </TableRow>
-
-                        <TableRow
-                            android:id="@+id/row_5_play"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent">
-
-                            <Button
-                                android:id="@+id/play_21"
-                                style="?attr/materialButtonOutlinedStyle"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginStart= "@dimen/_12sdp"
-                                android:layout_marginEnd="@dimen/_12sdp"
-                                android:text="@string/play" />
-
-                            <Button
-                                android:id="@+id/play_22"
-                                style="?attr/materialButtonOutlinedStyle"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginStart= "@dimen/_12sdp"
-                                android:layout_marginEnd="@dimen/_12sdp"
-                                android:text="@string/play" />
-
-                            <Button
-                                android:id="@+id/play_23"
-                                style="?attr/materialButtonOutlinedStyle"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginStart= "@dimen/_12sdp"
-                                android:layout_marginEnd="@dimen/_12sdp"
-                                android:text="@string/play" />
-
-                            <Button
-                                android:id="@+id/play_24"
-                                style="?attr/materialButtonOutlinedStyle"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginStart= "@dimen/_12sdp"
-                                android:layout_marginEnd="@dimen/_12sdp"
-                                android:text="@string/play" />
-
-                            <Button
-                                android:id="@+id/play_25"
-                                style="?attr/materialButtonOutlinedStyle"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginStart= "@dimen/_12sdp"
-                                android:layout_marginEnd="@dimen/_12sdp"
-                                android:text="@string/play" />
-
-                        </TableRow>
-                        <Button
-                            android:id="@+id/select_again_5a"
-                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginEnd="@dimen/_500sdp"
-                            android:text="@string/choose_again" />
-                    </TableLayout>
+                            android:orientation="vertical">
+                            <LinearLayout
+                                android:id="@+id/row_5_record"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal">
+
+                                <Button
+                                    style="?attr/materialButtonOutlinedStyle"
+                                    android:id="@+id/record_21"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/record_1"
+                                    android:layout_width="@dimen/_85sdp"
+                                    android:layout_marginStart="@dimen/_16sdp"
+                                    android:textSize="@dimen/_9ssp"/>
+
+
+                                <Button
+                                    style="?attr/materialButtonOutlinedStyle"
+                                    android:id="@+id/record_22"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/record_2"
+                                    android:layout_width="@dimen/_85sdp"
+                                    android:layout_marginStart="@dimen/_16sdp"
+                                    android:textSize="@dimen/_9ssp" />
+
+                                <Button
+                                    style="?attr/materialButtonOutlinedStyle"
+                                    android:id="@+id/record_23"
+                                    android:layout_height="wrap_content"
+                                    android:layout_width="@dimen/_85sdp"
+                                    android:layout_marginStart="@dimen/_16sdp"
+                                    android:textSize="@dimen/_9ssp"
+                                    android:text="@string/record_3" />
+
+                                <Button
+                                    style="?attr/materialButtonOutlinedStyle"
+                                    android:id="@+id/record_24"
+                                    android:layout_height="wrap_content"
+                                    android:layout_width="@dimen/_85sdp"
+                                    android:layout_marginStart="@dimen/_16sdp"
+                                    android:textSize="@dimen/_9ssp"
+                                    android:text="@string/record_4" />
+
+                                <Button
+                                    style="?attr/materialButtonOutlinedStyle"
+                                    android:id="@+id/record_25"
+                                    android:layout_height="wrap_content"
+                                    android:layout_width="@dimen/_85sdp"
+                                    android:layout_marginStart="@dimen/_16sdp"
+                                    android:textSize="@dimen/_9ssp"
+                                    android:text="@string/record_5" />
+
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:id="@+id/row_5_play"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal">
+
+                                <Button
+                                    android:id="@+id/play_21"
+                                    style="?attr/materialButtonOutlinedStyle"
+                                    android:layout_height="wrap_content"
+                                    android:layout_width="@dimen/_85sdp"
+                                    android:layout_marginStart="@dimen/_16sdp"
+                                    android:textSize="@dimen/_9ssp"
+                                    android:text="@string/play" />
+
+                                <Button
+                                    android:id="@+id/play_22"
+                                    style="?attr/materialButtonOutlinedStyle"
+                                    android:layout_height="wrap_content"
+                                    android:layout_width="@dimen/_85sdp"
+                                    android:layout_marginStart="@dimen/_16sdp"
+                                    android:textSize="@dimen/_9ssp"
+                                    android:text="@string/play"/>
+
+                                <Button
+                                    android:id="@+id/play_23"
+                                    style="?attr/materialButtonOutlinedStyle"
+                                    android:layout_height="wrap_content"
+                                    android:layout_width="@dimen/_85sdp"
+                                    android:layout_marginStart="@dimen/_16sdp"
+                                    android:textSize="@dimen/_9ssp"
+                                    android:text="@string/play"
+                                    />
+
+                                <Button
+                                    android:id="@+id/play_24"
+                                    style="?attr/materialButtonOutlinedStyle"
+                                    android:layout_height="wrap_content"
+                                    android:layout_width="@dimen/_85sdp"
+                                    android:layout_marginStart="@dimen/_16sdp"
+                                    android:textSize="@dimen/_9ssp"
+                                    android:text="@string/play" />
+
+                                <Button
+                                    android:id="@+id/play_25"
+                                    style="?attr/materialButtonOutlinedStyle"
+                                    android:layout_height="wrap_content"
+                                    android:layout_width="@dimen/_85sdp"
+                                    android:layout_marginStart="@dimen/_16sdp"
+                                    android:textSize="@dimen/_9ssp"
+                                    android:text="@string/play" />
+
+                            </LinearLayout>
+                            <Button
+                                android:id="@+id/select_again_5a"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/choose_again"
+                                android:layout_marginStart="@dimen/_16sdp"/>
+                        </LinearLayout>
+                    </LinearLayout>
+
                 </LinearLayout>
             </HorizontalScrollView>
 
@@ -1213,7 +1304,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:breakStrategy="high_quality"
-                android:paddingTop="@dimen/_16sdp"
+                android:paddingTop="@dimen/_50sdp"
                 android:paddingBottom="@dimen/_15sdp"
                 android:text="@string/tutorial_3"
                 android:textSize="@dimen/_17ssp" />
