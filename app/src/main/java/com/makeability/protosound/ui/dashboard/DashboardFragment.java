@@ -216,7 +216,7 @@ public class DashboardFragment extends Fragment {
         // Setup 3 edit texts for 3 classes
         for (int i = 0; i < classNameList.length; i++) {
             TextInputEditText classTextField = (TextInputEditText) root.findViewById(classNameList[i]);
-            setOnClickText(classTextField, i+1);
+            setOnClickText(classTextField, i);
         }
 
         // Setup submit button
@@ -330,7 +330,8 @@ public class DashboardFragment extends Fragment {
             }
         });
         for (Integer id: userChoiceMap.keySet()) {
-            if (userChoiceMap.get(id) == 0) {
+            Integer choice = userChoiceMap.get(id);
+            if (choice!= null && choice == 0) {
                 // Restore YOUR CHOICE's UI
                 TableRow rowRecord = requireActivity().findViewById(rowRecordList[id]);
                 TableRow rowPlay = requireActivity().findViewById(rowPlayList[id]);
@@ -347,7 +348,7 @@ public class DashboardFragment extends Fragment {
                 String classID = "class_" + (id+1);
                 TextInputEditText className = requireActivity().findViewById(getResources().getIdentifier(classID, "id", getContext().getPackageName()));
                 className.setText(labelList[id]);
-            } else if (userChoiceMap.get(id) == 1) {
+            } else if (choice!= null && choice == 1) {
                 // Restore PRE-DEFINED's UI
                 TableRow rowSelectB = requireActivity().findViewById(rowSelectBList[id]);
                 TableRow rowSelection = requireActivity().findViewById(selection[id]);
@@ -363,7 +364,7 @@ public class DashboardFragment extends Fragment {
                 }
 
                 AutoCompleteTextView spinner = (AutoCompleteTextView) requireActivity().findViewById(menuList[id]);
-                spinner.setText(spinnerSelection.get(id+1));
+                spinner.setText(spinnerSelection.get(id));
                 spinner.setAdapter(adapter);
             } else {
                 TableRow rowSelection = requireActivity().findViewById(selection[id]);
@@ -392,7 +393,8 @@ public class DashboardFragment extends Fragment {
         // Restore "Record" states
         for (int i = 0; i < recordButtonList.length; i++) {
             int row = i / 5;
-            if (sampleRecorded[i] && (userChoiceMap.containsKey(row) && userChoiceMap.get(row) == 0 || i == 25) )
+            Integer choice = userChoiceMap.get(row);
+            if (sampleRecorded[i] && (choice != null &&  choice == 0 || i == 25) )
             { // Only restore "Record" for YOUR CHOICE, or when
                 Button recordBtn = requireActivity().findViewById(recordButtonList[i]);
                 recordBtn.setBackgroundColor(Color.GREEN);
@@ -537,9 +539,9 @@ public class DashboardFragment extends Fragment {
             }
             checkUserChoiceComplete(i);
 
-            if (spinnerSelection.containsKey(i+1)) {
-                availPredefinedSamples.add(spinnerSelection.get(i+1));
-                spinnerSelection.remove(i+1);
+            if (spinnerSelection.containsKey(i)) {
+                availPredefinedSamples.add(spinnerSelection.get(i));
+                spinnerSelection.remove(i);
 
                 // reset adapter to this new availPredefinedSamples
                 adapter = new ArrayAdapter(requireActivity(),android.R.layout.simple_spinner_dropdown_item,  availPredefinedSamples);
@@ -625,9 +627,9 @@ public class DashboardFragment extends Fragment {
             @Override
             public void afterTextChanged(Editable s) {
                 String errMsg = "";
-                if (id == 1) {
+                if (id == 0) {
                     errMsg = "1st";
-                } else if (id == 2) {
+                } else if (id == 1) {
                     errMsg = "2nd";
                 } else {
                     errMsg = "3rd";
@@ -637,9 +639,9 @@ public class DashboardFragment extends Fragment {
                     field.setError("Please enter a name for your " + errMsg + " class.");
                 }
                 Log.d(TAG, "EditText: " + labelName);
-                labelList[id - 1] = labelName;
+                labelList[id] = labelName;
                 sharedViewModel.setMLabelList(labelList);
-                checkUserChoiceComplete(id-1);
+                checkUserChoiceComplete(id);
             }
         });
     }
