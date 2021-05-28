@@ -420,53 +420,6 @@ public class DashboardFragment extends Fragment {
         sharedViewModel.setMHorizontalScrollPos(horizontalPos); // save HorizontalScrollView pos
     }
 
-    private void setLocation(TextInputEditText locationEditText, Button confirmLocation) {
-        locationEditText.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                locationEditText.setFocusableInTouchMode(true);
-                locationEditText.requestFocus();
-                // Force show keyboard
-                InputMethodManager inputManager = (InputMethodManager) requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-                inputManager.showSoftInput(locationEditText, InputMethodManager.SHOW_IMPLICIT);
-
-            }
-        });
-        locationEditText.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                confirmLocation.setBackgroundColor(getResources().getColor(R.color.uw));
-                confirmLocation.setText(R.string.submitLocation);
-                locationSubmitted = false;
-                sharedViewModel.setText(s.toString()); // save location
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                testingLocation = s.toString();
-            }
-        });
-
-        confirmLocation.setOnClickListener(v -> {
-            if (testingLocation.isEmpty()) {
-                locationEditText.setError("Please enter your testing location");
-            } else {
-                model.submitLocation(testingLocation);
-                this.location = testingLocation;
-                sharedViewModel.setMLocationSubmitted(true);
-                confirmLocation.setBackgroundColor(Color.GREEN);
-                confirmLocation.setText(R.string.location_submitted);
-            }
-        });
-    }
-
-
     private void hideUIOnCreate(View root) {
         for (int rowID : rowSelectAList) {
             TableRow tableRow = root.findViewById(rowID);
@@ -536,6 +489,42 @@ public class DashboardFragment extends Fragment {
         });
     }
 
+    // listener for "Choose again" for YOUR CHOICE
+    private void setOnClickAgainA(Button againA, int i) {
+        againA.setOnClickListener(v-> {
+            // Reset state
+            userChoiceMap.put(i, 2);
+            labelList[i] = "";
+            // Clear sound name
+            TextInputEditText classTextField = (TextInputEditText) requireActivity().findViewById(classNameList[i]);
+            classTextField.setText("");
+            for (int j = i * 5; j < i * 5 + 5; j++) {
+                sampleRecorded[j] = false;
+                Button recordBtn = requireActivity().findViewById(recordButtonList[j]);
+                recordBtn.setBackgroundColor(Color.TRANSPARENT);
+                String record_id = "record_" + (j % 5 + 1);
+                recordBtn.setTextColor(getResources().getColor(R.color.uw));
+                recordBtn.setText(getResources().getIdentifier(record_id, "string", getContext().getPackageName()));
+
+                Button playBtn = requireActivity().findViewById(playButtonList[j]);
+                playBtn.setEnabled(false);
+            }
+            checkUserChoiceComplete(i);
+            sharedViewModel.setMLabelList(labelList);   // save labelList
+            sharedViewModel.setMSampleRecorded(sampleRecorded); // save sampleRecorded
+
+            TableRow rowSelectA = requireActivity().findViewById(rowSelectAList[i]);
+            TableRow rowSelection = requireActivity().findViewById(selection[i]);
+            TableRow rowPlay = requireActivity().findViewById(rowPlayList[i]);
+            TableRow rowRecord = requireActivity().findViewById(rowRecordList[i]);
+            rowSelectA.setVisibility(View.GONE);
+            rowSelection.setVisibility(View.VISIBLE);
+            rowPlay.setVisibility(View.GONE);
+            rowRecord.setVisibility(View.GONE);
+            againA.setVisibility(View.GONE);
+        });
+    }
+
     // listener for "Choose again" for PRE-DEFINED
     private void setOnClickAgainB(Button againB, int i) {
         againB.setOnClickListener(v-> {
@@ -587,55 +576,58 @@ public class DashboardFragment extends Fragment {
         });
     }
 
-    // listener for "Choose again" for YOUR CHOICE
-    private void setOnClickAgainA(Button againA, int i) {
-        againA.setOnClickListener(v-> {
-            // Reset state
-            userChoiceMap.put(i, 2);
-            labelList[i] = "";
-            // Clear sound name
-            TextInputEditText classTextField = (TextInputEditText) requireActivity().findViewById(classNameList[i]);
-            classTextField.setText("");
-            for (int j = i * 5; j < i * 5 + 5; j++) {
-                sampleRecorded[j] = false;
-                Button recordBtn = requireActivity().findViewById(recordButtonList[j]);
-                recordBtn.setBackgroundColor(Color.TRANSPARENT);
-                String record_id = "record_" + (j % 5 + 1);
-                recordBtn.setTextColor(getResources().getColor(R.color.uw));
-                recordBtn.setText(getResources().getIdentifier(record_id, "string", getContext().getPackageName()));
-
-                Button playBtn = requireActivity().findViewById(playButtonList[j]);
-                playBtn.setEnabled(false);
+    private void setViewFocusable(View v) {
+        v.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                v.setFocusableInTouchMode(true);
+                v.requestFocus();
+                if (v instanceof TextInputEditText) {
+                    InputMethodManager inputManager = (InputMethodManager) requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                    inputManager.showSoftInput(v, InputMethodManager.SHOW_IMPLICIT);
+                }
             }
-            checkUserChoiceComplete(i);
-            sharedViewModel.setMLabelList(labelList);   // save labelList
-            sharedViewModel.setMSampleRecorded(sampleRecorded); // save sampleRecorded
-
-            TableRow rowSelectA = requireActivity().findViewById(rowSelectAList[i]);
-            TableRow rowSelection = requireActivity().findViewById(selection[i]);
-            TableRow rowPlay = requireActivity().findViewById(rowPlayList[i]);
-            TableRow rowRecord = requireActivity().findViewById(rowRecordList[i]);
-            rowSelectA.setVisibility(View.GONE);
-            rowSelection.setVisibility(View.VISIBLE);
-            rowPlay.setVisibility(View.GONE);
-            rowRecord.setVisibility(View.GONE);
-            againA.setVisibility(View.GONE);
         });
     }
 
-
-    private void setOnClickText(TextInputEditText field, int id) {
-        field.setOnClickListener(new View.OnClickListener() {
+    private void setLocation(TextInputEditText locationEditText, Button confirmLocation) {
+        setViewFocusable(locationEditText);
+        locationEditText.addTextChangedListener(new TextWatcher() {
             @Override
-            public void onClick(View view) {
-                field.setFocusableInTouchMode(true);
-                field.requestFocus();
-                // Force show keyboard
-                InputMethodManager inputManager = (InputMethodManager) requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-                inputManager.showSoftInput(field, InputMethodManager.SHOW_IMPLICIT);
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
             }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                confirmLocation.setBackgroundColor(getResources().getColor(R.color.uw));
+                confirmLocation.setText(R.string.submitLocation);
+                locationSubmitted = false;
+                sharedViewModel.setText(s.toString()); // save location
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                testingLocation = s.toString();
+            }
         });
+
+        confirmLocation.setOnClickListener(v -> {
+            if (testingLocation.isEmpty()) {
+                locationEditText.setError("Please enter your testing location");
+            } else {
+                model.submitLocation(testingLocation);
+                this.location = testingLocation;
+                sharedViewModel.setMLocationSubmitted(true);
+                confirmLocation.setBackgroundColor(Color.GREEN);
+                confirmLocation.setText(R.string.location_submitted);
+            }
+        });
+    }
+
+    private void setOnClickText(TextInputEditText field, int id) {
+        setViewFocusable(field);
         field.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -670,13 +662,7 @@ public class DashboardFragment extends Fragment {
     }
 
     private void setSelectItemList(final AutoCompleteTextView spinner, int spinner_id) {
-        spinner.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                spinner.setFocusableInTouchMode(true);
-                spinner.requestFocus();
-            }
-        });
+        setViewFocusable(spinner);
         spinner.setOnItemClickListener((parent, view, position, id) -> {
             spinner.clearFocus();
             ImageView finish = requireActivity().findViewById(finishSoundList[spinner_id]);
