@@ -13,11 +13,14 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -142,6 +145,7 @@ public class DashboardFragment extends Fragment {
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
+
         sharedViewModel = new ViewModelProvider(requireActivity()).get(SharedViewModel.class);
         View root = inflater.inflate(R.layout.fragment_dashboard, container, false);
 
@@ -233,14 +237,7 @@ public class DashboardFragment extends Fragment {
             setUIVisibility(userChoice, preDefined, i);
         }
 
-        // Disable the submit button if the port hasn't been establish
-//        if (MainActivity.mSocket == null) {
-//            submit.setEnabled(false);
-//            submit.setText("Please complete all steps to submit");
-//        } else {
-
         submit.setText(R.string.submit_to_server);
-        //}
         return root;
     }
 
@@ -424,6 +421,17 @@ public class DashboardFragment extends Fragment {
     }
 
     private void setLocation(TextInputEditText locationEditText, Button confirmLocation) {
+        locationEditText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                locationEditText.setFocusableInTouchMode(true);
+                locationEditText.requestFocus();
+                // Force show keyboard
+                InputMethodManager inputManager = (InputMethodManager) requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                inputManager.showSoftInput(locationEditText, InputMethodManager.SHOW_IMPLICIT);
+
+            }
+        });
         locationEditText.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -569,7 +577,11 @@ public class DashboardFragment extends Fragment {
 
             TableRow rowSelectB = requireActivity().findViewById(rowSelectBList[i]);
             TableRow rowSelection = requireActivity().findViewById(selection[i]);
+            TableRow rowSelectA = requireActivity().findViewById(rowSelectAList[i]);
+            TableRow rowPlay = requireActivity().findViewById(rowPlayList[i]);
             rowSelectB.setVisibility(View.GONE);
+            rowSelectA.setVisibility(View.GONE);
+            rowPlay.setVisibility(View.GONE);
             rowSelection.setVisibility(View.VISIBLE);
             againB.setVisibility(View.GONE);
         });
@@ -613,6 +625,17 @@ public class DashboardFragment extends Fragment {
 
 
     private void setOnClickText(TextInputEditText field, int id) {
+        field.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                field.setFocusableInTouchMode(true);
+                field.requestFocus();
+                // Force show keyboard
+                InputMethodManager inputManager = (InputMethodManager) requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                inputManager.showSoftInput(field, InputMethodManager.SHOW_IMPLICIT);
+
+            }
+        });
         field.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -647,10 +670,15 @@ public class DashboardFragment extends Fragment {
     }
 
     private void setSelectItemList(final AutoCompleteTextView spinner, int spinner_id) {
+        spinner.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                spinner.setFocusableInTouchMode(true);
+                spinner.requestFocus();
+            }
+        });
         spinner.setOnItemClickListener((parent, view, position, id) -> {
-            String selection_title_id = "selection_title_" + (spinner_id+1);
-            TextView selection_title = requireActivity().findViewById(getResources().getIdentifier(selection_title_id, "id", getContext().getPackageName()));
-//            selection_title.setTextColor(Color.GREEN);
+            spinner.clearFocus();
             ImageView finish = requireActivity().findViewById(finishSoundList[spinner_id]);
             finish.setVisibility(View.VISIBLE);
             finish.setColorFilter(Color.GREEN);

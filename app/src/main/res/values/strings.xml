@@ -75,29 +75,20 @@
     <string name="record_background_noise">Record Background Noise</string>
 
     <string name="hello_blank_fragment">1. To train new data, tap on \"Train\"\n
-        <font size="14">User is required to complete all the steps before training data.\n
-        User has to provide 5 sounds, either by choosing YOUR CHOICE or PRE-DEFINED option.\n
-            \t\tYOUR CHOICE: the app provides 5 \"Record\" and 5 \"Playback\" boxes. A \"Record\"
+        <font size="14">User is required to complete all the steps before training data.
+            User has to provide 5 sounds, either by choosing YOUR CHOICE or PRE-DEFINED option.\n
+            \nYOUR CHOICE: the app provides 5 \"Record\" and 5 \"Playback\" boxes. A \"Record\"
         box records for 1 second using microphone, while a \"Playback\" box lets user hear back what
         has been recorded.\n
-            \t\tPRE-DEFINED: user chooses from a list from 9 provided sounds.\n </font>
+            \nPRE-DEFINED: user chooses from a list from 9 provided sounds.\n </font>
         \n\n
         2. To predict your sounds, tap on \"Evaluate\"\n
-        <font size="14">
-        User is required to train data first before evaluating their sounds.\n
-        By tapping on the microphone icon, the app records and returns query result after every 3-second sound.\n
+        <font size="14">User is required to train data first before evaluating their sounds.\n
+            By tapping on the microphone icon, the app records and returns query result after every 3-second sound.\n
         (Note: this does not mean the app continuously returns result every 3 seconds. If a sound is 3-second long
             then the app will return the result after 3 seconds. If a sound is only 2-second long, the app has to listen
             for another second before returning the result)
         </font>
-        \n\n
-        A few notes about the current app (to be fixed in future updates)\n
-        <font size="14">
-        Be sure to enter all information on tab \"Train\" and complete training before switching to other tabs. Otherwise,
-            the information on \"Train\" is lost and has to be entered again.
-        </font>
-
-
     </string>
     <string name="choose_again">Choose again</string>
 </resources>
