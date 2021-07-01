@@ -7,6 +7,7 @@ import android.app.NotificationManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.Rect;
 import android.net.ConnectivityManager;
@@ -41,11 +42,14 @@ import com.makeability.protosound.ui.dashboard.DashboardFragment;
 import com.makeability.protosound.ui.SharedViewModel;
 import com.makeability.protosound.ui.home.models.AudioLabel;
 import com.makeability.protosound.ui.home.service.ForegroundService;
+import com.makeability.protosound.ui.tutorial.FragmentTutorial;
+import com.makeability.protosound.ui.tutorial.Tutorial;
 import com.makeability.protosound.utils.ProtoApp;
 import com.makeability.protosound.utils.StreamingSoundRecorder;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
@@ -97,6 +101,7 @@ public class MainActivity extends AppCompatActivity {
 	public static int currentMode = NORMAL_MODE;
 	private SharedViewModel sharedViewModel;
 
+	private SharedPreferences prefs = null;
 
 	/**
 	 * Adapter to draw the timeline view for user to submit audio feedback
@@ -144,47 +149,47 @@ public class MainActivity extends AppCompatActivity {
 			}
 			listItemText.setText(list.get(position).getTimeAndLabel());
 
-			//Handle buttons and add onClickListeners
-			ImageButton trueButton = (ImageButton) view.findViewById(R.id.trueButton);
-			ImageButton falseButton = (ImageButton) view.findViewById(R.id.falseButton);
-			// weird bugs with position, this is a temporary fix
-			if (position < this.getCount() - 1) {
-				if (ratedLabels.get(position) == 1) {
-					Log.i(TAG, "remove position " + position);
-					trueButton.setEnabled(false);
-					falseButton.setEnabled(false);
-					falseButton.setVisibility(View.INVISIBLE);
-				} else if (ratedLabels.get(position) == - 1) {
-					Log.i(TAG, "remove position " + position);
-					falseButton.setEnabled(false);
-					trueButton.setEnabled(false);
-					trueButton.setVisibility(View.INVISIBLE);
-				}
-			}
-			// unless this is called specifically, the last position always show incorrect UI
-			if (position == this.getCount() - 1) {
-				listItemText.setVisibility(View.GONE);
-				trueButton.setVisibility(View.GONE);
-				falseButton.setVisibility(View.GONE);
-			}
-			trueButton.setOnClickListener(v -> {
-				Log.i(TAG, "Submit true button feedback " + position);
-				reportUserPredictionFeedback(list.get(position).label, true, list.get(position).getTime());
-				trueButton.setEnabled(false);
-				falseButton.setEnabled(false);
-				falseButton.setVisibility(View.INVISIBLE);
-				ratedLabels.set(position, 1);
-				evalCount++;
-			});
-			falseButton.setOnClickListener(v -> {
-				Log.i(TAG, "Submit false button feedback" + position);
-				reportUserPredictionFeedback(list.get(position).label, false, list.get(position).getTime());
-				trueButton.setVisibility(View.INVISIBLE);
-				trueButton.setEnabled(false);
-				falseButton.setEnabled(false);
-				ratedLabels.set(position, -1);
-				evalCount++;
-			});
+//			//Handle buttons and add onClickListeners
+//			ImageButton trueButton = (ImageButton) view.findViewById(R.id.trueButton);
+//			ImageButton falseButton = (ImageButton) view.findViewById(R.id.falseButton);
+//			// weird bugs with position, this is a temporary fix
+//			if (position < this.getCount() - 1) {
+//				if (ratedLabels.get(position) == 1) {
+//					Log.i(TAG, "remove position " + position);
+//					trueButton.setEnabled(false);
+//					falseButton.setEnabled(false);
+//					falseButton.setVisibility(View.INVISIBLE);
+//				} else if (ratedLabels.get(position) == - 1) {
+//					Log.i(TAG, "remove position " + position);
+//					falseButton.setEnabled(false);
+//					trueButton.setEnabled(false);
+//					trueButton.setVisibility(View.INVISIBLE);
+//				}
+//			}
+//			// unless this is called specifically, the last position always show incorrect UI
+//			if (position == this.getCount() - 1) {
+//				listItemText.setVisibility(View.GONE);
+//				trueButton.setVisibility(View.GONE);
+//				falseButton.setVisibility(View.GONE);
+//			}
+//			trueButton.setOnClickListener(v -> {
+//				Log.i(TAG, "Submit true button feedback " + position);
+//				reportUserPredictionFeedback(list.get(position).label, true, list.get(position).getTime());
+//				trueButton.setEnabled(false);
+//				falseButton.setEnabled(false);
+//				falseButton.setVisibility(View.INVISIBLE);
+//				ratedLabels.set(position, 1);
+//				evalCount++;
+//			});
+//			falseButton.setOnClickListener(v -> {
+//				Log.i(TAG, "Submit false button feedback" + position);
+//				reportUserPredictionFeedback(list.get(position).label, false, list.get(position).getTime());
+//				trueButton.setVisibility(View.INVISIBLE);
+//				trueButton.setEnabled(false);
+//				falseButton.setEnabled(false);
+//				ratedLabels.set(position, -1);
+//				evalCount++;
+//			});
 
 			return view;
 		}
@@ -266,10 +271,10 @@ public class MainActivity extends AppCompatActivity {
 		// Passing each menu ID as a set of Ids because each
 		// menu should be considered as top level destinations.
 		AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
-				R.id.navigation_home, R.id.navigation_dashboard, R.id.navigation_help)
+				R.id.navigation_home, R.id.navigation_dashboard, R.id.navigation_tutorial)
 				.build();
 		NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
-		NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
+		//NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
 		NavigationUI.setupWithNavController(navView, navController);
 		navView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
 			@Override
@@ -282,8 +287,16 @@ public class MainActivity extends AppCompatActivity {
 		}
 		);
 
-		checkNetworkConnection();
-		//receiveAudioLabel();
+		prefs = getSharedPreferences("com.makeability.protosound", MODE_PRIVATE);
+	}
+
+	@Override
+	protected void onResume() {
+		super.onResume();
+		if (prefs.getBoolean("firstrun", true)) {
+			startActivity(new Intent(this, Tutorial.class));
+		}
+		prefs.edit().putBoolean("firstrun", false).apply();
 	}
 
 	// https://stackoverflow.com/questions/4828636/edittext-clear-focus-on-touch-outside/8766475
@@ -332,11 +345,11 @@ public class MainActivity extends AppCompatActivity {
 		}
 		Button submitButton = (Button) findViewById(R.id.submit);
 		ProgressBar progressBar = findViewById(R.id.progressBar);
-		submitButton.setBackgroundColor(Color.GREEN);
+		submitButton.setBackgroundColor(getResources().getColor(R.color.purple_200));
 		submitButton.setText(R.string.training_complete);
 		submitButton.setTextColor(Color.BLACK);
 		new Handler(Looper.getMainLooper()).post(() -> {
-			progressBar.setVisibility(View.GONE);
+			progressBar.setVisibility(View.INVISIBLE);
 		});
 
 		TextView tutorial_4 = findViewById(R.id.tutorial_4);
@@ -375,10 +388,10 @@ public class MainActivity extends AppCompatActivity {
 //				}
 //			}
 		Log.d(TAG, "onAudioLabelUIViewMessage " + audioLabel.getShortenLabel());
-		if (timeLine.isEmpty()) {
-			Log.d(TAG, "timeline isEmpty. Initiate");
-			timeLine.add(new AudioLabel("Begin by liking this box", "1.0", "", "", ""));
-		}
+//		if (timeLine.isEmpty()) {
+//			Log.d(TAG, "timeline isEmpty. Initiate");
+//			timeLine.add(new AudioLabel("Begin by liking this box", "1.0", "", "", ""));
+//		}
 		timeLine.add(audioLabel);
 		ratedLabels.add(0);
 		if (timeLine.size() > MAX_TIMELINE_SIZE) {
@@ -494,24 +507,6 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-
-	private void checkNetworkConnection() {
-		ConnectivityManager connMgr =
-				(ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
-		boolean isWifiConn = false;
-		boolean isMobileConn = false;
-		for (Network network : connMgr.getAllNetworks()) {
-			NetworkInfo networkInfo = connMgr.getNetworkInfo(network);
-			if (networkInfo.getType() == ConnectivityManager.TYPE_WIFI) {
-				isWifiConn |= networkInfo.isConnected();
-			}
-			if (networkInfo.getType() == ConnectivityManager.TYPE_MOBILE) {
-				isMobileConn |= networkInfo.isConnected();
-			}
-		}
-		Log.d(DEBUG_TAG, "Wifi connected: " + isWifiConn);
-		Log.d(DEBUG_TAG, "Mobile connected: " + isMobileConn);
-	}
 
 	private void createNotificationChannel() {
 		// Create the NotificationChannel, but only on API 26+ because

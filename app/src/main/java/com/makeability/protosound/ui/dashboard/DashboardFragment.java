@@ -74,6 +74,7 @@ public class DashboardFragment extends Fragment {
     private Module module;
     public String location;
     public String submitAudioTime;
+    private boolean trainingComplete = false;
 
     private static final boolean TEST = true;
     private SharedViewModel sharedViewModel;
@@ -289,8 +290,9 @@ public class DashboardFragment extends Fragment {
 
         if (locationSubmitted) {
             Button confirmLocation = requireActivity().findViewById(R.id.confirm_location);
-            confirmLocation.setBackgroundColor(Color.GREEN);
-            confirmLocation.setText(R.string.location_submitted);
+            confirmLocation.setBackgroundColor(getResources().getColor(R.color.purple_200));
+            confirmLocation.setText(R.string.submitted);
+            confirmLocation.setTextColor(Color.BLACK);
         }
 
         // Restore labelList of sound names
@@ -392,13 +394,15 @@ public class DashboardFragment extends Fragment {
             if (sampleRecorded[i] && (choice != null &&  choice == 0 || i == 25) )
             { // Only restore "Record" for YOUR CHOICE, or when
                 Button recordBtn = requireActivity().findViewById(recordButtonList[i]);
-                recordBtn.setBackgroundColor(Color.GREEN);
+                recordBtn.setBackgroundColor(getResources().getColor(R.color.purple_200));
                 recordBtn.setText(R.string.done);
                 recordBtn.setTextColor(Color.BLACK);
                 recorder = new SoundRecorder(this.requireContext(), VOICE_FILE_NAME + i + ".pcm", mListener);
 
                 Button playBtn = requireActivity().findViewById(playButtonList[i]);
                 playBtn.setEnabled(true);
+                playBtn.setBackgroundColor(getResources().getColor(R.color.purple_200));
+                playBtn.setTextColor(Color.BLACK);
             }
             checkUserChoiceComplete(i / 5);    // Check completion for "Sound i"
         }
@@ -484,6 +488,7 @@ public class DashboardFragment extends Fragment {
     // listener for "Choose again" for YOUR CHOICE
     private void setOnClickAgainA(Button againA, int i) {
         againA.setOnClickListener(v-> {
+            resetTrainBtn();
             // Reset state
             userChoiceMap.put(i, 2);
             labelList[i] = "";
@@ -495,11 +500,13 @@ public class DashboardFragment extends Fragment {
                 Button recordBtn = requireActivity().findViewById(recordButtonList[j]);
                 recordBtn.setBackgroundColor(Color.TRANSPARENT);
                 String record_id = "record_" + (j % 5 + 1);
-                recordBtn.setTextColor(getResources().getColor(R.color.uw));
+                recordBtn.setTextColor(getResources().getColor(R.color.purple_200));
                 recordBtn.setText(getResources().getIdentifier(record_id, "string", getContext().getPackageName()));
 
                 Button playBtn = requireActivity().findViewById(playButtonList[j]);
                 playBtn.setEnabled(false);
+                playBtn.setBackgroundColor(getResources().getColor(R.color.material_on_primary_disabled, requireActivity().getTheme()));
+                playBtn.setTextColor(getResources().getColor(R.color.purple_200));
             }
             checkUserChoiceComplete(i);
             sharedViewModel.setMLabelList(labelList);   // save labelList
@@ -520,6 +527,7 @@ public class DashboardFragment extends Fragment {
     // listener for "Choose again" for PRE-DEFINED
     private void setOnClickAgainB(Button againB, int i) {
         againB.setOnClickListener(v-> {
+            resetTrainBtn();
             userChoiceMap.put(i, 2);
             labelList[i] = "";
             for (int j = i * 5; j < i * 5 + 5; j++) {
@@ -592,7 +600,8 @@ public class DashboardFragment extends Fragment {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                confirmLocation.setBackgroundColor(getResources().getColor(R.color.uw));
+                confirmLocation.setBackgroundColor(getResources().getColor(R.color.material_on_primary_emphasis_high_type, requireActivity().getTheme()));
+                confirmLocation.setTextColor(getResources().getColor(R.color.purple_200));
                 confirmLocation.setText(R.string.submitLocation);
                 locationSubmitted = false;
                 sharedViewModel.setText(s.toString()); // save location
@@ -602,6 +611,7 @@ public class DashboardFragment extends Fragment {
             @Override
             public void afterTextChanged(Editable s) {
                 testingLocation = s.toString();
+                resetTrainBtn();
             }
         });
 
@@ -612,8 +622,9 @@ public class DashboardFragment extends Fragment {
                 model.submitLocation(testingLocation);
                 this.location = testingLocation;
                 sharedViewModel.setMLocationSubmitted(true);
-                confirmLocation.setBackgroundColor(Color.GREEN);
-                confirmLocation.setText(R.string.location_submitted);
+                confirmLocation.setBackgroundColor(getResources().getColor(R.color.purple_200));
+                confirmLocation.setTextColor(Color.BLACK);
+                confirmLocation.setText(R.string.submitted);
             }
         });
     }
@@ -628,19 +639,29 @@ public class DashboardFragment extends Fragment {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-
             }
 
             @Override
             public void afterTextChanged(Editable s) {
                 String errMsg = "";
-                if (id == 0) {
-                    errMsg = "1st";
-                } else if (id == 1) {
-                    errMsg = "2nd";
-                } else {
-                    errMsg = "3rd";
+                switch (id) {
+                    case 0:
+                        errMsg = "1st";
+                        break;
+                    case 1:
+                        errMsg = "2nd";
+                        break;
+                    case 2:
+                        errMsg = "3rd";
+                        break;
+                    case 3:
+                        errMsg = "4th";
+                        break;
+                    case 4:
+                        errMsg = "5th";
+                        break;
                 }
+
                 String labelName = s.toString();
                 if (labelName.isEmpty()) {
                     field.setError("Please enter a name for your " + errMsg + " class.");
@@ -649,6 +670,7 @@ public class DashboardFragment extends Fragment {
                 labelList[id] = labelName;
                 sharedViewModel.setMLabelList(labelList);
                 checkUserChoiceComplete(id);
+                resetTrainBtn();
             }
         });
     }
@@ -656,6 +678,8 @@ public class DashboardFragment extends Fragment {
     private void setSelectItemList(final AutoCompleteTextView spinner, int spinner_id) {
         setViewFocusable(spinner);
         spinner.setOnItemClickListener((parent, view, position, id) -> {
+            trainingComplete = false;
+            resetTrainBtn();
             spinner.clearFocus();
             ImageView finish = requireActivity().findViewById(finishSoundList[spinner_id]);
             finish.setVisibility(View.VISIBLE);
@@ -706,6 +730,7 @@ public class DashboardFragment extends Fragment {
 
         btn.setOnClickListener(v -> {
             Log.d(TAG, "record:"+ id + " called");
+            resetTrainBtn();
             btn.setBackgroundColor(Color.DKGRAY);
             btn.setText(R.string.recording);
             startRecording(id);
@@ -721,7 +746,7 @@ public class DashboardFragment extends Fragment {
             final Handler handler = new Handler(Looper.getMainLooper());
             handler.postDelayed(() -> {
                 //Do something after 1200ms
-                btn.setBackgroundColor(Color.GREEN);
+                btn.setBackgroundColor(getResources().getColor(R.color.purple_200));
                 btn.setText(R.string.done);
                 btn.setTextColor(Color.BLACK);
                 for (int rid : recordButtonList) {
@@ -734,6 +759,8 @@ public class DashboardFragment extends Fragment {
 
             Button play = requireActivity().findViewById(playButtonList[order]);
             play.setEnabled(true);
+            play.setBackgroundColor(getResources().getColor(R.color.purple_200));
+            play.setTextColor(Color.BLACK);
 
             int row = order / 5;
             checkUserChoiceComplete(row);
@@ -752,8 +779,6 @@ public class DashboardFragment extends Fragment {
                 String selection_title_id = "selection_title_" + (row+1);
                 TextView selection_title = requireActivity().findViewById(getResources().getIdentifier(selection_title_id, "id", getContext().getPackageName()));
                 if (selection_title != null && finish != null)  {
-
-                    selection_title.setTextColor(Color.WHITE);
 
                     finish.setVisibility(View.GONE);
                 }
@@ -777,12 +802,20 @@ public class DashboardFragment extends Fragment {
         });
     }
 
+    // reset "TRAIN MODEL" button UI to original after user changes something
+    private void resetTrainBtn() {
+        Button btn = requireActivity().findViewById(R.id.submit);
+        btn.setBackgroundColor(getResources().getColor(R.color.material_on_primary_emphasis_high_type, requireActivity().getTheme()));
+        btn.setText(R.string.submit_to_server);
+        btn.setTextColor(getResources().getColor(R.color.purple_200, requireActivity().getTheme()));
+    }
     private void setOnClickSubmit(final Button btn, final int id, View root) {
 
         btn.setOnClickListener(v -> {
-            if (!checkAllFieldsExisted()) {
+            if (!checkAllFieldsExisted() ) {
                 return;
             }
+            trainingComplete = true;
             Log.d(TAG, "Submit to Server");
 
             btn.setBackgroundColor(Color.GRAY);

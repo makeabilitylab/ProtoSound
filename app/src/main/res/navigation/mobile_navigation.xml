@@ -18,11 +18,18 @@
         tools:layout="@layout/fragment_home" />
 
     <fragment
-        android:id="@+id/navigation_help"
-        android:name="com.makeability.protosound.ui.help.FragmentHelp"
-        android:label="@string/title_help"
-        tools:layout="@layout/fragment_help"
-        />
+        android:id="@+id/navigation_tutorial"
+        android:name="com.makeability.protosound.ui.tutorial.FragmentTutorial"
+        android:label=""
+        tools:layout="@layout/fragment_tutorial" />
+
+<!--    <fragment-->
+<!--        android:id="@+id/navigation_help"-->
+<!--        android:name="com.makeability.protosound.ui.help.FragmentHelp"-->
+<!--        android:label="@string/title_help"-->
+<!--        tools:layout="@layout/fragment_help" />-->
+
+
 
 
 

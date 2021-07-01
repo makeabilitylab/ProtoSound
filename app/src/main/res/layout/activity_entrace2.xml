@@ -44,6 +44,7 @@
 		app:layout_constraintVertical_bias="0.121" />
 
 	<Button
+		android:backgroundTint="@color/purple_200"
 		android:id="@+id/normal"
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
