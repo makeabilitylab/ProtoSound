@@ -155,7 +155,7 @@ public class StreamingSoundRecorder {
 								final List<Short> tempBuffer = soundRecorder.soundBuffer;
 								double dbLevel = db(tempBuffer);
 								if (db(tempBuffer) > DB_THRESHOLD) {
-									Log.i(TAG, "doInBackground: sound db < 40 " + dbLevel);
+									Log.i(TAG, "doInBackground: sound db > 40 " + dbLevel);
 									processAudioRecognition(tempBuffer, dbLevel);
 								}
 								soundRecorder.soundBuffer = new ArrayList<>();

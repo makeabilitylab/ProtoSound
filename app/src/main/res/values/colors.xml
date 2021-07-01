@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 <!--    <color name="purple_200">#FFBB86FC</color>-->
-    <color name="purple_200">@color/protosound_green</color>
+    <color name="purple_200">@color/protosound_better_green2</color>
     <color name="uw">#4b2e83</color>
     <color name="purple_500">#FF6200EE</color>
 <!--    <color name="purple_700">#FF3700B3</color>-->
@@ -31,5 +31,7 @@
     <color name="white_text">#E1E1E1</color>
     <color name="white">@android:color/white</color>
     <color name="protosound_green">#1F813B</color>
+    <color name="protosound_better_green">#2FB55A</color>
+    <color name="protosound_better_green2">#1D9C4F</color>
     <color name="button_border_night">@color/purple_200</color>
 </resources>
