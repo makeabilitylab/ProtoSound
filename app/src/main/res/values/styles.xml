@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="customButtonStyle" parent="Theme.MaterialComponents">
+        <item name="backgroundTint">@color/material_on_primary_emphasis_high_type</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/purple_200</item>
+        <item name="strokeWidth">1dp</item>
+        <item name="strokeColor">@color/purple_200</item>
+    </style>
+
+    <style name="customButtonStyle2" parent="Theme.MaterialComponents">
+        <item name="backgroundTint">@color/material_on_primary_emphasis_high_type</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="android:textStyle">bold</item>
+        <item name="strokeWidth">1dp</item>
+        <item name="strokeColor">@color/purple_200</item>
+    </style>
+
+<!--    <style name="PopUpTheme" parent="android:Theme.Material">-->
+<!--        <item name="android:windowActivityTransitions">true</item>-->
+<!--        <item name="android:windowIsTranslucent">true</item>-->
+<!--        <item name="android:windowCloseOnTouchOutside">true</item>-->
+<!--    </style>-->
+
+</resources>
