@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.tutorial.FragmentTutorial">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/help_layout"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/_550sdp"
+            android:paddingBottom="@dimen/_100sdp"
+            tools:context=".ui.activity.HelpFragment">
+
+            <TextView
+                android:id="@+id/textView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/poppins_semibold2"
+                android:text="@string/protosound"
+                android:textSize="@dimen/_30ssp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.209" />
+
+            <ImageView
+                android:id="@+id/imageView"
+                android:layout_width="@dimen/_175sdp"
+                android:layout_height="@dimen/_175sdp"
+
+                android:src="@drawable/protosound_logo"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/textView"
+                app:layout_constraintVertical_bias="0.054" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/tutorial_btn"
+                style="@style/Widget.MaterialComponents.Button"
+                android:layout_width="@dimen/_149sdp"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/purple_200"
+                android:text="@string/app_tutorial"
+                android:textColor="@color/white"
+                android:textSize="@dimen/_10ssp"
+                android:theme="@style/Theme.MaterialComponents"
+                app:cornerRadius="10dp"
+                app:icon="@drawable/outline_library_books_24"
+                app:iconSize="@dimen/_35ssp"
+                app:iconTint="@color/white"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/imageView"
+                app:layout_constraintVertical_bias="0.193" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/faq_btn"
+                style="@style/Widget.MaterialComponents.Button"
+                android:layout_width="@dimen/_110sdp"
+                android:layout_height="wrap_content"
+                android:text="@string/faq"
+
+                android:textColor="@color/white"
+                android:textSize="@dimen/_10ssp"
+                android:theme="@style/Theme.MaterialComponents"
+                app:backgroundTint="#2a2a2a"
+                app:cornerRadius="10dp"
+                app:icon="@drawable/outline_help_outline_24"
+                app:iconSize="@dimen/_35ssp"
+                app:iconTint="@color/white"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.212"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/imageView"
+                app:layout_constraintVertical_bias="1.0" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/about_btn"
+                style="@style/Widget.MaterialComponents.Button"
+                android:layout_width="@dimen/_110sdp"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/purple_200"
+                android:text="@string/about"
+
+                android:textColor="@color/white"
+                android:textSize="@dimen/_10ssp"
+                android:theme="@style/Theme.MaterialComponents"
+                app:cornerRadius="10dp"
+                app:icon="@drawable/ic_baseline_info_24"
+                app:iconSize="@dimen/_35ssp"
+                app:iconTint="@color/white"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.783"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/imageView"
+                app:layout_constraintVertical_bias="1.0" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </LinearLayout>
+
+</FrameLayout>

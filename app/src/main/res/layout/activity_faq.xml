@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.tutorial.Faq"
+    tools:layout_editor_absoluteY="25dp">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        tools:layout_editor_absoluteY="70dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginStart="@dimen/_15sdp"
+            android:layout_marginEnd="@dimen/_15sdp">
+
+            <TextView
+                android:id="@+id/title_dashboard"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:breakStrategy="high_quality"
+                android:paddingTop="@dimen/_10ssp"
+                android:paddingBottom="@dimen/_10sdp"
+                android:text="@string/faq"
+                android:textSize="@dimen/_23ssp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/about_1"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+
+                android:autoLink="web|email"
+                android:linksClickable="true"
+                android:paddingBottom="@dimen/_15sdp"
+                android:text="@string/qa1"
+                android:textSize="@dimen/_12ssp" />
+
+            <TextView
+                android:id="@+id/about_2"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+
+                android:autoLink="web|email"
+                android:linksClickable="true"
+                android:paddingBottom="@dimen/_15sdp"
+                android:text="@string/qa2"
+                android:textSize="@dimen/_12ssp" />
+
+            <TextView
+                android:id="@+id/about_3"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+
+                android:autoLink="web|email"
+                android:linksClickable="true"
+                android:paddingBottom="@dimen/_15sdp"
+                android:text="@string/qa3"
+                android:textSize="@dimen/_12ssp" />
+
+            <TextView
+                android:id="@+id/about_4"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+
+                android:autoLink="web|email"
+                android:linksClickable="true"
+                android:paddingBottom="@dimen/_15sdp"
+                android:text="@string/qa4"
+                android:textSize="@dimen/_12ssp" />
+
+            <TextView
+                android:id="@+id/about_5"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+
+                android:autoLink="web|email"
+                android:linksClickable="true"
+                android:paddingBottom="@dimen/_15sdp"
+                android:text="@string/qa5"
+                android:textSize="@dimen/_12ssp" />
+
+
+            <Button
+                android:id="@+id/finishBtn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/_200sdp"
+                android:text="@string/finish"
+                android:textSize="@dimen/_15sdp"
+                app:layout_constraintEnd_toEndOf="parent" />
+        </LinearLayout>
+
+
+    </ScrollView>
+</androidx.constraintlayout.widget.ConstraintLayout>

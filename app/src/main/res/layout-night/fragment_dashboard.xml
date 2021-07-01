@@ -1,0 +1,1407 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.dashboard.DashboardFragment">
+
+    <!--    <TextView-->
+    <!--        android:id="@+id/text_dashboard"-->
+    <!--        android:layout_width="wrap_content"-->
+    <!--        android:layout_height="wrap_content"-->
+    <!--        android:text="Dashboard"-->
+    <!--        app:layout_constraintBottom_toBottomOf="parent"-->
+    <!--        app:layout_constraintEnd_toEndOf="parent"-->
+    <!--        app:layout_constraintHorizontal_bias="0.498"-->
+    <!--        app:layout_constraintStart_toStartOf="parent"-->
+    <!--        app:layout_constraintTop_toBottomOf="@+id/horizontalScrollView"-->
+    <!--        app:layout_constraintVertical_bias="0.02" />-->
+
+    <ScrollView
+        android:id="@+id/scrollView2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingStart="@dimen/_5sdp"
+        android:paddingEnd="@dimen/_5sdp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingStart="@dimen/_5sdp"
+            tools:ignore="RtlSymmetry">
+
+            <!--            <LinearLayout-->
+            <!--                android:layout_width="wrap_content"-->
+            <!--                android:layout_height="wrap_content"-->
+            <!--                android:orientation="horizontal">-->
+            <!--                <Button-->
+            <!--                    android:id="@+id/confirm_port"-->
+            <!--                    android:layout_width="wrap_content"-->
+            <!--                    android:layout_height="wrap_content"-->
+            <!--                    android:text="@string/confirm"/>-->
+
+            <!--                <TextView-->
+            <!--                    android:id="@+id/tick"-->
+            <!--                    android:layout_width="@dimen/_200sdp"-->
+            <!--                    android:layout_height="@dimen/_25sdp"-->
+            <!--                    android:gravity="center_vertical"-->
+            <!--                    android:paddingStart="@dimen/_5sdp"-->
+            <!--                    android:scaleType="fitXY"-->
+            <!--                    android:text=""-->
+            <!--                    android:textSize="@dimen/_12ssp"/>-->
+
+            <!--            </LinearLayout>-->
+
+            <TextView
+                android:id="@+id/title_dashboard"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:breakStrategy="high_quality"
+                android:paddingTop="@dimen/_10ssp"
+                android:paddingBottom="@dimen/_20sdp"
+                android:text="@string/title_dashboard"
+                android:textSize="@dimen/_23ssp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tutorial_1"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:breakStrategy="high_quality"
+                android:paddingTop="@dimen/_10ssp"
+                android:text="@string/tutorial_1"
+                android:textSize="@dimen/_15ssp" />
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="@dimen/_225sdp"
+                android:layout_height="wrap_content"
+                android:hint="@string/hint0b"
+                app:endIconMode="clear_text">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/testing_location"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:digits="0123456789 ,qwertzuiopasdfghjklyxcvbnm"
+                    android:imeOptions="actionDone"
+                    android:inputType="textAutoCorrect"
+                    android:singleLine="true" />
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <Button
+                style="@style/customButtonStyle"
+
+                android:id="@+id/confirm_location"
+                android:layout_width="@dimen/_98sdp"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/_10sdp"
+                android:text="@string/submitLocation" />
+
+            <TextView
+                android:id="@+id/tutorial_2a"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:breakStrategy="high_quality"
+                android:paddingTop="@dimen/_25sdp"
+                android:text="@string/tutorial_2a"
+                android:textSize="@dimen/_15ssp" />
+
+            <!--            <TextView-->
+            <!--                android:id="@+id/tutorial_2b"-->
+            <!--                android:layout_width="match_parent"-->
+            <!--                android:layout_height="match_parent"-->
+            <!--                android:breakStrategy="high_quality"-->
+            <!--                android:paddingStart="@dimen/_5sdp"-->
+            <!--                android:text="@string/tutorial_2b"-->
+            <!--                android:textSize="@dimen/_15ssp" />-->
+
+            <HorizontalScrollView
+                android:id="@+id/horizontalScrollView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:focusableInTouchMode="false"
+                    android:focusable="true"
+                    android:descendantFocusability="beforeDescendants"
+                    android:orientation="vertical">
+
+                    <LinearLayout
+                        android:id="@+id/sound_1"
+                        android:layout_width="@dimen/_500sdp"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal">
+                            <TextView
+                                android:id="@+id/selection_title_1"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:paddingTop="@dimen/_15sdp"
+                                android:text="@string/class_1"
+                                android:textSize="@dimen/_15ssp" />
+
+                            <ImageView
+                                android:id="@+id/check_mark_1"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="bottom"
+                                android:paddingStart="@dimen/_5sdp"
+                                app:srcCompat="@drawable/ic_baseline_check_circle_24" />
+                        </LinearLayout>
+
+
+                        <LinearLayout
+                            android:id="@+id/selection_1"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal">
+
+                            <Button
+                                style="@style/customButtonStyle"
+                                android:id="@+id/select_1a"
+                                android:layout_width="@dimen/_105sdp"
+                                android:textSize="@dimen/_10sdp"
+                                android:layout_height="wrap_content"
+                                android:text="@string/user_choice"/>
+
+                            <Button
+                                android:id="@+id/select_1b"
+                                style="@style/customButtonStyle"
+                                android:layout_width="@dimen/_105sdp"
+                                android:textSize="@dimen/_10sdp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="@dimen/_16sdp"
+                                android:text="@string/pre_defined" />
+
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:id="@+id/row_1_select_b"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical">
+
+                            <com.google.android.material.textfield.TextInputLayout
+                                style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox.Dense.ExposedDropdownMenu"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent">
+
+
+                                <AutoCompleteTextView
+                                    android:id="@+id/menu_1"
+                                    android:layout_width="@dimen/_225sdp"
+                                    android:layout_height="wrap_content"
+                                    android:hint="@string/class_1_predefined"
+                                    android:inputType="none"
+                                    android:focusableInTouchMode="false"/>
+                                <Button
+                                    style="@style/customButtonStyle"
+
+                                    android:id="@+id/select_again_1b"
+                                    android:layout_width="@dimen/_85sdp"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/choose_again" />
+
+
+                            </com.google.android.material.textfield.TextInputLayout>
+                        </LinearLayout>
+
+
+                        <LinearLayout
+                            android:id="@+id/row_1_select_a"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content">
+
+                            <com.google.android.material.textfield.TextInputLayout
+                                android:layout_width="@dimen/_225sdp"
+                                android:layout_height="wrap_content"
+                                android:hint="@string/hint1"
+                                android:paddingTop="@dimen/_15sdp"
+                                android:paddingBottom="@dimen/_15sdp">
+
+                                <com.google.android.material.textfield.TextInputEditText
+                                    android:id="@+id/class_1"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:digits="0123456789 ,qwertzuiopasdfghjklyxcvbnm"
+                                    android:imeOptions="actionDone"
+                                    android:inputType="text"
+                                    android:singleLine="true"
+                                    android:focusableInTouchMode="false"/>
+
+                            </com.google.android.material.textfield.TextInputLayout>
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical">
+                            <LinearLayout
+                                android:id="@+id/row_1_record"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal">
+
+                                <Button
+                                    style="@style/customButtonStyle"
+
+                                    android:id="@+id/record_1"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/record_1"
+                                    android:layout_width="@dimen/_85sdp"
+                                    android:textSize="@dimen/_9ssp"/>
+
+
+                                <Button
+                                    style="@style/customButtonStyle"
+
+                                    android:id="@+id/record_2"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/record_2"
+                                    android:layout_width="@dimen/_85sdp"
+                                    android:layout_marginStart="@dimen/_16sdp"
+                                    android:textSize="@dimen/_9ssp" />
+
+                                <Button
+                                    style="@style/customButtonStyle"
+
+                                    android:id="@+id/record_3"
+                                    android:layout_height="wrap_content"
+                                    android:layout_width="@dimen/_85sdp"
+                                    android:layout_marginStart="@dimen/_16sdp"
+                                    android:textSize="@dimen/_9ssp"
+                                    android:text="@string/record_3" />
+
+                                <Button
+                                    style="@style/customButtonStyle"
+
+                                    android:id="@+id/record_4"
+                                    android:layout_height="wrap_content"
+                                    android:layout_width="@dimen/_85sdp"
+                                    android:layout_marginStart="@dimen/_16sdp"
+                                    android:textSize="@dimen/_9ssp"
+                                    android:text="@string/record_4" />
+
+                                <Button
+                                    style="@style/customButtonStyle"
+
+                                    android:id="@+id/record_5"
+                                    android:layout_height="wrap_content"
+                                    android:layout_width="@dimen/_85sdp"
+                                    android:layout_marginStart="@dimen/_16sdp"
+                                    android:textSize="@dimen/_9ssp"
+                                    android:text="@string/record_5" />
+
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:id="@+id/row_1_play"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal">
+
+                                <Button
+                                    android:id="@+id/play_1"
+                                    style="@style/customButtonStyle"
+                                    android:layout_height="wrap_content"
+                                    android:layout_width="@dimen/_85sdp"
+                                    android:textSize="@dimen/_9ssp"
+                                    android:text="@string/play" />
+
+                                <Button
+                                    android:id="@+id/play_2"
+                                    style="@style/customButtonStyle"
+                                    android:layout_height="wrap_content"
+                                    android:layout_width="@dimen/_85sdp"
+                                    android:layout_marginStart="@dimen/_16sdp"
+                                    android:textSize="@dimen/_9ssp"
+                                    android:text="@string/play"/>
+
+                                <Button
+                                    android:id="@+id/play_3"
+                                    style="@style/customButtonStyle"
+                                    android:layout_height="wrap_content"
+                                    android:layout_width="@dimen/_85sdp"
+                                    android:layout_marginStart="@dimen/_16sdp"
+                                    android:textSize="@dimen/_9ssp"
+                                    android:text="@string/play" />
+
+                                <Button
+                                    android:id="@+id/play_4"
+                                    style="@style/customButtonStyle"
+                                    android:layout_height="wrap_content"
+                                    android:layout_width="@dimen/_85sdp"
+                                    android:layout_marginStart="@dimen/_16sdp"
+                                    android:textSize="@dimen/_9ssp"
+                                    android:text="@string/play" />
+
+                                <Button
+                                    android:id="@+id/play_5"
+                                    style="@style/customButtonStyle"
+                                    android:layout_height="wrap_content"
+                                    android:layout_width="@dimen/_85sdp"
+                                    android:layout_marginStart="@dimen/_16sdp"
+                                    android:textSize="@dimen/_9ssp"
+                                    android:text="@string/play" />
+
+                            </LinearLayout>
+                            <Button
+                                style="@style/customButtonStyle"
+
+                                android:id="@+id/select_again_1a"
+                                android:layout_width="@dimen/_85sdp"
+                                android:layout_height="wrap_content"
+                                android:text="@string/choose_again"/>
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/sound_2"
+                        android:layout_width="@dimen/_500sdp"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal">
+                            <TextView
+                                android:id="@+id/selection_title_2"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:paddingTop="@dimen/_15sdp"
+                                android:text="@string/class_2"
+                                android:textSize="@dimen/_15ssp" />
+
+                            <ImageView
+                                android:id="@+id/check_mark_2"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="bottom"
+                                android:paddingStart="@dimen/_5sdp"
+                                app:srcCompat="@drawable/ic_baseline_check_circle_24" />
+                        </LinearLayout>
+
+
+                        <LinearLayout
+                            android:id="@+id/selection_2"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal">
+
+                            <Button
+                                style="@style/customButtonStyle"
+                                android:id="@+id/select_2a"
+                                android:layout_width="@dimen/_105sdp"
+                                android:textSize="@dimen/_10sdp"
+                                android:layout_height="wrap_content"
+                                android:text="@string/user_choice" />
+
+                            <Button
+                                android:id="@+id/select_2b"
+                                style="@style/customButtonStyle"
+                                android:layout_width="@dimen/_105sdp"
+                                android:textSize="@dimen/_10sdp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="@dimen/_16sdp"
+                                android:text="@string/pre_defined" />
+
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:id="@+id/row_2_select_b"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical">
+
+                            <com.google.android.material.textfield.TextInputLayout
+                                style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox.Dense.ExposedDropdownMenu"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent">
+
+
+                                <AutoCompleteTextView
+                                    android:id="@+id/menu_2"
+                                    android:layout_width="@dimen/_225sdp"
+                                    android:layout_height="wrap_content"
+                                    android:hint="@string/class_2_predefined"
+                                    android:inputType="none"
+                                    android:focusableInTouchMode="false"/>
+                                <Button
+                                    style="@style/customButtonStyle"
+
+                                    android:id="@+id/select_again_2b"
+                                    android:layout_width="@dimen/_85sdp"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/choose_again" />
+
+
+                            </com.google.android.material.textfield.TextInputLayout>
+                        </LinearLayout>
+
+
+                        <LinearLayout
+                            android:id="@+id/row_2_select_a"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content">
+
+                            <com.google.android.material.textfield.TextInputLayout
+                                android:layout_width="@dimen/_225sdp"
+                                android:layout_height="wrap_content"
+                                android:hint="@string/hint2"
+                                android:paddingTop="@dimen/_15sdp"
+                                android:paddingBottom="@dimen/_15sdp">
+
+                                <com.google.android.material.textfield.TextInputEditText
+                                    android:id="@+id/class_2"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:digits="0123456789 ,qwertzuiopasdfghjklyxcvbnm"
+                                    android:imeOptions="actionDone"
+                                    android:inputType="text"
+                                    android:singleLine="true"
+                                    android:focusableInTouchMode="false"/>
+
+                            </com.google.android.material.textfield.TextInputLayout>
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical">
+                            <LinearLayout
+                                android:id="@+id/row_2_record"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal">
+
+                                <Button
+                                    style="@style/customButtonStyle"
+
+                                    android:id="@+id/record_6"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/record_1"
+                                    android:layout_width="@dimen/_85sdp"
+                                    android:textSize="@dimen/_9ssp"/>
+
+
+                                <Button
+                                    style="@style/customButtonStyle"
+
+                                    android:id="@+id/record_7"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/record_2"
+                                    android:layout_width="@dimen/_85sdp"
+                                    android:layout_marginStart="@dimen/_16sdp"
+                                    android:textSize="@dimen/_9ssp" />
+
+                                <Button
+                                    style="@style/customButtonStyle"
+
+                                    android:id="@+id/record_8"
+                                    android:layout_height="wrap_content"
+                                    android:layout_width="@dimen/_85sdp"
+                                    android:layout_marginStart="@dimen/_16sdp"
+                                    android:textSize="@dimen/_9ssp"
+                                    android:text="@string/record_3" />
+
+                                <Button
+                                    style="@style/customButtonStyle"
+
+                                    android:id="@+id/record_9"
+                                    android:layout_width="@dimen/_85sdp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginStart="@dimen/_16sdp"
+                                    android:textSize="@dimen/_9ssp"
+                                    android:text="@string/record_4" />
+
+                                <Button
+                                    style="@style/customButtonStyle"
+
+                                    android:id="@+id/record_10"
+                                    android:layout_height="wrap_content"
+                                    android:layout_width="@dimen/_85sdp"
+                                    android:layout_marginStart="@dimen/_16sdp"
+                                    android:textSize="@dimen/_9ssp"
+                                    android:text="@string/record_5" />
+
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:id="@+id/row_2_play"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal">
+
+                                <Button
+                                    android:id="@+id/play_6"
+                                    style="@style/customButtonStyle"
+
+                                    android:layout_height="wrap_content"
+                                    android:layout_width="@dimen/_85sdp"
+                                    android:textSize="@dimen/_9ssp"
+                                    android:text="@string/play" />
+
+                                <Button
+                                    android:id="@+id/play_7"
+                                    style="@style/customButtonStyle"
+
+                                    android:layout_height="wrap_content"
+                                    android:layout_width="@dimen/_85sdp"
+                                    android:layout_marginStart="@dimen/_16sdp"
+                                    android:textSize="@dimen/_9ssp"
+                                    android:text="@string/play"/>
+
+                                <Button
+                                    android:id="@+id/play_8"
+                                    style="@style/customButtonStyle"
+
+                                    android:layout_height="wrap_content"
+                                    android:layout_width="@dimen/_85sdp"
+                                    android:layout_marginStart="@dimen/_16sdp"
+                                    android:textSize="@dimen/_9ssp"
+                                    android:text="@string/play"
+                                    />
+
+                                <Button
+                                    android:id="@+id/play_9"
+                                    style="@style/customButtonStyle"
+
+                                    android:layout_height="wrap_content"
+                                    android:layout_width="@dimen/_85sdp"
+                                    android:layout_marginStart="@dimen/_16sdp"
+                                    android:textSize="@dimen/_9ssp"
+                                    android:text="@string/play" />
+
+                                <Button
+                                    android:id="@+id/play_10"
+                                    style="@style/customButtonStyle"
+
+                                    android:layout_height="wrap_content"
+                                    android:layout_width="@dimen/_85sdp"
+                                    android:layout_marginStart="@dimen/_16sdp"
+                                    android:textSize="@dimen/_9ssp"
+                                    android:text="@string/play" />
+
+                            </LinearLayout>
+                            <Button
+                                style="@style/customButtonStyle"
+
+                                android:id="@+id/select_again_2a"
+                                android:layout_width="@dimen/_85sdp"
+                                android:layout_height="wrap_content"
+                                android:text="@string/choose_again"/>
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/sound_3"
+                        android:layout_width="@dimen/_500sdp"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal">
+                            <TextView
+                                android:id="@+id/selection_title_3"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:paddingTop="@dimen/_15sdp"
+                                android:text="@string/class_3"
+                                android:textSize="@dimen/_15ssp" />
+
+                            <ImageView
+                                android:id="@+id/check_mark_3"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="bottom"
+                                android:paddingStart="@dimen/_5sdp"
+                                app:srcCompat="@drawable/ic_baseline_check_circle_24" />
+                        </LinearLayout>
+
+
+                        <LinearLayout
+                            android:id="@+id/selection_3"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal">
+
+                            <Button
+                                style="@style/customButtonStyle"
+                                android:id="@+id/select_3a"
+                                android:layout_width="@dimen/_105sdp"
+                                android:textSize="@dimen/_10sdp"
+                                android:layout_height="wrap_content"
+                                android:text="@string/user_choice" />
+
+                            <Button
+                                android:id="@+id/select_3b"
+                                style="@style/customButtonStyle"
+                                android:layout_width="@dimen/_105sdp"
+                                android:textSize="@dimen/_10sdp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="@dimen/_16sdp"
+                                android:text="@string/pre_defined" />
+
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:id="@+id/row_3_select_b"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical">
+
+                            <com.google.android.material.textfield.TextInputLayout
+                                style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox.Dense.ExposedDropdownMenu"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent">
+
+
+
+                                <AutoCompleteTextView
+                                    android:id="@+id/menu_3"
+                                    android:layout_width="@dimen/_225sdp"
+                                    android:layout_height="wrap_content"
+                                    android:hint="@string/class_3_predefined"
+                                    android:inputType="none"
+                                    android:focusableInTouchMode="false"/>
+                                <Button
+                                    style="@style/customButtonStyle"
+
+                                    android:id="@+id/select_again_3b"
+                                    android:layout_width="@dimen/_85sdp"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/choose_again" />
+
+
+                            </com.google.android.material.textfield.TextInputLayout>
+                        </LinearLayout>
+
+
+                        <LinearLayout
+                            android:id="@+id/row_3_select_a"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content">
+
+                            <com.google.android.material.textfield.TextInputLayout
+                                android:layout_width="@dimen/_225sdp"
+                                android:layout_height="wrap_content"
+                                android:hint="@string/hint3"
+                                android:paddingTop="@dimen/_15sdp"
+                                android:paddingBottom="@dimen/_15sdp">
+
+                                <com.google.android.material.textfield.TextInputEditText
+                                    android:id="@+id/class_3"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:digits="0123456789 ,qwertzuiopasdfghjklyxcvbnm"
+                                    android:imeOptions="actionDone"
+                                    android:inputType="text"
+                                    android:singleLine="true"
+                                    android:focusableInTouchMode="false"/>
+
+                            </com.google.android.material.textfield.TextInputLayout>
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical">
+                            <LinearLayout
+                                android:id="@+id/row_3_record"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal">
+
+                                <Button
+                                    style="@style/customButtonStyle"
+
+                                    android:id="@+id/record_11"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/record_1"
+                                    android:layout_width="@dimen/_85sdp"
+                                    android:textSize="@dimen/_9ssp"/>
+
+
+                                <Button
+                                    style="@style/customButtonStyle"
+
+                                    android:id="@+id/record_12"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/record_2"
+                                    android:layout_width="@dimen/_85sdp"
+                                    android:layout_marginStart="@dimen/_16sdp"
+                                    android:textSize="@dimen/_9ssp" />
+
+                                <Button
+                                    style="@style/customButtonStyle"
+
+                                    android:id="@+id/record_13"
+                                    android:layout_height="wrap_content"
+                                    android:layout_width="@dimen/_85sdp"
+                                    android:layout_marginStart="@dimen/_16sdp"
+                                    android:textSize="@dimen/_9ssp"
+                                    android:text="@string/record_3" />
+
+                                <Button
+                                    style="@style/customButtonStyle"
+
+                                    android:id="@+id/record_14"
+                                    android:layout_height="wrap_content"
+                                    android:layout_width="@dimen/_85sdp"
+                                    android:layout_marginStart="@dimen/_16sdp"
+                                    android:textSize="@dimen/_9ssp"
+                                    android:text="@string/record_4" />
+
+                                <Button
+                                    style="@style/customButtonStyle"
+
+                                    android:id="@+id/record_15"
+                                    android:layout_height="wrap_content"
+                                    android:layout_width="@dimen/_85sdp"
+                                    android:layout_marginStart="@dimen/_16sdp"
+                                    android:textSize="@dimen/_9ssp"
+                                    android:text="@string/record_5" />
+
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:id="@+id/row_3_play"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal">
+
+                                <Button
+                                    android:id="@+id/play_11"
+                                    style="@style/customButtonStyle"
+
+                                    android:layout_height="wrap_content"
+                                    android:layout_width="@dimen/_85sdp"
+                                    android:textSize="@dimen/_9ssp"
+                                    android:text="@string/play" />
+
+                                <Button
+                                    android:id="@+id/play_12"
+                                    style="@style/customButtonStyle"
+
+                                    android:layout_height="wrap_content"
+                                    android:layout_width="@dimen/_85sdp"
+                                    android:layout_marginStart="@dimen/_16sdp"
+                                    android:textSize="@dimen/_9ssp"
+                                    android:text="@string/play"/>
+
+                                <Button
+                                    android:id="@+id/play_13"
+                                    style="@style/customButtonStyle"
+
+                                    android:layout_height="wrap_content"
+                                    android:layout_width="@dimen/_85sdp"
+                                    android:layout_marginStart="@dimen/_16sdp"
+                                    android:textSize="@dimen/_9ssp"
+                                    android:text="@string/play"
+                                    />
+
+                                <Button
+                                    android:id="@+id/play_14"
+                                    style="@style/customButtonStyle"
+
+                                    android:layout_height="wrap_content"
+                                    android:layout_width="@dimen/_85sdp"
+                                    android:layout_marginStart="@dimen/_16sdp"
+                                    android:textSize="@dimen/_9ssp"
+                                    android:text="@string/play" />
+
+                                <Button
+                                    android:id="@+id/play_15"
+                                    style="@style/customButtonStyle"
+
+                                    android:layout_height="wrap_content"
+                                    android:layout_width="@dimen/_85sdp"
+                                    android:layout_marginStart="@dimen/_16sdp"
+                                    android:textSize="@dimen/_9ssp"
+                                    android:text="@string/play" />
+
+                            </LinearLayout>
+                            <Button
+                                style="@style/customButtonStyle"
+
+                                android:id="@+id/select_again_3a"
+                                android:layout_width="@dimen/_85sdp"
+                                android:layout_height="wrap_content"
+                                android:text="@string/choose_again"/>
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/sound_4"
+                        android:layout_width="@dimen/_500sdp"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal">
+                            <TextView
+                                android:id="@+id/selection_title_4"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:paddingTop="@dimen/_15sdp"
+                                android:text="@string/class_4"
+                                android:textSize="@dimen/_15ssp" />
+
+                            <ImageView
+                                android:id="@+id/check_mark_4"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="bottom"
+                                android:paddingStart="@dimen/_5sdp"
+                                app:srcCompat="@drawable/ic_baseline_check_circle_24" />
+                        </LinearLayout>
+
+
+                        <LinearLayout
+                            android:id="@+id/selection_4"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal">
+
+                            <Button
+                                style="@style/customButtonStyle"
+                                android:id="@+id/select_4a"
+                                android:layout_width="@dimen/_105sdp"
+                                android:textSize="@dimen/_10sdp"
+                                android:layout_height="wrap_content"
+                                android:text="@string/user_choice" />
+
+                            <Button
+                                android:id="@+id/select_4b"
+                                style="@style/customButtonStyle"
+                                android:layout_width="@dimen/_105sdp"
+                                android:textSize="@dimen/_10sdp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="@dimen/_16sdp"
+                                android:text="@string/pre_defined" />
+
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:id="@+id/row_4_select_b"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical">
+
+                            <com.google.android.material.textfield.TextInputLayout
+                                style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox.Dense.ExposedDropdownMenu"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent">
+
+
+                                <AutoCompleteTextView
+                                    android:id="@+id/menu_4"
+                                    android:layout_width="@dimen/_225sdp"
+                                    android:layout_height="wrap_content"
+                                    android:hint="@string/class_4_predefined"
+                                    android:inputType="none"
+                                    android:focusableInTouchMode="false"/>
+                                <Button
+                                    style="@style/customButtonStyle"
+
+                                    android:id="@+id/select_again_4b"
+                                    android:layout_width="@dimen/_85sdp"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/choose_again" />
+
+
+                            </com.google.android.material.textfield.TextInputLayout>
+                        </LinearLayout>
+
+
+                        <LinearLayout
+                            android:id="@+id/row_4_select_a"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content">
+
+                            <com.google.android.material.textfield.TextInputLayout
+                                android:layout_width="@dimen/_225sdp"
+                                android:layout_height="wrap_content"
+                                android:hint="@string/hint4"
+                                android:paddingTop="@dimen/_15sdp"
+                                android:paddingBottom="@dimen/_15sdp">
+
+                                <com.google.android.material.textfield.TextInputEditText
+                                    android:id="@+id/class_4"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:digits="0123456789 ,qwertzuiopasdfghjklyxcvbnm"
+                                    android:imeOptions="actionDone"
+                                    android:inputType="text"
+                                    android:singleLine="true"
+                                    android:focusableInTouchMode="false"/>
+
+                            </com.google.android.material.textfield.TextInputLayout>
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical">
+                            <LinearLayout
+                                android:id="@+id/row_4_record"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal">
+
+                                <Button
+                                    style="@style/customButtonStyle"
+
+                                    android:id="@+id/record_16"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/record_1"
+                                    android:layout_width="@dimen/_85sdp"
+                                    android:textSize="@dimen/_9ssp"/>
+
+
+                                <Button
+                                    style="@style/customButtonStyle"
+
+                                    android:id="@+id/record_17"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/record_2"
+                                    android:layout_width="@dimen/_85sdp"
+                                    android:layout_marginStart="@dimen/_16sdp"
+                                    android:textSize="@dimen/_9ssp" />
+
+                                <Button
+                                    style="@style/customButtonStyle"
+
+                                    android:id="@+id/record_18"
+                                    android:layout_height="wrap_content"
+                                    android:layout_width="@dimen/_85sdp"
+                                    android:layout_marginStart="@dimen/_16sdp"
+                                    android:textSize="@dimen/_9ssp"
+                                    android:text="@string/record_3" />
+
+                                <Button
+                                    style="@style/customButtonStyle"
+
+                                    android:id="@+id/record_19"
+                                    android:layout_height="wrap_content"
+                                    android:layout_width="@dimen/_85sdp"
+                                    android:layout_marginStart="@dimen/_16sdp"
+                                    android:textSize="@dimen/_9ssp"
+                                    android:text="@string/record_4" />
+
+                                <Button
+                                    style="@style/customButtonStyle"
+
+                                    android:id="@+id/record_20"
+                                    android:layout_height="wrap_content"
+                                    android:layout_width="@dimen/_85sdp"
+                                    android:layout_marginStart="@dimen/_16sdp"
+                                    android:textSize="@dimen/_9ssp"
+                                    android:text="@string/record_5" />
+
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:id="@+id/row_4_play"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal">
+
+                                <Button
+                                    android:id="@+id/play_16"
+                                    style="@style/customButtonStyle"
+
+                                    android:layout_height="wrap_content"
+                                    android:layout_width="@dimen/_85sdp"
+                                    android:textSize="@dimen/_9ssp"
+                                    android:text="@string/play" />
+
+                                <Button
+                                    android:id="@+id/play_17"
+                                    style="@style/customButtonStyle"
+
+                                    android:layout_height="wrap_content"
+                                    android:layout_width="@dimen/_85sdp"
+                                    android:layout_marginStart="@dimen/_16sdp"
+                                    android:textSize="@dimen/_9ssp"
+                                    android:text="@string/play"/>
+
+                                <Button
+                                    android:id="@+id/play_18"
+                                    style="@style/customButtonStyle"
+
+                                    android:layout_height="wrap_content"
+                                    android:layout_width="@dimen/_85sdp"
+                                    android:layout_marginStart="@dimen/_16sdp"
+                                    android:textSize="@dimen/_9ssp"
+                                    android:text="@string/play"
+                                    />
+
+                                <Button
+                                    android:id="@+id/play_19"
+                                    style="@style/customButtonStyle"
+
+                                    android:layout_height="wrap_content"
+                                    android:layout_width="@dimen/_85sdp"
+                                    android:layout_marginStart="@dimen/_16sdp"
+                                    android:textSize="@dimen/_9ssp"
+                                    android:text="@string/play" />
+
+                                <Button
+                                    android:id="@+id/play_20"
+                                    style="@style/customButtonStyle"
+
+                                    android:layout_height="wrap_content"
+                                    android:layout_width="@dimen/_85sdp"
+                                    android:layout_marginStart="@dimen/_16sdp"
+                                    android:textSize="@dimen/_9ssp"
+                                    android:text="@string/play" />
+
+                            </LinearLayout>
+                            <Button
+                                style="@style/customButtonStyle"
+
+                                android:id="@+id/select_again_4a"
+                                android:layout_width="@dimen/_85sdp"
+                                android:layout_height="wrap_content"
+                                android:text="@string/choose_again"/>
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/sound_5"
+                        android:layout_width="@dimen/_500sdp"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal">
+                            <TextView
+                                android:id="@+id/selection_title_5"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:paddingTop="@dimen/_15sdp"
+                                android:text="@string/class_5"
+                                android:textSize="@dimen/_15ssp" />
+
+                            <ImageView
+                                android:id="@+id/check_mark_5"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="bottom"
+                                android:paddingStart="@dimen/_5sdp"
+                                app:srcCompat="@drawable/ic_baseline_check_circle_24" />
+                        </LinearLayout>
+
+
+                        <LinearLayout
+                            android:id="@+id/selection_5"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal">
+
+                            <Button
+                                style="@style/customButtonStyle"
+                                android:id="@+id/select_5a"
+                                android:layout_width="@dimen/_105sdp"
+                                android:textSize="@dimen/_10sdp"
+                                android:layout_height="wrap_content"
+                                android:text="@string/user_choice" />
+
+                            <Button
+                                android:id="@+id/select_5b"
+                                style="@style/customButtonStyle"
+                                android:layout_width="@dimen/_105sdp"
+                                android:textSize="@dimen/_10sdp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="@dimen/_16sdp"
+                                android:text="@string/pre_defined" />
+
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:id="@+id/row_5_select_b"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical">
+
+                            <com.google.android.material.textfield.TextInputLayout
+                                style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox.Dense.ExposedDropdownMenu"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent">
+
+
+                                <AutoCompleteTextView
+                                    android:id="@+id/menu_5"
+                                    android:layout_width="@dimen/_225sdp"
+                                    android:layout_height="wrap_content"
+                                    android:hint="@string/class_5_predefined"
+                                    android:inputType="none"
+                                    android:focusableInTouchMode="false"/>
+                                <Button
+                                    style="@style/customButtonStyle"
+
+                                    android:id="@+id/select_again_5b"
+                                    android:layout_width="@dimen/_85sdp"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/choose_again" />
+
+
+                            </com.google.android.material.textfield.TextInputLayout>
+                        </LinearLayout>
+
+
+                        <LinearLayout
+                            android:id="@+id/row_5_select_a"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content">
+
+                            <com.google.android.material.textfield.TextInputLayout
+                                android:layout_width="@dimen/_225sdp"
+                                android:layout_height="wrap_content"
+                                android:hint="@string/hint5"
+                                android:paddingTop="@dimen/_15sdp"
+                                android:paddingBottom="@dimen/_15sdp">
+
+                                <com.google.android.material.textfield.TextInputEditText
+                                    android:id="@+id/class_5"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:digits="0123456789 ,qwertzuiopasdfghjklyxcvbnm"
+                                    android:imeOptions="actionDone"
+                                    android:inputType="text"
+                                    android:singleLine="true"
+                                    android:focusableInTouchMode="false"/>
+
+                            </com.google.android.material.textfield.TextInputLayout>
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical">
+                            <LinearLayout
+                                android:id="@+id/row_5_record"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal">
+
+                                <Button
+                                    style="@style/customButtonStyle"
+
+                                    android:id="@+id/record_21"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/record_1"
+                                    android:layout_width="@dimen/_85sdp"
+                                    android:textSize="@dimen/_9ssp"/>
+
+
+                                <Button
+                                    style="@style/customButtonStyle"
+
+                                    android:id="@+id/record_22"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/record_2"
+                                    android:layout_width="@dimen/_85sdp"
+                                    android:layout_marginStart="@dimen/_16sdp"
+                                    android:textSize="@dimen/_9ssp" />
+
+                                <Button
+                                    style="@style/customButtonStyle"
+
+                                    android:id="@+id/record_23"
+                                    android:layout_height="wrap_content"
+                                    android:layout_width="@dimen/_85sdp"
+                                    android:layout_marginStart="@dimen/_16sdp"
+                                    android:textSize="@dimen/_9ssp"
+                                    android:text="@string/record_3" />
+
+                                <Button
+                                    style="@style/customButtonStyle"
+
+                                    android:id="@+id/record_24"
+                                    android:layout_height="wrap_content"
+                                    android:layout_width="@dimen/_85sdp"
+                                    android:layout_marginStart="@dimen/_16sdp"
+                                    android:textSize="@dimen/_9ssp"
+                                    android:text="@string/record_4" />
+
+                                <Button
+                                    style="@style/customButtonStyle"
+
+                                    android:id="@+id/record_25"
+                                    android:layout_height="wrap_content"
+                                    android:layout_width="@dimen/_85sdp"
+                                    android:layout_marginStart="@dimen/_16sdp"
+                                    android:textSize="@dimen/_9ssp"
+                                    android:text="@string/record_5" />
+
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:id="@+id/row_5_play"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal">
+
+                                <Button
+                                    android:id="@+id/play_21"
+                                    style="@style/customButtonStyle"
+
+                                    android:layout_height="wrap_content"
+                                    android:layout_width="@dimen/_85sdp"
+                                    android:textSize="@dimen/_9ssp"
+                                    android:text="@string/play" />
+
+                                <Button
+                                    android:id="@+id/play_22"
+                                    style="@style/customButtonStyle"
+
+                                    android:layout_height="wrap_content"
+                                    android:layout_width="@dimen/_85sdp"
+                                    android:layout_marginStart="@dimen/_16sdp"
+                                    android:textSize="@dimen/_9ssp"
+                                    android:text="@string/play"/>
+
+                                <Button
+                                    android:id="@+id/play_23"
+                                    style="@style/customButtonStyle"
+
+                                    android:layout_height="wrap_content"
+                                    android:layout_width="@dimen/_85sdp"
+                                    android:layout_marginStart="@dimen/_16sdp"
+                                    android:textSize="@dimen/_9ssp"
+                                    android:text="@string/play"
+                                    />
+
+                                <Button
+                                    android:id="@+id/play_24"
+                                    style="@style/customButtonStyle"
+
+                                    android:layout_height="wrap_content"
+                                    android:layout_width="@dimen/_85sdp"
+                                    android:layout_marginStart="@dimen/_16sdp"
+                                    android:textSize="@dimen/_9ssp"
+                                    android:text="@string/play" />
+
+                                <Button
+                                    android:id="@+id/play_25"
+                                    style="@style/customButtonStyle"
+
+                                    android:layout_height="wrap_content"
+                                    android:layout_width="@dimen/_85sdp"
+                                    android:layout_marginStart="@dimen/_16sdp"
+                                    android:textSize="@dimen/_9ssp"
+                                    android:text="@string/play" />
+
+                            </LinearLayout>
+                            <Button
+                                style="@style/customButtonStyle"
+
+                                android:id="@+id/select_again_5a"
+                                android:layout_width="@dimen/_85sdp"
+                                android:layout_height="wrap_content"
+                                android:text="@string/choose_again"/>
+                        </LinearLayout>
+                    </LinearLayout>
+
+                </LinearLayout>
+            </HorizontalScrollView>
+
+            <TextView
+                android:id="@+id/tutorial_3"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:breakStrategy="high_quality"
+                android:paddingTop="@dimen/_50sdp"
+                android:paddingBottom="@dimen/_10sdp"
+                android:text="@string/tutorial_3"
+                android:textSize="@dimen/_15ssp" />
+
+            <Button
+                style="@style/customButtonStyle"
+
+                android:id="@+id/record_bg"
+                android:layout_width="@dimen/_98sdp"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/_11sdp"
+                android:text="@string/record" />
+
+            <Button
+                android:id="@+id/play_bg"
+                style="@style/customButtonStyle"
+
+                android:layout_width="@dimen/_98sdp"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/_11sdp"
+                android:text="@string/play" />
+
+            <TextView
+                android:id="@+id/tutorial_4"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:breakStrategy="high_quality"
+                android:paddingTop="@dimen/_20sdp"
+                android:text="@string/tutorial_4"
+                android:textSize="@dimen/_10ssp"
+                android:textAlignment="center"/>
+            <TextView
+                android:id="@+id/tutorial_5"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:breakStrategy="high_quality"
+                android:paddingTop="@dimen/_20sdp"
+                android:text="@string/tutorial_5"
+                android:textSize="@dimen/_10ssp"
+                android:textAlignment="center"/>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                >
+                <ProgressBar
+                    android:id="@+id/progressBar"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/_50sdp"
+                    android:visibility="invisible"
+                    android:indeterminate="true" />
+
+                <Button
+                    style="@style/customButtonStyle"
+
+                    android:id="@+id/submit"
+                    android:layout_width="@dimen/_180sdp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/_55sdp"
+                    android:layout_marginEnd="@dimen/_20sdp"
+
+                    android:text="@string/submit_to_server" />
+            </LinearLayout>
+
+
+
+        </LinearLayout>
+    </ScrollView>
+</androidx.constraintlayout.widget.ConstraintLayout>
