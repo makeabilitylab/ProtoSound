@@ -1,14 +1,15 @@
 <resources>
     <string name="app_name">ProtoSound</string>
-    <string name="title_home">Evaluate</string>
-    <string name="title_dashboard">Train</string>
+    <string name="title_home">Predict</string>
+    <string name="title_dashboard">Train Your Sounds</string>
+    <string name="evaluate">Predict Your Sounds</string>
     <string name="title_help">Help</string>
     <string name="title_notifications">About</string>
-    <string name="class_1">Sound 1:</string>
-    <string name="class_2">Sound 2:</string>
-    <string name="class_3">Sound 3:</string>
-    <string name="class_4">Sound 4:</string>
-    <string name="class_5">Sound 5:</string>
+    <string name="class_1">Sound 1</string>
+    <string name="class_2">Sound 2</string>
+    <string name="class_3">Sound 3</string>
+    <string name="class_4">Sound 4</string>
+    <string name="class_5">Sound 5</string>
     <string name="class_1_predefined">Pre-defined sound 1</string>
     <string name="class_2_predefined">Pre-defined sound 2</string>
     <string name="class_3_predefined">Pre-defined sound 3</string>
@@ -18,12 +19,12 @@
     <string name="play">Playback</string>
     <string name="record_11">Record 11</string>
     <string name="record_12">Record 12</string>
-    <string name="tutorial_1"><b>Step 1:</b> Enter the current testing location (kitchen, bedroom, etc.) then click SUBMIT:</string>
-    <string name="tutorial_2a"><b>Step 2:</b> Select <u><b>5 different sounds</b></u>.\nFor each sound, choose either option:</string>
-    <string name="tutorial_2b"><b>YOUR CHOICE:</b> Record 5 samples and provide a name. Each sample is 1 second long. (Scroll right to see all 5 "Record" boxes) \n\n<b>PRE-DEFINED:</b> Choose a sound from a list of 9 provided sounds.</string>
-    <string name="tutorial_3"><b>Step 3:</b> Record background noises</string>
-    <string name="tutorial_4"><font color="yellow">Complete the steps above before training the model</font></string>
-    <string name="tutorial_5"><font color="yellow">Click on "Evaluate" to predict your sounds</font></string>
+    <string name="tutorial_1"><b>1. Enter your current location</b></string>
+    <string name="tutorial_2a"><b>2. Select the sounds to recognize</b></string>
+<!--    <string name="tutorial_2b"><b>YOUR CHOICE:</b> Record 5 samples and provide a name. Each sample is 1 second long. (Scroll right to see all 5 "Record" boxes) \n\n<b>PRE-DEFINED:</b> Choose a sound from a list of 9 provided sounds.</string>-->
+    <string name="tutorial_3"><b>3. Record background noises</b></string>
+    <string name="tutorial_4">Complete the steps above before training the model</string>
+    <string name="tutorial_5">Select the \"Predict\" tab to predict your sounds</string>
     <string name="record_1">Record 1</string>
     <string name="record_2">Record 2</string>
     <string name="record_3">Record 3</string>
@@ -60,8 +61,8 @@
     <string name="confirm">Confirm</string>
     <string name="port_connected">Port connected!</string>
     <string name="mic">mic</string>
-    <string name="tap_blue">Start predicting</string>
-    <string name="training_complete">Training completed</string>
+    <string name="tap_blue">Start Recording</string>
+    <string name="training_complete">Training Completed</string>
     <string name="recording">Recording</string>
     <string name="done">Recorded</string>
     <string name="training_data">Training data</string>
@@ -70,25 +71,62 @@
     <string name="pre_defined">Pre-defined</string>
     <string name="greeting"><b>Welcome to ProtoSound</b></string>
     <string name="submitLocation">Submit</string>
-    <string name="location_submitted">Location submitted</string>
+    <string name="submitted">Submitted</string>
     <string name="select_predefined">Tap to select</string>
-    <string name="record_background_noise">Record Background Noise</string>
+    <string name="record">Record</string>
 
     <string name="hello_blank_fragment">1. To train new data, tap on \"Train\"\n
-        <font size="14">User is required to complete all the steps before training data.
+        User is required to complete all the steps before training data.
             User has to provide 5 sounds, either by choosing YOUR CHOICE or PRE-DEFINED option.\n
             \nYOUR CHOICE: the app provides 5 \"Record\" and 5 \"Playback\" boxes. A \"Record\"
         box records for 1 second using microphone, while a \"Playback\" box lets user hear back what
         has been recorded.\n
-            \nPRE-DEFINED: user chooses from a list from 9 provided sounds.\n </font>
+            \nPRE-DEFINED: user chooses from a list from 9 provided sounds.\n
         \n\n
         2. To predict your sounds, tap on \"Evaluate\"\n
-        <font size="14">User is required to train data first before evaluating their sounds.\n
+        User is required to train data first before evaluating their sounds.\n
             By tapping on the microphone icon, the app records and returns query result after every 3-second sound.\n
         (Note: this does not mean the app continuously returns result every 3 seconds. If a sound is 3-second long
             then the app will return the result after 3 seconds. If a sound is only 2-second long, the app has to listen
             for another second before returning the result)
-        </font>
+
     </string>
     <string name="choose_again">Back</string>
+    <string name="title_tutorial">Tutorial</string>
+    <string name="app_tutorial">APP TUTORIAL</string>
+    <string name="faq">FAQ</string>
+    <string name="about">About</string>
+    <string name="train">Train</string>
+    <string name="about_1">"SoundWatch is an Android-based app designed for commercially available smartwatches to provide glanceable, always-available, and private sound feedback in multiple contexts.
+        \nIt began on ..., and is led by a hard of hearing University of Washington doctoral student who wanted to build for his community. Thus, SoundWatch has involved the DHH communities at many stages of its development, along with faculty advisors, student developers, programmers, and UI/UX designers.
+        \nSoundWatch informs users about three key sound properties: sound identity, loudness, and time of occurrence through customizable sound alerts using visual and vibrational feedback. We use a deep learning-based sound classification engine (running on either the watch or on the paired phone or cloud) to continually sense and process sound events in real-time. SoundWatch supports four different architectural configurations: watch-only, watch+phone, watch+phone+cloud, and watch+cloud.
+        \n\nThank you for using SoundWatch!
+        \nThis is a beta release, so always feel free to connect with us to provide feedback so we can improve or to just say Hi!
+
+    </string>
+    <string name="email">protosound@cs.uw.edu</string>
+    <string name="website">protosound.cs.uw.edu</string>
+    <string name="finish">Finish</string>
+
+
+    <string name="qa1"><b>How does the option "Your Choice" work?</b>
+        \n\nYou are prompted to enter a name for your sound and record the sound 5 times. Each recording is 1-second long, which means there are 5 1-second samples. You can play the recording back to see if it is the sound that you want. You can also record again for the same slot when you tap on the "Recorded" button.
+    </string>
+
+    <string name="qa2"><b>If I already submitted my location, can I resubmit it?</b>
+        \n\nYou can re-enter the location as many times as you would like. Once you press the "Train Model" button, the final location is saved.
+    </string>
+
+    <string name="qa3"><b>Why does Predict not return any result for my sound?</b>
+        \n\nThere are a couple of reasons. You might not have trained the sounds yet or the app simply does not recognize your untrained sound.
+    </string>
+
+    <string name="qa4"><b>Why does Predict return incorrect results for a sound when I have trained it?</b>
+        \n\nIt could be that within your trained dataset, there is low variance among the different sounds which leads to high errors. Alternatively, if a sound is trained through "Your Choice", the 5 recordings may capture vastly different sound waves for a particular sound and this can lead to inconsistencies when getting predictions.
+    </string>
+
+    <string name="qa5"><b>After training 5 sounds, can I train different sounds?</b>
+        \n\nYes. After training 5 sounds, you can make necessary changes then tap on "TRAIN MODEL" to train the sounds again.
+    </string>
+
 </resources>

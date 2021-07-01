@@ -34,6 +34,7 @@ import java.io.Writer;
 import java.lang.reflect.Array;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -118,7 +119,7 @@ public class ProtoApp extends Application {
                         Log.d(TAG, "skip " + useUserData + " location " + fileName);
                         continue;
                     }
-                    Log.d(TAG, "USE_USER_DATA, " + useUserData + " location " + fileName);
+                    //Log.d(TAG, "USE_USER_DATA, " + useUserData + " location " + fileName);
                     String filePath = path + "/" + fileName;
                     // CODE FOR NOT EXIST OUTPUT_PATH_DIR
 
@@ -243,7 +244,7 @@ public class ProtoApp extends Application {
                 for(CSVRecord record : csvParser) {
 
                     String filePath = DATA_PATH +"/"+ record.get("filename");
-                    Log.d(TAG, "FILEPATH " +  filePath);
+                    //Log.d(TAG, "FILEPATH " +  filePath);
                     // SPEC_TO_IMAGE
 
                     float[][] specScaled = ML.specToImage(ML.getMelSspectrogramDb(filePath));
@@ -417,7 +418,7 @@ public class ProtoApp extends Application {
                 Log.d(TAG, "Making prediction...");
                 List<String> result = new ArrayList<>();
                 result.add(i2c.get(bestIndex)); // label
-                result.add(String.valueOf(bestConfidence));
+                result.add(new DecimalFormat("#").format(Math.round((1 - ratio) * 100)));
                 result.add(dbStr);
                 Log.d(TAG, "PREDICTION LABEL " + result.get(0));
                 //Log.d(TAG, "AVG BEST CONFIDENCE " + result.get(1));
