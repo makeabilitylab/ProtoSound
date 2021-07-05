@@ -16,7 +16,8 @@
     <string name="class_4_predefined">Pre-defined sound 4</string>
     <string name="class_5_predefined">Pre-defined sound 5</string>
     <string name="protosound">ProtoSound</string>
-    <string name="play">Playback</string>
+    <string name="play">Play</string>
+    <string name="reset">Reset</string>
     <string name="record_11">Record 11</string>
     <string name="record_12">Record 12</string>
     <string name="tutorial_1"><b>1. Enter your current location</b></string>

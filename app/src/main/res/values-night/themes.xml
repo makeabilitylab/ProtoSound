@@ -5,7 +5,7 @@
         <item name="android:windowIsTranslucent">true</item>
         <item name="android:windowCloseOnTouchOutside">true</item>
         <!-- Primary brand color. -->
-        <item name="colorPrimary">#DADADA</item>
+        <item name="colorPrimary">@color/purple_200</item>
 <!--        <item name="colorPrimaryVariant">@color/purple_700</item>-->
         <item name="colorOnPrimary">@color/black</item>
         <!-- Secondary brand color. -->
@@ -18,4 +18,5 @@
         <item name="android:textColor">#DADADA</item>
 <!--        <item name="android:background">@color/black</item>-->
     </style>
+
 </resources>

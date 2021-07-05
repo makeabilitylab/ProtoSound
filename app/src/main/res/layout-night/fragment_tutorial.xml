@@ -36,7 +36,7 @@
                 android:layout_width="@dimen/_175sdp"
                 android:layout_height="@dimen/_175sdp"
 
-                android:src="@drawable/protosound_logo"
+                android:src="@drawable/protosound_logo_2"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"

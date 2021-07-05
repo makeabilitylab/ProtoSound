@@ -1,10 +1,10 @@
 package com.makeability.protosound.ui.dashboard;
 
 import android.Manifest;
-import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.graphics.drawable.GradientDrawable;
 import android.media.AudioFormat;
 import android.os.Bundle;
 import android.os.Handler;
@@ -13,14 +13,12 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -75,6 +73,8 @@ public class DashboardFragment extends Fragment {
     public String location;
     public String submitAudioTime;
     private boolean trainingComplete = false;
+    private int BACKGROUND_COLOR;
+    private int THEME_COLOR;
 
     private static final boolean TEST = true;
     private SharedViewModel sharedViewModel;
@@ -110,17 +110,17 @@ public class DashboardFragment extends Fragment {
             R.id.record_16, R.id.record_17, R.id.record_18, R.id.record_19, R.id.record_20,
             R.id.record_21, R.id.record_22, R.id.record_23, R.id.record_24, R.id.record_25, R.id.record_bg};
 
-    int[] playButtonList = {R.id.play_1, R.id.play_2, R.id.play_3, R.id.play_4, R.id.play_5,
-            R.id.play_6, R.id.play_7, R.id.play_8, R.id.play_9, R.id.play_10,
-            R.id.play_11, R.id.play_12, R.id.play_13, R.id.play_14, R.id.play_15,
-            R.id.play_16, R.id.play_17, R.id.play_18, R.id.play_19, R.id.play_20,
-            R.id.play_21, R.id.play_22, R.id.play_23, R.id.play_24, R.id.play_25, R.id.play_bg};
+    int[] resetButtonList = {R.id.reset_1, R.id.reset_2, R.id.reset_3, R.id.reset_4, R.id.reset_5,
+            R.id.reset_6, R.id.reset_7, R.id.reset_8, R.id.reset_9, R.id.reset_10,
+            R.id.reset_11, R.id.reset_12, R.id.reset_13, R.id.reset_14, R.id.reset_15,
+            R.id.reset_16, R.id.reset_17, R.id.reset_18, R.id.reset_19, R.id.reset_20,
+            R.id.reset_21, R.id.reset_22, R.id.reset_23, R.id.reset_24, R.id.reset_25, R.id.reset_bg};
 
     int[] rowSelectAList = {R.id.row_1_select_a, R.id.row_2_select_a, R.id.row_3_select_a, R.id.row_4_select_a, R.id.row_5_select_a};
     int[] rowSelectBList = {R.id.row_1_select_b, R.id.row_2_select_b, R.id.row_3_select_b, R.id.row_4_select_b, R.id.row_5_select_b};   // predefined
 
     int[] rowRecordList = {R.id.row_1_record, R.id.row_2_record, R.id.row_3_record, R.id.row_4_record, R.id.row_5_record};
-    int[] rowPlayList = {R.id.row_1_play, R.id.row_2_play, R.id.row_3_play, R.id.row_4_play, R.id.row_5_play};
+    int[] rowResetList = {R.id.row_1_reset, R.id.row_2_reset, R.id.row_3_reset, R.id.row_4_reset, R.id.row_5_reset};
 
     int[] selectAButtonList = {R.id.select_1a, R.id.select_2a, R.id.select_3a, R.id.select_4a, R.id.select_5a};
     int[] selectBButtonList = {R.id.select_1b, R.id.select_2b, R.id.select_3b, R.id.select_4b, R.id.select_5b};
@@ -150,6 +150,8 @@ public class DashboardFragment extends Fragment {
         sharedViewModel = new ViewModelProvider(requireActivity()).get(SharedViewModel.class);
         View root = inflater.inflate(R.layout.fragment_dashboard, container, false);
 
+        BACKGROUND_COLOR = getResources().getColor(R.color.material_on_primary_emphasis_high_type, requireActivity().getTheme());
+        THEME_COLOR = getResources().getColor(R.color.purple_200, requireActivity().getTheme());
         location = null;
         locationSubmitted = false;
         spinnerSelection = new HashMap<>();
@@ -159,10 +161,10 @@ public class DashboardFragment extends Fragment {
         selectANameMap = new HashMap<>();
         TextView tutorial_5 = root.findViewById(R.id.tutorial_5);
         tutorial_5.setVisibility(View.GONE);
-        Map<Integer, Integer> recordPlayMap = new HashMap<>();
-        for (int i = 0; i < playButtonList.length; i++) {
-            if (!recordPlayMap.containsKey(playButtonList[i])) {
-                recordPlayMap.put(playButtonList[i], recordButtonList[i]);
+        Map<Integer, Integer> recordResetMap = new HashMap<>();
+        for (int i = 0; i < resetButtonList.length; i++) {
+            if (!recordResetMap.containsKey(resetButtonList[i])) {
+                recordResetMap.put(resetButtonList[i], recordButtonList[i]);
             }
         }
 
@@ -190,10 +192,10 @@ public class DashboardFragment extends Fragment {
             setOnClickRecord(record, recordButtonList[i], i);
         }
 
-        for (int pid : playButtonList) {
-            Button play = root.findViewById(pid);
-            play.setEnabled(false);
-            setOnClickPlay(play, recordPlayMap.get(pid));
+
+        for (int i = 0; i < resetButtonList.length; i++) {
+            Button reset = root.findViewById(resetButtonList[i]);
+            setOnClickResetRecording(reset, recordResetMap.get(resetButtonList[i]), i);
         }
 
         for (int i = 0; i < selectAgainAButtonList.length; i++) {
@@ -290,7 +292,7 @@ public class DashboardFragment extends Fragment {
 
         if (locationSubmitted) {
             Button confirmLocation = requireActivity().findViewById(R.id.confirm_location);
-            confirmLocation.setBackgroundColor(getResources().getColor(R.color.purple_200));
+            confirmLocation.setBackgroundColor(THEME_COLOR);
             confirmLocation.setText(R.string.submitted);
             confirmLocation.setTextColor(Color.BLACK);
         }
@@ -333,12 +335,12 @@ public class DashboardFragment extends Fragment {
             if (choice!= null && choice == 0) {
                 // Restore YOUR CHOICE's UI
                 LinearLayout rowRecord = requireActivity().findViewById(rowRecordList[id]);
-                LinearLayout rowPlay = requireActivity().findViewById(rowPlayList[id]);
+                LinearLayout rowReset = requireActivity().findViewById(rowResetList[id]);
                 LinearLayout rowSelectA = requireActivity().findViewById(rowSelectAList[id]);
                 LinearLayout rowSelection = requireActivity().findViewById(selection[id]);
                 Button selectAgainA = requireActivity().findViewById(selectAgainAButtonList[id]);
                 rowRecord.setVisibility(View.VISIBLE);
-                rowPlay.setVisibility(View.VISIBLE);
+                rowReset.setVisibility(View.VISIBLE);
                 rowSelectA.setVisibility(View.VISIBLE);
                 rowSelection.setVisibility(View.GONE);
                 selectAgainA.setVisibility(View.VISIBLE);
@@ -394,15 +396,16 @@ public class DashboardFragment extends Fragment {
             if (sampleRecorded[i] && (choice != null &&  choice == 0 || i == 25) )
             { // Only restore "Record" for YOUR CHOICE, or when
                 Button recordBtn = requireActivity().findViewById(recordButtonList[i]);
-                recordBtn.setBackgroundColor(getResources().getColor(R.color.purple_200));
-                recordBtn.setText(R.string.done);
+                recordBtn.setBackgroundColor(THEME_COLOR);
+                recordBtn.setText(R.string.play);
                 recordBtn.setTextColor(Color.BLACK);
+                setOnClickPlay(recordBtn, recordButtonList[i]);
                 recorder = new SoundRecorder(this.requireContext(), VOICE_FILE_NAME + i + ".pcm", mListener);
 
-                Button playBtn = requireActivity().findViewById(playButtonList[i]);
-                playBtn.setEnabled(true);
-                playBtn.setBackgroundColor(getResources().getColor(R.color.purple_200));
-                playBtn.setTextColor(Color.BLACK);
+//                Button playBtn = requireActivity().findViewById(resetButtonList[i]);
+//                playBtn.setEnabled(true);
+//                playBtn.setBackgroundColor(THEME_COLOR);
+//                playBtn.setTextColor(Color.BLACK);
             }
             checkUserChoiceComplete(i / 5);    // Check completion for "Sound i"
         }
@@ -435,7 +438,7 @@ public class DashboardFragment extends Fragment {
             LinearLayout ll = root.findViewById(rowID);
             ll.setVisibility(View.GONE);
         }
-        for (int rowID : rowPlayList) {
+        for (int rowID : rowResetList) {
             LinearLayout ll = root.findViewById(rowID);
             ll.setVisibility(View.GONE);
         }
@@ -459,7 +462,7 @@ public class DashboardFragment extends Fragment {
     private void setUIVisibility(Button userChoice, Button preDefined, int id) {
         userChoice.setOnClickListener(v -> {
             LinearLayout rowRecord = requireActivity().findViewById(rowRecordList[id]);
-            LinearLayout rowPlay = requireActivity().findViewById(rowPlayList[id]);
+            LinearLayout rowPlay = requireActivity().findViewById(rowResetList[id]);
             LinearLayout rowSelectA = requireActivity().findViewById(rowSelectAList[id]);
             LinearLayout rowSelection = requireActivity().findViewById(selection[id]);
             Button selectAgainA = requireActivity().findViewById(selectAgainAButtonList[id]);
@@ -500,13 +503,9 @@ public class DashboardFragment extends Fragment {
                 Button recordBtn = requireActivity().findViewById(recordButtonList[j]);
                 recordBtn.setBackgroundColor(Color.TRANSPARENT);
                 String record_id = "record_" + (j % 5 + 1);
-                recordBtn.setTextColor(getResources().getColor(R.color.purple_200));
+                recordBtn.setTextColor(THEME_COLOR);
                 recordBtn.setText(getResources().getIdentifier(record_id, "string", getContext().getPackageName()));
 
-                Button playBtn = requireActivity().findViewById(playButtonList[j]);
-                playBtn.setEnabled(false);
-                playBtn.setBackgroundColor(getResources().getColor(R.color.material_on_primary_disabled, requireActivity().getTheme()));
-                playBtn.setTextColor(getResources().getColor(R.color.purple_200));
             }
             checkUserChoiceComplete(i);
             sharedViewModel.setMLabelList(labelList);   // save labelList
@@ -514,11 +513,11 @@ public class DashboardFragment extends Fragment {
 
             LinearLayout rowSelectA = requireActivity().findViewById(rowSelectAList[i]);
             LinearLayout rowSelection = requireActivity().findViewById(selection[i]);
-            LinearLayout rowPlay = requireActivity().findViewById(rowPlayList[i]);
+            LinearLayout rowReset = requireActivity().findViewById(rowResetList[i]);
             LinearLayout rowRecord = requireActivity().findViewById(rowRecordList[i]);
             rowSelectA.setVisibility(View.GONE);
             rowSelection.setVisibility(View.VISIBLE);
-            rowPlay.setVisibility(View.GONE);
+            rowReset.setVisibility(View.GONE);
             rowRecord.setVisibility(View.GONE);
             againA.setVisibility(View.GONE);
         });
@@ -567,7 +566,7 @@ public class DashboardFragment extends Fragment {
             LinearLayout rowSelectB = requireActivity().findViewById(rowSelectBList[i]);
             LinearLayout rowSelection = requireActivity().findViewById(selection[i]);
             LinearLayout rowSelectA = requireActivity().findViewById(rowSelectAList[i]);
-            LinearLayout rowPlay = requireActivity().findViewById(rowPlayList[i]);
+            LinearLayout rowPlay = requireActivity().findViewById(rowResetList[i]);
             rowSelectB.setVisibility(View.GONE);
             rowSelectA.setVisibility(View.GONE);
             rowPlay.setVisibility(View.GONE);
@@ -600,8 +599,8 @@ public class DashboardFragment extends Fragment {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                confirmLocation.setBackgroundColor(getResources().getColor(R.color.material_on_primary_emphasis_high_type, requireActivity().getTheme()));
-                confirmLocation.setTextColor(getResources().getColor(R.color.purple_200));
+                confirmLocation.setBackgroundColor(BACKGROUND_COLOR);
+                confirmLocation.setTextColor(THEME_COLOR);
                 confirmLocation.setText(R.string.submitLocation);
                 locationSubmitted = false;
                 sharedViewModel.setText(s.toString()); // save location
@@ -746,8 +745,8 @@ public class DashboardFragment extends Fragment {
             final Handler handler = new Handler(Looper.getMainLooper());
             handler.postDelayed(() -> {
                 //Do something after 1200ms
-                btn.setBackgroundColor(getResources().getColor(R.color.purple_200));
-                btn.setText(R.string.done);
+                btn.setBackgroundColor(THEME_COLOR);
+                btn.setText("Play");
                 btn.setTextColor(Color.BLACK);
                 for (int rid : recordButtonList) {
                     if (rid != id) {
@@ -757,14 +756,10 @@ public class DashboardFragment extends Fragment {
                 }
             }, 1200);
 
-            Button play = requireActivity().findViewById(playButtonList[order]);
-            play.setEnabled(true);
-            play.setBackgroundColor(getResources().getColor(R.color.purple_200));
-            play.setTextColor(Color.BLACK);
+            setOnClickPlay(btn, id);
 
             int row = order / 5;
             checkUserChoiceComplete(row);
-
         });
     }
 
@@ -802,12 +797,26 @@ public class DashboardFragment extends Fragment {
         });
     }
 
+    // "Reset" button makes the user record sound again
+    private void setOnClickResetRecording(final Button btn, final int id, final int order){
+
+        btn.setOnClickListener(v -> {
+            Button recordBtn = requireActivity().findViewById(id);
+            String record_id = "record_" + (order % 5 + 1);
+            recordBtn.setText(getResources().getIdentifier(record_id, "string", getContext().getPackageName()));
+            recordBtn.setTextColor(THEME_COLOR);
+            recordBtn.setBackgroundColor(BACKGROUND_COLOR);
+            setOnClickRecord(recordBtn, id, order);
+            sampleRecorded[order] = false;
+        });
+    }
+
     // reset "TRAIN MODEL" button UI to original after user changes something
     private void resetTrainBtn() {
         Button btn = requireActivity().findViewById(R.id.submit);
-        btn.setBackgroundColor(getResources().getColor(R.color.material_on_primary_emphasis_high_type, requireActivity().getTheme()));
+        btn.setBackgroundColor(BACKGROUND_COLOR);
         btn.setText(R.string.submit_to_server);
-        btn.setTextColor(getResources().getColor(R.color.purple_200, requireActivity().getTheme()));
+        btn.setTextColor(THEME_COLOR);
     }
     private void setOnClickSubmit(final Button btn, final int id, View root) {
 

@@ -9,12 +9,11 @@
         <item name="strokeColor">@color/purple_200</item>
     </style>
 
-    <style name="customButtonStyle2" parent="Theme.MaterialComponents">
-        <item name="backgroundTint">@color/material_on_primary_emphasis_high_type</item>
+    <style name="buttonStyleInactive" parent="Theme.MaterialComponents">
         <item name="android:textAllCaps">true</item>
         <item name="android:textStyle">bold</item>
         <item name="strokeWidth">1dp</item>
-        <item name="strokeColor">@color/purple_200</item>
+        <item name="strokeColor">@color/dark_grey</item>
     </style>
 
 <!--    <style name="PopUpTheme" parent="android:Theme.Material">-->

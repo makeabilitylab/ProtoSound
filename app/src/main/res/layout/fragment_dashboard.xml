@@ -208,13 +208,14 @@
                                     android:hint="@string/class_1_predefined"
                                     android:inputType="none"
                                     android:focusableInTouchMode="false"/>
-                                <Button
-                                    style="@style/customButtonStyle"
 
+                                <Button
                                     android:id="@+id/select_again_1b"
                                     android:layout_width="@dimen/_85sdp"
                                     android:layout_height="wrap_content"
-                                    android:text="@string/choose_again" />
+                                    style="@style/Widget.MaterialComponents.Button.TextButton"
+                                    app:icon="@drawable/outline_arrow_back_24"
+                                    app:iconSize="@dimen/_30sdp"/>
 
 
                             </com.google.android.material.textfield.TextInputLayout>
@@ -309,63 +310,63 @@
                             </LinearLayout>
 
                             <LinearLayout
-                                android:id="@+id/row_1_play"
+                                android:id="@+id/row_1_reset"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:orientation="horizontal">
 
                                 <Button
-                                    android:id="@+id/play_1"
                                     style="@style/customButtonStyle"
+                                    android:id="@+id/reset_1"
                                     android:layout_height="wrap_content"
                                     android:layout_width="@dimen/_85sdp"
                                     android:textSize="@dimen/_9ssp"
-                                    android:text="@string/play" />
+                                    android:text="@string/reset" />
 
                                 <Button
-                                    android:id="@+id/play_2"
                                     style="@style/customButtonStyle"
+                                    android:id="@+id/reset_2"
                                     android:layout_height="wrap_content"
                                     android:layout_width="@dimen/_85sdp"
                                     android:layout_marginStart="@dimen/_16sdp"
                                     android:textSize="@dimen/_9ssp"
-                                    android:text="@string/play"/>
+                                    android:text="@string/reset"/>
 
                                 <Button
-                                    android:id="@+id/play_3"
                                     style="@style/customButtonStyle"
+                                    android:id="@+id/reset_3"
                                     android:layout_height="wrap_content"
                                     android:layout_width="@dimen/_85sdp"
                                     android:layout_marginStart="@dimen/_16sdp"
                                     android:textSize="@dimen/_9ssp"
-                                    android:text="@string/play" />
+                                    android:text="@string/reset" />
 
                                 <Button
-                                    android:id="@+id/play_4"
                                     style="@style/customButtonStyle"
+                                    android:id="@+id/reset_4"
                                     android:layout_height="wrap_content"
                                     android:layout_width="@dimen/_85sdp"
                                     android:layout_marginStart="@dimen/_16sdp"
                                     android:textSize="@dimen/_9ssp"
-                                    android:text="@string/play" />
+                                    android:text="@string/reset" />
 
                                 <Button
-                                    android:id="@+id/play_5"
                                     style="@style/customButtonStyle"
+                                    android:id="@+id/reset_5"
                                     android:layout_height="wrap_content"
                                     android:layout_width="@dimen/_85sdp"
                                     android:layout_marginStart="@dimen/_16sdp"
                                     android:textSize="@dimen/_9ssp"
-                                    android:text="@string/play" />
+                                    android:text="@string/reset" />
 
                             </LinearLayout>
                             <Button
-                                style="@style/customButtonStyle"
-
                                 android:id="@+id/select_again_1a"
                                 android:layout_width="@dimen/_85sdp"
                                 android:layout_height="wrap_content"
-                                android:text="@string/choose_again"/>
+                                style="@style/Widget.MaterialComponents.Button.TextButton"
+                                app:icon="@drawable/outline_arrow_back_24"
+                                app:iconSize="@dimen/_30sdp"/>
                         </LinearLayout>
                     </LinearLayout>
 
@@ -442,12 +443,12 @@
                                     android:inputType="none"
                                     android:focusableInTouchMode="false"/>
                                 <Button
-                                    style="@style/customButtonStyle"
-
                                     android:id="@+id/select_again_2b"
                                     android:layout_width="@dimen/_85sdp"
                                     android:layout_height="wrap_content"
-                                    android:text="@string/choose_again" />
+                                    style="@style/Widget.MaterialComponents.Button.TextButton"
+                                    app:icon="@drawable/outline_arrow_back_24"
+                                    app:iconSize="@dimen/_30sdp"/>
 
 
                             </com.google.android.material.textfield.TextInputLayout>
@@ -542,69 +543,64 @@
                             </LinearLayout>
 
                             <LinearLayout
-                                android:id="@+id/row_2_play"
+                                android:id="@+id/row_2_reset"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:orientation="horizontal">
 
                                 <Button
-                                    android:id="@+id/play_6"
                                     style="@style/customButtonStyle"
-
+                                    android:id="@+id/reset_6"
                                     android:layout_height="wrap_content"
                                     android:layout_width="@dimen/_85sdp"
                                     android:textSize="@dimen/_9ssp"
-                                    android:text="@string/play" />
+                                    android:text="@string/reset" />
 
                                 <Button
-                                    android:id="@+id/play_7"
                                     style="@style/customButtonStyle"
-
+                                    android:id="@+id/reset_7"
                                     android:layout_height="wrap_content"
                                     android:layout_width="@dimen/_85sdp"
                                     android:layout_marginStart="@dimen/_16sdp"
                                     android:textSize="@dimen/_9ssp"
-                                    android:text="@string/play"/>
+                                    android:text="@string/reset"/>
 
                                 <Button
-                                    android:id="@+id/play_8"
                                     style="@style/customButtonStyle"
-
+                                    android:id="@+id/reset_8"
                                     android:layout_height="wrap_content"
                                     android:layout_width="@dimen/_85sdp"
                                     android:layout_marginStart="@dimen/_16sdp"
                                     android:textSize="@dimen/_9ssp"
-                                    android:text="@string/play"
+                                    android:text="@string/reset"
                                     />
 
                                 <Button
-                                    android:id="@+id/play_9"
                                     style="@style/customButtonStyle"
-
+                                    android:id="@+id/reset_9"
                                     android:layout_height="wrap_content"
                                     android:layout_width="@dimen/_85sdp"
                                     android:layout_marginStart="@dimen/_16sdp"
                                     android:textSize="@dimen/_9ssp"
-                                    android:text="@string/play" />
+                                    android:text="@string/reset" />
 
                                 <Button
-                                    android:id="@+id/play_10"
                                     style="@style/customButtonStyle"
-
+                                    android:id="@+id/reset_10"
                                     android:layout_height="wrap_content"
                                     android:layout_width="@dimen/_85sdp"
                                     android:layout_marginStart="@dimen/_16sdp"
                                     android:textSize="@dimen/_9ssp"
-                                    android:text="@string/play" />
+                                    android:text="@string/reset" />
 
                             </LinearLayout>
                             <Button
-                                style="@style/customButtonStyle"
-
                                 android:id="@+id/select_again_2a"
                                 android:layout_width="@dimen/_85sdp"
                                 android:layout_height="wrap_content"
-                                android:text="@string/choose_again"/>
+                                style="@style/Widget.MaterialComponents.Button.TextButton"
+                                app:icon="@drawable/outline_arrow_back_24"
+                                app:iconSize="@dimen/_30sdp"/>
                         </LinearLayout>
                     </LinearLayout>
 
@@ -682,12 +678,12 @@
                                     android:inputType="none"
                                     android:focusableInTouchMode="false"/>
                                 <Button
-                                    style="@style/customButtonStyle"
-
                                     android:id="@+id/select_again_3b"
                                     android:layout_width="@dimen/_85sdp"
                                     android:layout_height="wrap_content"
-                                    android:text="@string/choose_again" />
+                                    style="@style/Widget.MaterialComponents.Button.TextButton"
+                                    app:icon="@drawable/outline_arrow_back_24"
+                                    app:iconSize="@dimen/_30sdp"/>
 
 
                             </com.google.android.material.textfield.TextInputLayout>
@@ -782,69 +778,64 @@
                             </LinearLayout>
 
                             <LinearLayout
-                                android:id="@+id/row_3_play"
+                                android:id="@+id/row_3_reset"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:orientation="horizontal">
 
                                 <Button
-                                    android:id="@+id/play_11"
                                     style="@style/customButtonStyle"
-
+                                    android:id="@+id/reset_11"
                                     android:layout_height="wrap_content"
                                     android:layout_width="@dimen/_85sdp"
                                     android:textSize="@dimen/_9ssp"
-                                    android:text="@string/play" />
+                                    android:text="@string/reset" />
 
                                 <Button
-                                    android:id="@+id/play_12"
                                     style="@style/customButtonStyle"
-
+                                    android:id="@+id/reset_12"
                                     android:layout_height="wrap_content"
                                     android:layout_width="@dimen/_85sdp"
                                     android:layout_marginStart="@dimen/_16sdp"
                                     android:textSize="@dimen/_9ssp"
-                                    android:text="@string/play"/>
+                                    android:text="@string/reset"/>
 
                                 <Button
-                                    android:id="@+id/play_13"
                                     style="@style/customButtonStyle"
-
+                                    android:id="@+id/reset_13"
                                     android:layout_height="wrap_content"
                                     android:layout_width="@dimen/_85sdp"
                                     android:layout_marginStart="@dimen/_16sdp"
                                     android:textSize="@dimen/_9ssp"
-                                    android:text="@string/play"
+                                    android:text="@string/reset"
                                     />
 
                                 <Button
-                                    android:id="@+id/play_14"
                                     style="@style/customButtonStyle"
-
+                                    android:id="@+id/reset_14"
                                     android:layout_height="wrap_content"
                                     android:layout_width="@dimen/_85sdp"
                                     android:layout_marginStart="@dimen/_16sdp"
                                     android:textSize="@dimen/_9ssp"
-                                    android:text="@string/play" />
+                                    android:text="@string/reset" />
 
                                 <Button
-                                    android:id="@+id/play_15"
                                     style="@style/customButtonStyle"
-
+                                    android:id="@+id/reset_15"
                                     android:layout_height="wrap_content"
                                     android:layout_width="@dimen/_85sdp"
                                     android:layout_marginStart="@dimen/_16sdp"
                                     android:textSize="@dimen/_9ssp"
-                                    android:text="@string/play" />
+                                    android:text="@string/reset" />
 
                             </LinearLayout>
                             <Button
-                                style="@style/customButtonStyle"
-
                                 android:id="@+id/select_again_3a"
                                 android:layout_width="@dimen/_85sdp"
                                 android:layout_height="wrap_content"
-                                android:text="@string/choose_again"/>
+                                style="@style/Widget.MaterialComponents.Button.TextButton"
+                                app:icon="@drawable/outline_arrow_back_24"
+                                app:iconSize="@dimen/_30sdp"/>
                         </LinearLayout>
                     </LinearLayout>
 
@@ -921,12 +912,12 @@
                                     android:inputType="none"
                                     android:focusableInTouchMode="false"/>
                                 <Button
-                                    style="@style/customButtonStyle"
-
                                     android:id="@+id/select_again_4b"
                                     android:layout_width="@dimen/_85sdp"
                                     android:layout_height="wrap_content"
-                                    android:text="@string/choose_again" />
+                                    style="@style/Widget.MaterialComponents.Button.TextButton"
+                                    app:icon="@drawable/outline_arrow_back_24"
+                                    app:iconSize="@dimen/_30sdp"/>
 
 
                             </com.google.android.material.textfield.TextInputLayout>
@@ -1021,69 +1012,64 @@
                             </LinearLayout>
 
                             <LinearLayout
-                                android:id="@+id/row_4_play"
+                                android:id="@+id/row_4_reset"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:orientation="horizontal">
 
                                 <Button
-                                    android:id="@+id/play_16"
                                     style="@style/customButtonStyle"
-
+                                    android:id="@+id/reset_16"
                                     android:layout_height="wrap_content"
                                     android:layout_width="@dimen/_85sdp"
                                     android:textSize="@dimen/_9ssp"
-                                    android:text="@string/play" />
+                                    android:text="@string/reset" />
 
                                 <Button
-                                    android:id="@+id/play_17"
                                     style="@style/customButtonStyle"
-
+                                    android:id="@+id/reset_17"
                                     android:layout_height="wrap_content"
                                     android:layout_width="@dimen/_85sdp"
                                     android:layout_marginStart="@dimen/_16sdp"
                                     android:textSize="@dimen/_9ssp"
-                                    android:text="@string/play"/>
+                                    android:text="@string/reset"/>
 
                                 <Button
-                                    android:id="@+id/play_18"
                                     style="@style/customButtonStyle"
-
+                                    android:id="@+id/reset_18"
                                     android:layout_height="wrap_content"
                                     android:layout_width="@dimen/_85sdp"
                                     android:layout_marginStart="@dimen/_16sdp"
                                     android:textSize="@dimen/_9ssp"
-                                    android:text="@string/play"
+                                    android:text="@string/reset"
                                     />
 
                                 <Button
-                                    android:id="@+id/play_19"
                                     style="@style/customButtonStyle"
-
+                                    android:id="@+id/reset_19"
                                     android:layout_height="wrap_content"
                                     android:layout_width="@dimen/_85sdp"
                                     android:layout_marginStart="@dimen/_16sdp"
                                     android:textSize="@dimen/_9ssp"
-                                    android:text="@string/play" />
+                                    android:text="@string/reset" />
 
                                 <Button
-                                    android:id="@+id/play_20"
                                     style="@style/customButtonStyle"
-
+                                    android:id="@+id/reset_20"
                                     android:layout_height="wrap_content"
                                     android:layout_width="@dimen/_85sdp"
                                     android:layout_marginStart="@dimen/_16sdp"
                                     android:textSize="@dimen/_9ssp"
-                                    android:text="@string/play" />
+                                    android:text="@string/reset" />
 
                             </LinearLayout>
                             <Button
-                                style="@style/customButtonStyle"
-
                                 android:id="@+id/select_again_4a"
                                 android:layout_width="@dimen/_85sdp"
                                 android:layout_height="wrap_content"
-                                android:text="@string/choose_again"/>
+                                style="@style/Widget.MaterialComponents.Button.TextButton"
+                                app:icon="@drawable/outline_arrow_back_24"
+                                app:iconSize="@dimen/_30sdp"/>
                         </LinearLayout>
                     </LinearLayout>
 
@@ -1160,12 +1146,12 @@
                                     android:inputType="none"
                                     android:focusableInTouchMode="false"/>
                                 <Button
-                                    style="@style/customButtonStyle"
-
                                     android:id="@+id/select_again_5b"
                                     android:layout_width="@dimen/_85sdp"
                                     android:layout_height="wrap_content"
-                                    android:text="@string/choose_again" />
+                                    style="@style/Widget.MaterialComponents.Button.TextButton"
+                                    app:icon="@drawable/outline_arrow_back_24"
+                                    app:iconSize="@dimen/_30sdp" />
 
 
                             </com.google.android.material.textfield.TextInputLayout>
@@ -1260,69 +1246,64 @@
                             </LinearLayout>
 
                             <LinearLayout
-                                android:id="@+id/row_5_play"
+                                android:id="@+id/row_5_reset"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:orientation="horizontal">
 
                                 <Button
-                                    android:id="@+id/play_21"
                                     style="@style/customButtonStyle"
-
+                                    android:id="@+id/reset_21"
                                     android:layout_height="wrap_content"
                                     android:layout_width="@dimen/_85sdp"
                                     android:textSize="@dimen/_9ssp"
-                                    android:text="@string/play" />
+                                    android:text="@string/reset" />
 
                                 <Button
-                                    android:id="@+id/play_22"
                                     style="@style/customButtonStyle"
-
+                                    android:id="@+id/reset_22"
                                     android:layout_height="wrap_content"
                                     android:layout_width="@dimen/_85sdp"
                                     android:layout_marginStart="@dimen/_16sdp"
                                     android:textSize="@dimen/_9ssp"
-                                    android:text="@string/play"/>
+                                    android:text="@string/reset"/>
 
                                 <Button
-                                    android:id="@+id/play_23"
                                     style="@style/customButtonStyle"
-
+                                    android:id="@+id/reset_23"
                                     android:layout_height="wrap_content"
                                     android:layout_width="@dimen/_85sdp"
                                     android:layout_marginStart="@dimen/_16sdp"
                                     android:textSize="@dimen/_9ssp"
-                                    android:text="@string/play"
+                                    android:text="@string/reset"
                                     />
 
                                 <Button
-                                    android:id="@+id/play_24"
                                     style="@style/customButtonStyle"
-
+                                    android:id="@+id/reset_24"
                                     android:layout_height="wrap_content"
                                     android:layout_width="@dimen/_85sdp"
                                     android:layout_marginStart="@dimen/_16sdp"
                                     android:textSize="@dimen/_9ssp"
-                                    android:text="@string/play" />
+                                    android:text="@string/reset" />
 
                                 <Button
-                                    android:id="@+id/play_25"
                                     style="@style/customButtonStyle"
-
+                                    android:id="@+id/reset_25"
                                     android:layout_height="wrap_content"
                                     android:layout_width="@dimen/_85sdp"
                                     android:layout_marginStart="@dimen/_16sdp"
                                     android:textSize="@dimen/_9ssp"
-                                    android:text="@string/play" />
+                                    android:text="@string/reset" />
 
                             </LinearLayout>
                             <Button
-                                style="@style/customButtonStyle"
-
                                 android:id="@+id/select_again_5a"
                                 android:layout_width="@dimen/_85sdp"
                                 android:layout_height="wrap_content"
-                                android:text="@string/choose_again"/>
+                                style="@style/Widget.MaterialComponents.Button.TextButton"
+                                app:icon="@drawable/outline_arrow_back_24"
+                                app:iconSize="@dimen/_30sdp"/>
                         </LinearLayout>
                     </LinearLayout>
 
@@ -1349,13 +1330,13 @@
                 android:text="@string/record" />
 
             <Button
-                android:id="@+id/play_bg"
+                android:id="@+id/reset_bg"
                 style="@style/customButtonStyle"
 
                 android:layout_width="@dimen/_98sdp"
                 android:layout_height="wrap_content"
                 android:textSize="@dimen/_11sdp"
-                android:text="@string/play" />
+                android:text="@string/reset" />
 
             <TextView
                 android:id="@+id/tutorial_4"
