@@ -21,9 +21,6 @@
 		android:screenOrientation="sensorPortrait"
 		android:usesCleartextTraffic="true"
 		android:name=".utils.ProtoApp">
-		<activity android:name=".ui.tutorial.Tutorial" />
-		<activity android:name=".ui.tutorial.About" />
-		<activity android:name=".ui.tutorial.Faq" />
 		<activity android:name=".EntranceActivity"
 			android:screenOrientation="portrait">
 			<intent-filter>
@@ -32,6 +29,10 @@
 				<category android:name="android.intent.category.LAUNCHER" />
 			</intent-filter>
 		</activity>
+		<activity android:name=".ui.tutorial.Tutorial" />
+		<activity android:name=".ui.tutorial.About" />
+		<activity android:name=".ui.tutorial.Faq" />
+
 		<activity
 			android:name=".MainActivity"
 			android:screenOrientation="portrait">

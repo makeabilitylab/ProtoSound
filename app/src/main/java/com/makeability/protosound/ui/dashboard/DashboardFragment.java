@@ -58,6 +58,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -71,6 +72,7 @@ public class DashboardFragment extends Fragment {
     private ProtoApp model;
     private Module module;
     public String location;
+    public String locationChoice = "none";
     public String submitAudioTime;
     private boolean trainingComplete = false;
     private int BACKGROUND_COLOR;
@@ -89,8 +91,14 @@ public class DashboardFragment extends Fragment {
     private String portNumber;
     private String testingLocation = "";
     private String[] labelList = {"", "", "", "", ""};
-    private int countUserClass = 0;
+    private final List<String> givenPredefinedLabels = new ArrayList<String>(Arrays.asList(
+            "Appliances", "Baby Cry", "Cat Meow", "Dog Bark", "Doorbell",
+            "Fire Alarm", "Knocking", "Siren", "Water Running"));
     SoundRecorder recorder;
+
+    private ArrayAdapter<CharSequence> locationAdapter;
+    private List<String> savedLocations;
+
     private ArrayAdapter<CharSequence> adapter;
     private List<CharSequence> availPredefinedSamples;
     private Map<Integer, CharSequence> spinnerSelection;
@@ -175,17 +183,15 @@ public class DashboardFragment extends Fragment {
 
 //        TextInputEditText portNumberEditText = (TextInputEditText) root.findViewById(R.id.port_number);
 //        Button confirmPort = (Button) root.findViewById(R.id.confirm_port);
-        TextInputEditText locationEditText = (TextInputEditText) root.findViewById(R.id.testing_location);
-//        sharedViewModel.getText().observe(requireActivity(), new Observer<String>() {
-//            @Override
-//            public void onChanged(@Nullable String s) {
-//                location = s;
-//                Log.d(TAG, "TEST LOCATION " + location);
-//                //locationEditText.setText(s);
-//            }
-//        });
+        TextInputEditText locationEditText = (TextInputEditText) root.findViewById(R.id.input_location);
+
         Button confirmLocation = root.findViewById(R.id.confirm_location);
         setLocation(locationEditText, confirmLocation);
+
+        // Set "Back" functionality for location selection
+        setOnClickAgainLocationNew(root.findViewById(R.id.select_again_location_1));
+        setOnClickAgainLocationExisting(root.findViewById(R.id.select_again_location_2));
+
 
         for (int i = 0; i < recordButtonList.length; i++) {
             Button record = root.findViewById(recordButtonList[i]);
@@ -200,13 +206,20 @@ public class DashboardFragment extends Fragment {
 
         for (int i = 0; i < selectAgainAButtonList.length; i++) {
             Button again = root.findViewById(selectAgainAButtonList[i]);
-            setOnClickAgainA(again, i);
+            setOnClickAgainSoundNew(again, i);
         }
 
         for (int i = 0; i < selectAgainBButtonList.length; i++) {
             Button again = root.findViewById(selectAgainBButtonList[i]);
-            setOnClickAgainB(again, i);
+            setOnClickAgainSoundExisting(again, i);
         }
+
+        savedLocations = model.getSavedLocations();
+        Log.d(TAG,"LOCATIONS: "  + Arrays.toString(savedLocations.toArray()));
+        locationAdapter = new ArrayAdapter(requireActivity(), android.R.layout.simple_spinner_dropdown_item,savedLocations);
+        AutoCompleteTextView userLocationSelection = root.findViewById(R.id.location_menu);
+        userLocationSelection.setAdapter(locationAdapter);
+        setOnClickUserLocationSelection(userLocationSelection);
 
 
         // Create a dummyAdapter to get use getAutofillOptions() to return array of labels
@@ -229,20 +242,29 @@ public class DashboardFragment extends Fragment {
         // Setup submit button
         Button submit = (Button) root.findViewById(R.id.submit);
         setOnClickSubmit(submit, R.id.record_1, root);
+        submit.setText(R.string.submit_to_server);
 
         // hide all selection UI until user choose an option
         hideUIOnCreate(root);
+
+        // set Listener for Location UI selection
+        Button locationNewBtn = root.findViewById(R.id.location_new_btn);
+        Button locationExistingBtn = root.findViewById(R.id.location_existing_btn);
+        setLocationUIVisibility(locationNewBtn, locationExistingBtn);
 
         // set Listener for all UI selection
         for (int i = 0; i < selectAButtonList.length; i++) {
             Button userChoice = root.findViewById(selectAButtonList[i]);
             Button preDefined = root.findViewById(selectBButtonList[i]);
-            setUIVisibility(userChoice, preDefined, i);
+            setSoundUIVisibility(userChoice, preDefined, i);
         }
 
-        submit.setText(R.string.submit_to_server);
+        Button resetAllBtn = (Button) root.findViewById(R.id.reset_all);
+        setOnClickResetAll(resetAllBtn);
+
         return root;
     }
+
 
     @Override public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -271,8 +293,27 @@ public class DashboardFragment extends Fragment {
             }
         });
 
+        // Restore saved locations
+        sharedViewModel.getMSavedLocations().observe(requireActivity(), new Observer<List<String>>() {
+            @Override
+            public void onChanged(@Nullable List<String> mSavedLocationsChoice) {
+                savedLocations = mSavedLocationsChoice;
+            }
+        });
+
+        // Restore location adapter
+        locationAdapter = new ArrayAdapter(requireActivity(),android.R.layout.simple_spinner_dropdown_item,  savedLocations);
+
+        // Restore location choice
+        sharedViewModel.getMLocationChoice().observe(requireActivity(), new Observer<String>() {
+            @Override
+            public void onChanged(@Nullable String mLocationChoice) {
+                locationChoice = mLocationChoice;
+            }
+        });
+
         // Restore location entered
-        TextInputEditText locationEditText = (TextInputEditText) view.findViewById(R.id.testing_location);
+        TextInputEditText locationEditText = (TextInputEditText) view.findViewById(R.id.input_location);
         sharedViewModel.getText().observe(requireActivity(), new Observer<String>() {
             @Override
             public void onChanged(@Nullable String mLocation) {
@@ -280,6 +321,7 @@ public class DashboardFragment extends Fragment {
             }
         });
         locationEditText.setText(location);
+
 
         // Restore location button
         sharedViewModel.getMLocationSubmitted().observe(requireActivity(), new Observer<Boolean>() {
@@ -289,12 +331,27 @@ public class DashboardFragment extends Fragment {
             }
         });
 
+        if (locationChoice.equals("new")) {
+            displayLocationNewUI();
+
+            if (locationSubmitted) {
+                Button confirmLocation = requireActivity().findViewById(R.id.confirm_location);
+                confirmLocation.setBackgroundColor(THEME_COLOR);
+                confirmLocation.setText(R.string.submitted);
+                confirmLocation.setTextColor(Color.BLACK);
+            }
+        } else if (locationChoice.equals("existing")) {
+            displayLocationExistingUI();
+            AutoCompleteTextView locationSpinner = view.findViewById(R.id.location_menu);
+            locationSpinner.setText(location);
+            locationSpinner.setAdapter(locationAdapter);
+        }
 
         if (locationSubmitted) {
-            Button confirmLocation = requireActivity().findViewById(R.id.confirm_location);
-            confirmLocation.setBackgroundColor(THEME_COLOR);
-            confirmLocation.setText(R.string.submitted);
-            confirmLocation.setTextColor(Color.BLACK);
+            HorizontalScrollView step2 = view.findViewById((R.id.horizontalScrollView));
+            step2.setVisibility(View.VISIBLE);
+            LinearLayout step3 = requireActivity().findViewById((R.id.step3));
+            step3.setVisibility(View.VISIBLE);
         }
 
         // Restore labelList of sound names
@@ -357,9 +414,10 @@ public class DashboardFragment extends Fragment {
                 rowSelectB.setVisibility(View.VISIBLE);
                 rowSelection.setVisibility(View.GONE);
                 selectAgainB.setVisibility(View.VISIBLE);
+                int predefinedType = givenPredefinedLabels.contains(labelList[id]) ? 1 : 2;
                 for (int i = id * 5; i < id * 5 + 5; i++) {
                     sampleRecorded[i] = true;
-                    predefinedSamples[i] = 1;
+                    predefinedSamples[i] = predefinedType;
                 }
 
                 AutoCompleteTextView spinner = (AutoCompleteTextView) requireActivity().findViewById(menuList[id]);
@@ -402,12 +460,25 @@ public class DashboardFragment extends Fragment {
                 setOnClickPlay(recordBtn, recordButtonList[i]);
                 recorder = new SoundRecorder(this.requireContext(), VOICE_FILE_NAME + i + ".pcm", mListener);
 
-//                Button playBtn = requireActivity().findViewById(resetButtonList[i]);
-//                playBtn.setEnabled(true);
-//                playBtn.setBackgroundColor(THEME_COLOR);
-//                playBtn.setTextColor(Color.BLACK);
             }
             checkUserChoiceComplete(i / 5);    // Check completion for "Sound i"
+        }
+
+
+        // Restore "TRAIN" button state
+        boolean trainingComplete = true;
+        for (int i = 0; i < labelList.length; i++) {
+            if (labelList[i].equals("") || !sampleRecorded[i * 5]) {
+                trainingComplete = false;
+                break;
+            }
+        }
+        trainingComplete &= sampleRecorded[25]; // background noise recorded?
+        if (trainingComplete) {
+            Button submit = requireActivity().findViewById(R.id.submit);
+            submit.setBackgroundColor(THEME_COLOR);
+            submit.setText(R.string.training_complete);
+            submit.setTextColor(Color.BLACK);
         }
     }
 
@@ -426,6 +497,19 @@ public class DashboardFragment extends Fragment {
     }
 
     private void hideUIOnCreate(View root) {
+        // Location
+        LinearLayout locationNewInput = root.findViewById(R.id.location_selection_new);
+        locationNewInput.setVisibility(View.GONE);
+        LinearLayout locationExistingInput = root.findViewById(R.id.location_selection_existing);
+        locationExistingInput.setVisibility(View.GONE);
+
+        HorizontalScrollView step2 = root.findViewById((R.id.horizontalScrollView));
+        step2.setVisibility(View.GONE);
+
+        LinearLayout step3 = root.findViewById((R.id.step3));
+        step3.setVisibility(View.GONE);
+
+        // Sound selection
         for (int rowID : rowSelectAList) {
             LinearLayout ll = root.findViewById(rowID);
             ll.setVisibility(View.GONE);
@@ -459,7 +543,39 @@ public class DashboardFragment extends Fragment {
         }
     }
 
-    private void setUIVisibility(Button userChoice, Button preDefined, int id) {
+    private void setLocationUIVisibility(Button locationNewBtn, Button locationExistingBtn) {
+        locationNewBtn.setOnClickListener(v->{
+            displayLocationNewUI();
+
+        });
+
+        locationExistingBtn.setOnClickListener(v-> {
+            displayLocationExistingUI();
+
+        });
+    }
+
+    private void displayLocationNewUI() {
+        LinearLayout locationSelection = requireActivity().findViewById(R.id.selection_location);
+        LinearLayout locationNewInput = requireActivity().findViewById(R.id.location_selection_new);
+        locationSelection.setVisibility(View.GONE);
+        locationNewInput.setVisibility(View.VISIBLE);
+
+        locationChoice = "new";
+        sharedViewModel.setMLocationChoice(locationChoice);
+    }
+
+    private void displayLocationExistingUI() {
+        LinearLayout locationSelection = requireActivity().findViewById(R.id.selection_location);
+        LinearLayout locationExistingInput = requireActivity().findViewById(R.id.location_selection_existing);
+        locationSelection.setVisibility(View.GONE);
+        locationExistingInput.setVisibility(View.VISIBLE);
+
+        locationChoice = "existing";
+        sharedViewModel.setMLocationChoice(locationChoice);
+    }
+
+    private void setSoundUIVisibility(Button userChoice, Button preDefined, int id) {
         userChoice.setOnClickListener(v -> {
             LinearLayout rowRecord = requireActivity().findViewById(rowRecordList[id]);
             LinearLayout rowPlay = requireActivity().findViewById(rowResetList[id]);
@@ -485,94 +601,222 @@ public class DashboardFragment extends Fragment {
             userChoiceMap.put(id, 1);
             sharedViewModel.setMUserChoiceMap(userChoiceMap);
             sharedViewModel.setMSampleRecorded(sampleRecorded);
+
+
         });
     }
 
-    // listener for "Choose again" for YOUR CHOICE
-    private void setOnClickAgainA(Button againA, int i) {
+    // listener for "Back" for NEW Location
+    private void setOnClickAgainLocationNew(Button btn) {
+        btn.setOnClickListener(v->{
+            hideLocationNewSelection();
+        });
+    }
+
+    // listener for "Back" for Existing Location
+    private void setOnClickAgainLocationExisting(Button btn) {
+        btn.setOnClickListener(v->{
+            hideLocationExistingSelection();
+
+
+        });
+    }
+
+    private void hideLocationNewSelection(){
+        resetTrainBtn();
+        resetSoundBackgroundUI();
+        LinearLayout locationSelection = requireActivity().findViewById(R.id.selection_location);
+        LinearLayout locationNewInput = requireActivity().findViewById(R.id.location_selection_new);
+        HorizontalScrollView step2 = requireActivity().findViewById((R.id.horizontalScrollView));
+        LinearLayout step3 = requireActivity().findViewById((R.id.step3));
+        locationSelection.setVisibility(View.VISIBLE);
+        locationNewInput.setVisibility(View.GONE);
+        step2.setVisibility(View.GONE);
+        step3.setVisibility(View.GONE);
+
+        locationSubmitted = false;
+        location = null;
+        TextInputEditText locationEditText = (TextInputEditText) requireActivity().findViewById(R.id.input_location);
+        locationEditText.setText(null);
+
+        // Save data
+        sharedViewModel.setMLocationSubmitted(false);
+        sharedViewModel.setText(location);
+        sharedViewModel.setMLocationChoice("none");
+
+        for (int i = 0; i < menuList.length; i++) {
+            Button againBtn = requireActivity().findViewById(selectAgainAButtonList[i]);
+            resetSoundNewUI(againBtn, i);
+        }
+
+        for (int i = 0; i < menuList.length; i++) {
+            Button againBtn = requireActivity().findViewById(selectAgainBButtonList[i]);
+            resetSoundExistingUI(againBtn, i);
+        }
+    }
+
+    private void hideLocationExistingSelection(){
+        resetTrainBtn();
+        resetSoundBackgroundUI();
+        LinearLayout locationSelection = requireActivity().findViewById(R.id.selection_location);
+        LinearLayout locationExisting = requireActivity().findViewById(R.id.location_selection_existing);
+        HorizontalScrollView step2 = requireActivity().findViewById((R.id.horizontalScrollView));
+        LinearLayout step3 = requireActivity().findViewById((R.id.step3));
+        locationSelection.setVisibility(View.VISIBLE);
+        locationExisting.setVisibility(View.GONE);
+        step2.setVisibility(View.GONE);
+        step3.setVisibility(View.GONE);
+
+        savedLocations.add(location);
+        AutoCompleteTextView locationSpinner = requireActivity().findViewById(R.id.location_menu);
+        locationSpinner.setText("");
+        locationSubmitted = false;
+        location = null;
+
+        // Save data
+        sharedViewModel.setMLocationSubmitted(false);
+        sharedViewModel.setText(location);
+        sharedViewModel.setMLocationChoice("none");
+        sharedViewModel.setMSavedLocations(savedLocations);
+
+        for (int i = 0; i < menuList.length; i++) {
+            Button againBtn = requireActivity().findViewById(selectAgainAButtonList[i]);
+            resetSoundNewUI(againBtn, i);
+        }
+
+        for (int i = 0; i < menuList.length; i++) {
+            Button againBtn = requireActivity().findViewById(selectAgainBButtonList[i]);
+            resetSoundExistingUI(againBtn, i);
+        }
+    }
+
+
+    // listener for "Back" for NEW Sound
+    private void setOnClickAgainSoundNew(Button againA, int i) {
         againA.setOnClickListener(v-> {
             resetTrainBtn();
-            // Reset state
-            userChoiceMap.put(i, 2);
-            labelList[i] = "";
-            // Clear sound name
-            TextInputEditText classTextField = (TextInputEditText) requireActivity().findViewById(classNameList[i]);
-            classTextField.setText("");
-            for (int j = i * 5; j < i * 5 + 5; j++) {
-                sampleRecorded[j] = false;
-                Button recordBtn = requireActivity().findViewById(recordButtonList[j]);
-                recordBtn.setBackgroundColor(Color.TRANSPARENT);
-                String record_id = "record_" + (j % 5 + 1);
-                recordBtn.setTextColor(THEME_COLOR);
-                recordBtn.setText(getResources().getIdentifier(record_id, "string", getContext().getPackageName()));
-
-            }
-            checkUserChoiceComplete(i);
-            sharedViewModel.setMLabelList(labelList);   // save labelList
-            sharedViewModel.setMSampleRecorded(sampleRecorded); // save sampleRecorded
-
-            LinearLayout rowSelectA = requireActivity().findViewById(rowSelectAList[i]);
-            LinearLayout rowSelection = requireActivity().findViewById(selection[i]);
-            LinearLayout rowReset = requireActivity().findViewById(rowResetList[i]);
-            LinearLayout rowRecord = requireActivity().findViewById(rowRecordList[i]);
-            rowSelectA.setVisibility(View.GONE);
-            rowSelection.setVisibility(View.VISIBLE);
-            rowReset.setVisibility(View.GONE);
-            rowRecord.setVisibility(View.GONE);
-            againA.setVisibility(View.GONE);
+            resetSoundNewUI(againA, i);
         });
     }
 
-    // listener for "Choose again" for PRE-DEFINED
-    private void setOnClickAgainB(Button againB, int i) {
+    // listener for "Back" for EXISTING Sound
+    private void setOnClickAgainSoundExisting(Button againB, int i) {
         againB.setOnClickListener(v-> {
             resetTrainBtn();
-            userChoiceMap.put(i, 2);
-            labelList[i] = "";
-            for (int j = i * 5; j < i * 5 + 5; j++) {
-                sampleRecorded[j] = false;
-                predefinedSamples[j] = 0;
-            }
-            checkUserChoiceComplete(i);
-
-            if (spinnerSelection.containsKey(i)) {
-                availPredefinedSamples.add(spinnerSelection.get(i));
-                spinnerSelection.remove(i);
-
-                // reset adapter to this new availPredefinedSamples
-                adapter = new ArrayAdapter(requireActivity(),android.R.layout.simple_spinner_dropdown_item,  availPredefinedSamples);
-                adapter.sort(new Comparator<CharSequence>() {
-                    @Override
-                    public int compare(CharSequence s1, CharSequence s2) {
-                        return s1.toString().compareTo(s2.toString());
-                    }
-                });
-                AutoCompleteTextView spinner = requireActivity().findViewById(menuList[i]);
-                spinner.setText("");
-
-                // need to reset spinner's listener
-                for (int j = 0; j < menuList.length; j++) {
-                    AutoCompleteTextView spinner2 = (AutoCompleteTextView) requireActivity().findViewById(menuList[j]);
-                    spinner2.setAdapter(adapter);
-                    setSelectItemList(spinner2, j);
-                }
-                sharedViewModel.setMAvailPredefinedSamples(availPredefinedSamples);
-                sharedViewModel.setMSpinnerSelection(spinnerSelection);
-            }
-
-            sharedViewModel.setMLabelList(labelList);   // save labelList
-            sharedViewModel.setMSampleRecorded(sampleRecorded); // save sampleRecorded
-
-            LinearLayout rowSelectB = requireActivity().findViewById(rowSelectBList[i]);
-            LinearLayout rowSelection = requireActivity().findViewById(selection[i]);
-            LinearLayout rowSelectA = requireActivity().findViewById(rowSelectAList[i]);
-            LinearLayout rowPlay = requireActivity().findViewById(rowResetList[i]);
-            rowSelectB.setVisibility(View.GONE);
-            rowSelectA.setVisibility(View.GONE);
-            rowPlay.setVisibility(View.GONE);
-            rowSelection.setVisibility(View.VISIBLE);
-            againB.setVisibility(View.GONE);
+            resetSoundExistingUI(againB, i);
         });
+    }
+    private void resetSoundBackgroundUI() {
+        Button recordBtn = requireActivity().findViewById(recordButtonList[25]);
+        recordBtn.setTextColor(THEME_COLOR);
+        recordBtn.setBackgroundColor(BACKGROUND_COLOR);
+        recordBtn.setText(R.string.record);
+        setOnClickRecord(recordBtn, recordButtonList[25], 25);
+
+        sampleRecorded[25] = false;
+        sharedViewModel.setMSampleRecorded(sampleRecorded);
+    }
+    private void resetSoundNewUI(Button againA, int i) {
+        // Reset state
+        userChoiceMap.put(i, 2);
+        labelList[i] = "";
+        // Clear sound name
+        TextInputEditText classTextField = (TextInputEditText) requireActivity().findViewById(classNameList[i]);
+        classTextField.setText("");
+        for (int j = i * 5; j < i * 5 + 5; j++) {
+            sampleRecorded[j] = false;
+            Button recordBtn = requireActivity().findViewById(recordButtonList[j]);
+            recordBtn.setBackgroundColor(Color.TRANSPARENT);
+            String record_id = "record_" + (j % 5 + 1);
+            recordBtn.setTextColor(THEME_COLOR);
+            recordBtn.setText(getResources().getIdentifier(record_id, "string", getContext().getPackageName()));
+            setOnClickRecord(recordBtn, recordButtonList[j], j);
+        }
+        checkUserChoiceComplete(i);
+        sharedViewModel.setMLabelList(labelList);   // save labelList
+        sharedViewModel.setMSampleRecorded(sampleRecorded); // save sampleRecorded
+
+        LinearLayout rowSelectA = requireActivity().findViewById(rowSelectAList[i]);
+        LinearLayout rowSelection = requireActivity().findViewById(selection[i]);
+        LinearLayout rowReset = requireActivity().findViewById(rowResetList[i]);
+        LinearLayout rowRecord = requireActivity().findViewById(rowRecordList[i]);
+        rowSelectA.setVisibility(View.GONE);
+        rowSelection.setVisibility(View.VISIBLE);
+        rowReset.setVisibility(View.GONE);
+        rowRecord.setVisibility(View.GONE);
+        againA.setVisibility(View.GONE);
+    }
+
+    private void resetSoundExistingUI(Button againB, int i) {
+        userChoiceMap.put(i, 2);
+        labelList[i] = "";
+        for (int j = i * 5; j < i * 5 + 5; j++) {
+            sampleRecorded[j] = false;
+            predefinedSamples[j] = 0;
+        }
+        checkUserChoiceComplete(i);
+
+        if (spinnerSelection.containsKey(i)) {
+            CharSequence item = spinnerSelection.get(i);
+
+                availPredefinedSamples.add(item);
+
+            spinnerSelection.remove(i);
+
+
+        }
+        // reset adapter to this new availPredefinedSamples
+        adapter = new ArrayAdapter<>(requireActivity(),android.R.layout.simple_spinner_dropdown_item,  availPredefinedSamples);
+        adapter.sort(new Comparator<CharSequence>() {
+            @Override
+            public int compare(CharSequence s1, CharSequence s2) {
+                if (Character.isLowerCase(s1.charAt(0)) &&
+                        (!Character.isLowerCase(s2.charAt(0)))) {
+                    return -1;
+                } else if (!Character.isLowerCase(s1.charAt(0)) &&
+                        (Character.isLowerCase(s2.charAt(0)))) {
+                    return 1;
+                } else {
+                    return s1.toString().compareTo(s2.toString());
+                }
+            }
+        });
+
+        AutoCompleteTextView spinner = requireActivity().findViewById(menuList[i]);
+        spinner.setText("");
+
+        // need to reset spinner's listener
+        for (int j = 0; j < menuList.length; j++) {
+            AutoCompleteTextView spinner2 = (AutoCompleteTextView) requireActivity().findViewById(menuList[j]);
+            spinner2.setAdapter(adapter);
+            setSelectItemList(spinner2, j);
+        }
+        sharedViewModel.setMAvailPredefinedSamples(availPredefinedSamples);
+        sharedViewModel.setMSpinnerSelection(spinnerSelection);
+
+        sharedViewModel.setMLabelList(labelList);   // save labelList
+        sharedViewModel.setMSampleRecorded(sampleRecorded); // save sampleRecorded
+
+        LinearLayout rowSelectB = requireActivity().findViewById(rowSelectBList[i]);
+        LinearLayout rowSelection = requireActivity().findViewById(selection[i]);
+        LinearLayout rowSelectA = requireActivity().findViewById(rowSelectAList[i]);
+        LinearLayout rowPlay = requireActivity().findViewById(rowResetList[i]);
+        rowSelectB.setVisibility(View.GONE);
+        rowSelectA.setVisibility(View.GONE);
+        rowPlay.setVisibility(View.GONE);
+        rowSelection.setVisibility(View.VISIBLE);
+        againB.setVisibility(View.GONE);
+    }
+
+    private void setOnClickResetAll(Button resetAllBtn) {
+        resetAllBtn.setOnClickListener(v->{
+            if (locationChoice.equals("new")) {
+                hideLocationNewSelection();
+            } else {
+                hideLocationExistingSelection();
+            }
+        });
+
     }
 
     private void setViewFocusable(View v) {
@@ -618,12 +862,36 @@ public class DashboardFragment extends Fragment {
             if (testingLocation.isEmpty()) {
                 locationEditText.setError("Please enter your testing location");
             } else {
-                model.submitLocation(testingLocation);
-                this.location = testingLocation;
-                sharedViewModel.setMLocationSubmitted(true);
-                confirmLocation.setBackgroundColor(getResources().getColor(R.color.purple_200));
-                confirmLocation.setTextColor(Color.BLACK);
-                confirmLocation.setText(R.string.submitted);
+                if (model.saveLocation(testingLocation)) {
+                    model.submitLocation(testingLocation);
+                    // Fetch new list of saved locations
+                    locationAdapter = new ArrayAdapter(requireActivity(), android.R.layout.simple_spinner_dropdown_item, savedLocations);
+                    AutoCompleteTextView userLocationSelection = requireActivity().findViewById(R.id.location_menu);
+                    userLocationSelection.setAdapter(locationAdapter);
+
+                    this.location = testingLocation;
+                    locationSubmitted = true;
+
+                    confirmLocation.setBackgroundColor(THEME_COLOR);
+                    confirmLocation.setTextColor(Color.BLACK);
+                    confirmLocation.setText(R.string.submitted);
+
+                    HorizontalScrollView step2 = requireActivity().findViewById((R.id.horizontalScrollView));
+                    step2.setVisibility(View.VISIBLE);
+
+                    LinearLayout step3 = requireActivity().findViewById((R.id.step3));
+                    step3.setVisibility(View.VISIBLE);
+
+                    for (int i = 0; i < menuList.length; i++) {
+                        AutoCompleteTextView spinner = requireActivity().findViewById(menuList[i]);
+                        spinner.setText(null);
+                    }
+
+                    // Save data
+                    sharedViewModel.setMLocationSubmitted(true);
+                }
+
+
             }
         });
     }
@@ -661,7 +929,7 @@ public class DashboardFragment extends Fragment {
                         break;
                 }
 
-                String labelName = s.toString();
+                String labelName = s.toString().trim();
                 if (labelName.isEmpty()) {
                     field.setError("Please enter a name for your " + errMsg + " class.");
                 }
@@ -671,6 +939,50 @@ public class DashboardFragment extends Fragment {
                 checkUserChoiceComplete(id);
                 resetTrainBtn();
             }
+        });
+    }
+
+    private void setOnClickUserLocationSelection(AutoCompleteTextView spinner) {
+        setViewFocusable(spinner);
+        spinner.setOnItemClickListener((parent, view, position, id) -> {
+            if (location != null && !location.equals("")) {
+                savedLocations.add(location);
+            }
+            location = (String)parent.getItemAtPosition(position);
+            Log.d(TAG,"LOCATION: " + location);
+            savedLocations.remove(location);
+            Collections.sort(savedLocations);
+            locationAdapter = new ArrayAdapter(requireActivity(),android.R.layout.simple_spinner_dropdown_item,  savedLocations);
+            spinner.setAdapter(locationAdapter);
+
+            locationSubmitted = true;
+            model.submitLocation(location);
+
+            adapter.clear();
+            adapter.addAll(model.getUserSoundsForLoc());
+            adapter.addAll(givenPredefinedLabels);
+
+            HorizontalScrollView step2 = requireActivity().findViewById((R.id.horizontalScrollView));
+            step2.setVisibility(View.VISIBLE);
+            LinearLayout step3 = requireActivity().findViewById((R.id.step3));
+            step3.setVisibility(View.VISIBLE);
+
+            for (int i = 0; i < menuList.length; i++) {
+                Button againBtn = requireActivity().findViewById(selectAgainAButtonList[i]);
+                resetSoundNewUI(againBtn, i);
+            }
+
+            for (int i = 0; i < menuList.length; i++) {
+                Button againBtn = requireActivity().findViewById(selectAgainBButtonList[i]);
+                spinnerSelection.remove(i, spinnerSelection.get(i)); // Remove selected sound from this location
+
+                resetSoundExistingUI(againBtn, i);
+            }
+
+            // Save data
+            sharedViewModel.setMLocationSubmitted(true);
+            sharedViewModel.setText(location);
+            sharedViewModel.setMSavedLocations(savedLocations);
         });
     }
 
@@ -712,14 +1024,23 @@ public class DashboardFragment extends Fragment {
             adapter.sort(new Comparator<CharSequence>() {
                 @Override
                 public int compare(CharSequence s1, CharSequence s2) {
-                    return s1.toString().compareTo(s2.toString());
+                    if (Character.isLowerCase(s1.charAt(0)) &&
+                            (!Character.isLowerCase(s2.charAt(0)))) {
+                        return -1;
+                    } else if (!Character.isLowerCase(s1.charAt(0)) &&
+                            (Character.isLowerCase(s2.charAt(0)))) {
+                        return 1;
+                    } else {
+                        return s1.toString().compareTo(s2.toString());
+                    }
                 }
             });
             spinner.setAdapter(adapter);
 
+            int predefinedType = givenPredefinedLabels.contains(selection) ? 1 : 2;
             for (int i = spinner_id * 5; i < spinner_id * 5 + 5; i++) {
                 sampleRecorded[i] = true;
-                predefinedSamples[i] = 1;
+                predefinedSamples[i] = predefinedType;
             }
         });
     }
@@ -801,6 +1122,7 @@ public class DashboardFragment extends Fragment {
     private void setOnClickResetRecording(final Button btn, final int id, final int order){
 
         btn.setOnClickListener(v -> {
+            resetTrainBtn();
             Button recordBtn = requireActivity().findViewById(id);
             String record_id = "record_" + (order % 5 + 1);
             recordBtn.setText(getResources().getIdentifier(record_id, "string", getContext().getPackageName()));
@@ -808,6 +1130,8 @@ public class DashboardFragment extends Fragment {
             recordBtn.setBackgroundColor(BACKGROUND_COLOR);
             setOnClickRecord(recordBtn, id, order);
             sampleRecorded[order] = false;
+            // Save data
+            sharedViewModel.setMSampleRecorded(sampleRecorded);
         });
     }
 
@@ -860,7 +1184,7 @@ public class DashboardFragment extends Fragment {
                 }
                 soundPackage.put("predefinedSamples", new JSONArray(predefinedSamples));
 
-                String submitAudioTime = model.submitData(soundPackage, map);
+                model.submitData(soundPackage, map);
 
                 this.submitAudioTime = submitAudioTime;
                 EventBus.getDefault().post(this);
@@ -878,14 +1202,6 @@ public class DashboardFragment extends Fragment {
         recorder.startRecording(id);
     }
 
-    private void stopRecording() {
-        // stops the recording activity
-        Log.d(TAG, "stopRecording: ");
-        if (null != recorder) {
-            recorder.stopRecording();
-        }
-    }
-
     private void startPlay(int id) {
         String audioFile = VOICE_FILE_NAME + id + ".pcm";
         if (null != recorder) {
@@ -896,33 +1212,31 @@ public class DashboardFragment extends Fragment {
     }
 
     private boolean checkAllFieldsExisted() {
-//        for (int rid : recordButtonList) {
-//            String filename = VOICE_FILE_NAME + rid + ".pcm";
-//            if (!new File(requireActivity().getFilesDir(), filename).exists()) {
-//                Log.d(TAG, "File not exist: " + filename);
-//                Toast.makeText(requireActivity(), "Missing one or more record samples", Toast.LENGTH_SHORT).show();
-//                return false;
-//            }
-//        }
-
         if (!locationSubmitted) {
             Toast.makeText(requireActivity(), "Missing location from Step 1.", Toast.LENGTH_SHORT).show();
             return false;
         }
-        for (boolean recordedSample : sampleRecorded) {
-            if (!recordedSample) {
-                Log.d(TAG, "record not exist");
-                Toast.makeText(requireActivity(), "Missing one or more user-defined recordings from Step 2.", Toast.LENGTH_SHORT).show();
-                return false;
-            }
-        }
+
         for (int i = 0; i < labelList.length; i++) {
             if (labelList[i].isEmpty()) {
                 Log.d(TAG, "Label not exist: " + i);
-                Toast.makeText(requireActivity(), "Missing one or more user-defined labels from Step 2.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireActivity(), "Missing sound label from Step 2 for sound " + (i + 1), Toast.LENGTH_SHORT).show();
                 return false;
             }
         }
+
+        for (int i = 0; i < sampleRecorded.length; i++) {
+            if (!sampleRecorded[i]) {
+                if (i != 25) {
+                    Toast.makeText(requireActivity(), "Missing recording from Step 2 for sound " + (i / 5 + 1), Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(requireActivity(), "Missing recording for Step 3.", Toast.LENGTH_SHORT).show();
+                }
+
+                return false;
+            }
+        }
+
         return true;
     }
 
@@ -938,7 +1252,6 @@ public class DashboardFragment extends Fragment {
         int size = 0;
         try {
             while ((size = bis.read(dataBuffer)) != -1) {
-//                Log.d(TAG, "getBytesFromWave: " + size +":"+ Arrays.toString(dataBuffer));
                 baos.write(dataBuffer, 0, size);
             }
             bytes = baos.toByteArray();
@@ -960,21 +1273,6 @@ public class DashboardFragment extends Fragment {
         return bytes;
     }
 
-//    private void sendRawAudioToServer(List<Short> soundBuffer, int id) {
-//        try {
-//            JSONObject jsonObject = new JSONObject();
-//
-//            jsonObject.put("data", new JSONArray(soundBuffer));
-//            jsonObject.put("time", "" + System.currentTimeMillis());
-//            Log.i(TAG, "Send raw audio to server:");
-//            Log.i(TAG, "Connected: " + MainActivity.mSocket.connected());
-////            emitter
-//            MainActivity.mSocket.emit("android_test");
-//            MainActivity.mSocket.emit("audio_data", jsonObject);
-//        } catch (JSONException e) {
-//            e.printStackTrace();
-//        }
-//    }
 
     private void checkRecordPermission() {
 
@@ -994,27 +1292,6 @@ public class DashboardFragment extends Fragment {
         return result;
     }
 
-    private int[] convertByteArrayToUnsignedByteArray(byte[] bytes) {
-        int[] unsigned = new int[bytes.length];
-        for (int i = 0; i < bytes.length; i++) {
-            unsigned[i] = bytes[i] & 0xFF;
-        }
-        return unsigned;
-    }
-
-
-    //Conversion of short to byte
-    private byte[] short2byte(short[] sData) {
-        int shortArrsize = sData.length;
-        byte[] bytes = new byte[shortArrsize * 2];
-
-        for (int i = 0; i < shortArrsize; i++) {
-            bytes[i * 2] = (byte) (sData[i] & 0x00FF);
-            bytes[(i * 2) + 1] = (byte) (sData[i] >> 8);
-            sData[i] = 0;
-        }
-        return bytes;
-    }
 
     @Override
     public void onRequestPermissionsResult(int requestCode,
@@ -1033,85 +1310,5 @@ public class DashboardFragment extends Fragment {
         }
     }
 
-
-    /**
-     * Write PCM data as WAV file
-     * @param os  Stream to save file to
-     * @param list List of byte array audio data
-     * @param srate  Sample rate - 8000, 16000, etc.
-     * @param channel Number of channels - Mono = 1, Stereo = 2, etc..
-     * @param format Number of bits per sample (16 here)
-     * @throws IOException
-     */
-    public void PCMtoFile(FileOutputStream os, List<byte[]> list, int srate, int channel, int format) throws IOException {
-
-        // create byte[] data from a list of data from watch
-        int len = 0;
-        for (int i = 0; i < list.size(); i++) {
-            len += list.get(i).length;
-        }
-        byte[] data = new byte[len];
-        int k = 0;
-        for (int i = 0; i < list.size();i++) {
-            for (int j = 0; j <list.get(i).length; j++) {
-                data[k] = list.get(i)[j];
-                k++;
-            }
-        }
-
-        byte[] header = new byte[44];
-
-        long totalDataLen = data.length + 36;
-        long bitrate = srate * channel * format;
-
-        header[0] = 'R';
-        header[1] = 'I';
-        header[2] = 'F';
-        header[3] = 'F';
-        header[4] = (byte) (totalDataLen & 0xff);
-        header[5] = (byte) ((totalDataLen >> 8) & 0xff);
-        header[6] = (byte) ((totalDataLen >> 16) & 0xff);
-        header[7] = (byte) ((totalDataLen >> 24) & 0xff);
-        header[8] = 'W';
-        header[9] = 'A';
-        header[10] = 'V';
-        header[11] = 'E';
-        header[12] = 'f';
-        header[13] = 'm';
-        header[14] = 't';
-        header[15] = ' ';
-        header[16] = (byte) format;
-        header[17] = 0;
-        header[18] = 0;
-        header[19] = 0;
-        header[20] = 1;
-        header[21] = 0;
-        header[22] = (byte) channel;
-        header[23] = 0;
-        header[24] = (byte) (srate & 0xff);
-        header[25] = (byte) ((srate >> 8) & 0xff);
-        header[26] = (byte) ((srate >> 16) & 0xff);
-        header[27] = (byte) ((srate >> 24) & 0xff);
-        header[28] = (byte) ((bitrate / 8) & 0xff);
-        header[29] = (byte) (((bitrate / 8) >> 8) & 0xff);
-        header[30] = (byte) (((bitrate / 8) >> 16) & 0xff);
-        header[31] = (byte) (((bitrate / 8) >> 24) & 0xff);
-        header[32] = (byte) ((channel * format) / 8);
-        header[33] = 0;
-        header[34] = 16;
-        header[35] = 0;
-        header[36] = 'd';
-        header[37] = 'a';
-        header[38] = 't';
-        header[39] = 'a';
-        header[40] = (byte) (data.length  & 0xff);
-        header[41] = (byte) ((data.length >> 8) & 0xff);
-        header[42] = (byte) ((data.length >> 16) & 0xff);
-        header[43] = (byte) ((data.length >> 24) & 0xff);
-
-        os.write(header, 0, 44);
-        os.write(data);
-        os.close();
-    }
 
 }

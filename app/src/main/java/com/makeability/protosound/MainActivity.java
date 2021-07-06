@@ -15,6 +15,7 @@ import android.net.Network;
 import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
@@ -65,6 +66,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.text.SimpleDateFormat;
@@ -287,16 +289,16 @@ public class MainActivity extends AppCompatActivity {
 		}
 		);
 
-		prefs = getSharedPreferences("com.makeability.protosound", MODE_PRIVATE);
+		prefs = getPreferences(MODE_PRIVATE);
 	}
-
 	@Override
 	protected void onResume() {
 		super.onResume();
 		if (prefs.getBoolean("firstrun", true)) {
 			startActivity(new Intent(this, Tutorial.class));
+			prefs.edit().putBoolean("firstrun", false).apply();
 		}
-		prefs.edit().putBoolean("firstrun", false).apply();
+
 	}
 
 	// https://stackoverflow.com/questions/4828636/edittext-clear-focus-on-touch-outside/8766475

@@ -4,11 +4,13 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 
 import com.makeability.protosound.ui.dashboard.DashboardFragment;
+import com.makeability.protosound.utils.ProtoApp;
 
 import static com.makeability.protosound.utils.Constants.TEST_NUMBER_EXTRA;
 

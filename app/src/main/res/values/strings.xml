@@ -1,8 +1,8 @@
 <resources>
     <string name="app_name">ProtoSound</string>
-    <string name="title_home">Predict</string>
+    <string name="title_home">Recognize</string>
     <string name="title_dashboard">Train Your Sounds</string>
-    <string name="evaluate">Predict Your Sounds</string>
+    <string name="evaluate">Recognize Your Sounds</string>
     <string name="title_help">Help</string>
     <string name="title_notifications">About</string>
     <string name="class_1">Sound 1</string>
@@ -10,22 +10,22 @@
     <string name="class_3">Sound 3</string>
     <string name="class_4">Sound 4</string>
     <string name="class_5">Sound 5</string>
-    <string name="class_1_predefined">Pre-defined sound 1</string>
-    <string name="class_2_predefined">Pre-defined sound 2</string>
-    <string name="class_3_predefined">Pre-defined sound 3</string>
-    <string name="class_4_predefined">Pre-defined sound 4</string>
-    <string name="class_5_predefined">Pre-defined sound 5</string>
+    <string name="class_1_predefined">Existing sound 1</string>
+    <string name="class_2_predefined">Existing sound 2</string>
+    <string name="class_3_predefined">Existing sound 3</string>
+    <string name="class_4_predefined">Existing sound 4</string>
+    <string name="class_5_predefined">Existing sound 5</string>
     <string name="protosound">ProtoSound</string>
     <string name="play">Play</string>
     <string name="reset">Reset</string>
     <string name="record_11">Record 11</string>
     <string name="record_12">Record 12</string>
-    <string name="tutorial_1"><b>1. Enter your current location</b></string>
+    <string name="tutorial_1"><b>1. Select the current location</b></string>
     <string name="tutorial_2a"><b>2. Select the sounds to recognize</b></string>
 <!--    <string name="tutorial_2b"><b>YOUR CHOICE:</b> Record 5 samples and provide a name. Each sample is 1 second long. (Scroll right to see all 5 "Record" boxes) \n\n<b>PRE-DEFINED:</b> Choose a sound from a list of 9 provided sounds.</string>-->
-    <string name="tutorial_3"><b>3. Record background noises</b></string>
+    <string name="tutorial_3"><b>3. Record background noise</b></string>
     <string name="tutorial_4">Complete the steps above before training the model</string>
-    <string name="tutorial_5">Select the \"Predict\" tab to predict your sounds</string>
+    <string name="tutorial_5">Select the \"Recognize\" tab to recognize your sounds</string>
     <string name="record_1">Record 1</string>
     <string name="record_2">Record 2</string>
     <string name="record_3">Record 3</string>
@@ -63,13 +63,13 @@
     <string name="port_connected">Port connected!</string>
     <string name="mic">mic</string>
     <string name="tap_blue">Start Recording</string>
-    <string name="training_complete">Training Completed</string>
+    <string name="training_complete">Complete</string>
     <string name="recording">Recording</string>
     <string name="done">Recorded</string>
-    <string name="training_data">Training data</string>
-    <string name="submit_to_server">TRAIN MODEL</string>
-    <string name="user_choice">Your choice</string>
-    <string name="pre_defined">Pre-defined</string>
+    <string name="training_data">Training</string>
+    <string name="submit_to_server">TRAIN</string>
+    <string name="user_choice">NEW</string>
+    <string name="pre_defined">EXISTING</string>
     <string name="greeting"><b>Welcome to ProtoSound</b></string>
     <string name="submitLocation">Submit</string>
     <string name="submitted">Submitted</string>
@@ -129,5 +129,7 @@
     <string name="qa5"><b>After training 5 sounds, can I train different sounds?</b>
         \n\nYes. After training 5 sounds, you can make necessary changes then tap on "TRAIN MODEL" to train the sounds again.
     </string>
+    <string name="user_location_hint">Saved locations</string>
+    <string name="reset_all">Clear all</string>
 
 </resources>

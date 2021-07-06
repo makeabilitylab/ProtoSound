@@ -15,6 +15,8 @@ import java.util.Map;
 public class SharedViewModel extends ViewModel {
 
     private static final String TAG = "DashboardViewModel";
+    private MutableLiveData<String> mLocationChoice = new MutableLiveData<>();    // location choice (new or existing)
+    private MutableLiveData<List<String>> mSavedLocations = new MutableLiveData<>();
     private MutableLiveData<String> mText = new MutableLiveData<>();    // location
     private MutableLiveData<Boolean> mLocationSubmitted = new MutableLiveData<>();
     private MutableLiveData<MainActivity.TimelineAdapter> mAdapter = new MutableLiveData<>();   // predictions timeline
@@ -110,5 +112,21 @@ public class SharedViewModel extends ViewModel {
         this.mAvailPredefinedSamples.setValue(mAvailPredefinedSamples);
     }
 
+
+    public LiveData<String> getMLocationChoice() {
+        return mLocationChoice;
+    }
+
+    public void setMLocationChoice(String locationChoice) {
+        this.mLocationChoice.setValue(locationChoice);
+    }
+
+    public LiveData<List<String>> getMSavedLocations() {
+        return mSavedLocations;
+    }
+
+    public void setMSavedLocations(List<String> mSavedLocations) {
+        this.mSavedLocations.setValue(mSavedLocations);
+    }
 
 }

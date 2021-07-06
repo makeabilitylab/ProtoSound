@@ -21,6 +21,7 @@ import org.pytorch.IValue;
 import org.pytorch.Module;
 import org.pytorch.Tensor;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -29,23 +30,29 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.Writer;
 import java.lang.reflect.Array;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 
 public class ProtoApp extends Application {
     private static final String TAG = "ProtoApp";
+    private boolean appRunFirstTime = false;
     private Module mModuleEncoder;
 
     private final int RATE = 44100;
@@ -53,35 +60,28 @@ public class ProtoApp extends Application {
     private final int SHOTS = 5;
     private final int BUFFER_SIZE = 3;          // originally 4
     private final float THRESHOLD = 0.75f;      // originally 0.6
-    private final boolean SHOULD_RECORD_TRAINING_TIME = true;
-    private final boolean SHOULD_RECORD_PREDICTION_TIME = true;
     private String INTERNAL_STORAGE;
     private String LIBRARY_DATA_PATH;
-    private String DATA_PATH;
+    private String USER_LIBRARY_PATH;
     private String DATA_CSV_PATH;
-    private String QUERY_PATH;
-    private String USER_FEEDBACK_FILE;
-    private String TRAINING_TIME_FILE;
-    private String PREDICTION_TIME_FILE;
+
+    private String USER_LOCATION_FILE;
 
     private Map<String, Integer> c2i;
-    private  Map<Integer, String> i2c;
+    private Map<Integer, String> i2c;
     private float[][] meanSupportEmbeddings;
     private String location;
     private int bufferCounter = 0;
     private float[] bufferArray = new float[WAYS];
 
 
-    private void generateCSV(String dataPathDir, Map<String, Integer> labelsDict, String outputPathDir) throws IOException{
+    private void generateCSV(Map<String, Integer> labelsDict, int[] predefinedSamples) throws IOException {
         List<String> categories = new ArrayList<>(labelsDict.keySet());
         c2i = new HashMap<>();
         i2c = new HashMap<>();
-        Log.d(TAG, "DATAPATHDIR " + dataPathDir);
-        Log.d(TAG, "OUTPUTPATHDIR " + outputPathDir);
-        Log.d(TAG, "CATEGORIES " + categories);
 
         int i = 0;
-        for (String category: categories) {
+        for (String category : categories) {
             c2i.put(category, i);
             i2c.put(i, category);
             i++;
@@ -92,10 +92,15 @@ public class ProtoApp extends Application {
         List<String> category = new ArrayList<>();
 
         boolean useUserData = false;
-
-        for (String eaDir: categories) {
-            if (labelsDict.get(eaDir) != 1) {
+        String dataPathDir;
+        for (String eaDir : categories) {
+            if (labelsDict.get(eaDir) == 0) {
                 useUserData = true;
+                dataPathDir = USER_LIBRARY_PATH + "/" + location;
+            } else if (labelsDict.get(eaDir) == 1) {
+                dataPathDir = LIBRARY_DATA_PATH;
+            } else {
+                dataPathDir = USER_LIBRARY_PATH + "/" + location;
             }
             int csvIndex = 1;
             String path = dataPathDir + "/" + eaDir;
@@ -109,16 +114,16 @@ public class ProtoApp extends Application {
                         Log.d(TAG, "skip " + useUserData + " location " + fileName);
                         continue;
                     }
+//
+//                    if (useUserData && !fileName.contains(location.toLowerCase())) {
+//                        Log.d(TAG, "skip " + useUserData + " location " + fileName);
+//                        continue;
+//                    }
 
-                    if (useUserData && !fileName.contains(location.toLowerCase())) {
-                        Log.d(TAG, "skip " + useUserData + " location " + fileName);
-                        continue;
-                    }
-
-                    if (!useUserData && !fileName.contains("lib")) {
-                        Log.d(TAG, "skip " + useUserData + " location " + fileName);
-                        continue;
-                    }
+//                    if (!useUserData && !fileName.contains("lib")) {
+//                        Log.d(TAG, "skip " + useUserData + " location " + fileName);
+//                        continue;
+//                    }
                     //Log.d(TAG, "USE_USER_DATA, " + useUserData + " location " + fileName);
                     String filePath = path + "/" + fileName;
                     // CODE FOR NOT EXIST OUTPUT_PATH_DIR
@@ -130,31 +135,30 @@ public class ProtoApp extends Application {
                     }
                     fold.add(csvIndex);
                     csvIndex++;
-                    // COPY from library to meta-test-data
-                    File src = new File(filePath);
-                    File dst = new File(DATA_PATH);
-                    FileUtils.copyToDirectory(src, dst);
+//                    // COPY from library to meta-test-data
+//                    File src = new File(filePath);
+//                    File dst = new File(DATA_PATH);
+//                    FileUtils.copyToDirectory(src, dst);
                 }
             }
             useUserData = false;
         }
         // DICT
         // DATAFRAME
-        String[] headers = new String[] {"filename", "fold", "category"};
-        try(Writer writer = new FileWriter(DATA_CSV_PATH);
-            CSVPrinter csvPrinter = new CSVPrinter(writer, CSVFormat.DEFAULT.withHeader(headers))
+        String[] headers = new String[]{"filename", "predefinedType", "category"};
+        try (Writer writer = new FileWriter(DATA_CSV_PATH);
+             CSVPrinter csvPrinter = new CSVPrinter(writer, CSVFormat.DEFAULT.withHeader(headers))
         ) {
             for (int j = 0; j < 25; j++) {
-                csvPrinter.printRecord(name.get(j), fold.get(j), category.get(j));
+                csvPrinter.printRecord(name.get(j), labelsDict.get(category.get(j)), category.get(j));
             }
         }
         Log.d(TAG, "GENERATE CSV COMPLETE");
 
     }
 
-    public String submitData(JSONObject jsonData, Map<Integer, List<Short>> map) {
+    public void submitData(JSONObject jsonData, Map<Integer, List<Short>> map) {
         try {
-            double startTime = System.currentTimeMillis();
             // Labels
             JSONArray labelsJSON = jsonData.getJSONArray("label");
             String[] labels = new String[labelsJSON.length()];
@@ -185,20 +189,30 @@ public class ProtoApp extends Application {
                 labelsDict.put(labels[i], predefinedSamples[i * 5]);
             }
 
+            String userLocationDir = USER_LIBRARY_PATH + "/" + location;
+            // IF CURRENTDIR NOT EXIST MAKE IT
+            File dir = new File(userLocationDir);
+            if (!dir.exists()) {
+                dir.mkdir();
+            }
+
             for (int i = 0; i < 25; i++) {
-                if (predefinedSamples[i] == 1) {
+                if (predefinedSamples[i] == 1 || predefinedSamples[i] == 2) {
                     continue;
                 }
                 String label = labels[Math.floorDiv(i, 5)];
-                String currentDir =  LIBRARY_DATA_PATH + "/" + label;
+
+                String userSoundDir = userLocationDir +  "/" + label;
                 // IF CURRENTDIR NOT EXIST MAKE IT
-                File dir = new File(currentDir);
-                if (!dir.exists()) {
-                    dir.mkdir();
+                File dir2 = new File(userSoundDir);
+                if (!dir2.exists()) {
+                    dir2.mkdir();
                 }
+
+
                 // Data_i
-                Log.d(TAG, "CURRENT DIR " + currentDir);
-                Log.d(TAG, "CURRENT DATA_: " + i);
+//                Log.d(TAG, "CURRENT DIR " + currentDir);
+//                Log.d(TAG, "CURRENT DATA_: " + i);
                 double[] data = new double[map.get(i).size()];
                 List<Short> dataList = map.get(i);
 
@@ -210,10 +224,10 @@ public class ProtoApp extends Application {
                 data = Arrays.copyOfRange(data, 700, data.length);
                 double[] output = addBackgroundNoise(data, backgroundNoise);
 
-                String filename = currentDir + "/" + location + "_" + label + "_user_" + i % 5 + ".wav";
+                String filename = userSoundDir + "/" + label + "_user_" + i % 5 + ".wav";
 
                 // Write to WAV file
-                try{
+                try {
                     int numFrames = data.length;
                     WavFile wavFile = WavFile.newWavFile(new File(filename), 1, numFrames, 16, RATE);
                     int framesWritten;
@@ -230,7 +244,7 @@ public class ProtoApp extends Application {
             // GENERATE CSV
             Log.d(TAG, "Generate CSV file and put 25 samples into one single folder");
             try {
-                generateCSV(LIBRARY_DATA_PATH, labelsDict, DATA_PATH);
+                generateCSV(labelsDict, predefinedSamples);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -239,13 +253,17 @@ public class ProtoApp extends Application {
             Set<String> labels2 = new LinkedHashSet<>();    // LinkedHashSet preserves order
             float[][][][] data = new float[25][1][128][87];
             int i = 0;
-            try(Reader reader = new FileReader(DATA_CSV_PATH);
-                CSVParser csvParser = new CSVParser(reader, CSVFormat.DEFAULT.withFirstRecordAsHeader().withIgnoreHeaderCase().withTrim())) {
-                for(CSVRecord record : csvParser) {
-
-                    String filePath = DATA_PATH +"/"+ record.get("filename");
-                    //Log.d(TAG, "FILEPATH " +  filePath);
-                    // SPEC_TO_IMAGE
+            try (Reader reader = new FileReader(DATA_CSV_PATH);
+                 CSVParser csvParser = new CSVParser(reader, CSVFormat.DEFAULT.withFirstRecordAsHeader().withIgnoreHeaderCase().withTrim())) {
+                String dataPathDir;
+                for (CSVRecord record : csvParser) {
+                    if (record.get("predefinedType").equals("1")) {
+                        dataPathDir = LIBRARY_DATA_PATH;
+                    } else {
+                        dataPathDir = USER_LIBRARY_PATH + "/" + location;
+                    }
+                    //String filePath = DATA_PATH + "/" + record.get("filename");
+                    String filePath = dataPathDir + "/" + record.get("category") + "/" + record.get("filename");
 
                     float[][] specScaled = ML.specToImage(ML.getMelSspectrogramDb(filePath));
                     float[][][] arr = new float[1][128][87];
@@ -266,17 +284,17 @@ public class ProtoApp extends Application {
                 Log.d(TAG, "LABEL " + label);
             }
 
-            Log.d(TAG, "SHAPE IS " + data.length + " " + data[0].length + " " + data[0][0].length + " " + data[0][0][0].length);
+            //Log.d(TAG, "SHAPE IS " + data.length + " " + data[0].length + " " + data[0][0].length + " " + data[0][0][0].length);
 
-            Tensor inputTensor = Tensor.fromBlob(flatten(data), new long[]{ data.length,data[0].length,data[0][0].length,data[0][0][0].length});
+            Tensor inputTensor = Tensor.fromBlob(flatten(data), new long[]{data.length, data[0].length, data[0][0].length, data[0][0][0].length});
             Tensor outputTensor = mModuleEncoder.forward(IValue.from(inputTensor)).toTensor();
             long[] outputShape = outputTensor.shape();
-            Log.d(TAG, "OUTPUT IS " + outputTensor);
+            //Log.d(TAG, "OUTPUT IS " + outputTensor);
 
             float[] outputArr = outputTensor.getDataAsFloatArray();
 
             int arrDim = outputShape.length;
-            float[][] supportEmbeddings = new float[(int) outputShape[0]][(int)outputShape[1]];
+            float[][] supportEmbeddings = new float[(int) outputShape[0]][(int) outputShape[1]];
             for (int j = 0; j < supportEmbeddings.length; j++) {
                 for (int k = 0; k < supportEmbeddings[0].length; k++) {
                     supportEmbeddings[j][k] = outputArr[(j * supportEmbeddings[0].length) + k];
@@ -288,25 +306,15 @@ public class ProtoApp extends Application {
                 for (int k = 0; k < meanSupportEmbeddings[0].length; k++) {
                     float sum = 0;
                     for (int l = 0; l < meanSupportEmbeddings.length; l++) {
-                        sum += supportEmbeddings[5*j+l][k];
+                        sum += supportEmbeddings[5 * j + l][k];
                     }
                     float mean = sum / meanSupportEmbeddings.length;
                     meanSupportEmbeddings[j][k] = mean;
                 }
             }
-            double elapsedTime;
-            if (SHOULD_RECORD_TRAINING_TIME) {
-                double endTime = System.currentTimeMillis();
-                elapsedTime = (endTime - startTime) / 1000.0;
-                FileUtils.writeStringToFile(new File(TRAINING_TIME_FILE), elapsedTime+"\n", StandardCharsets.UTF_8, true);
-                Log.d(TAG, "TRAINING TIME " + elapsedTime);
-            }
-
-            return Double.toString(elapsedTime);
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return null;
     }
 
     public List<String> handleSource(List<Short> queryData, double db) {
@@ -330,15 +338,13 @@ public class ProtoApp extends Application {
                 data[i] = queryData.get(i) / 32768.0;
             }
             data = Arrays.copyOfRange(data, 0, RATE);
-            Log.d(TAG, "QUERY LENGTH " + data.length);
-            String queryFile = QUERY_PATH + "/query.wav";
+            String queryFile = INTERNAL_STORAGE + "/query.wav";
             //String queryFile = INTERNAL_STORAGE + "/example/meta-test-query/living_dog-bark_5ft_sample5_195_chunk0_011.wav";
 
             int numFrames = data.length;
             WavFile wavFile = WavFile.newWavFile(new File(queryFile), 1, numFrames, 16, RATE);
             int framesWritten;
-            do
-            {
+            do {
                 framesWritten = wavFile.writeFrames(data, numFrames);
 
             }
@@ -351,13 +357,12 @@ public class ProtoApp extends Application {
                 bufferCounter = 0;
                 bufferArray = new float[5];
             }
-            double startTime = System.currentTimeMillis();
             float[][] specScaled = ML.specToImage(ML.getMelSspectrogramDb(queryFile));
 
             float[][][][] arr = new float[1][1][128][87];
             arr[0][0] = specScaled;
 
-            Tensor inputTensor = Tensor.fromBlob(flatten(arr), new long[]{ arr.length,arr[0].length,arr[0][0].length,arr[0][0][0].length});
+            Tensor inputTensor = Tensor.fromBlob(flatten(arr), new long[]{arr.length, arr[0].length, arr[0][0].length, arr[0][0][0].length});
             Tensor outputTensor = mModuleEncoder.forward(IValue.from(inputTensor)).toTensor();
 
 
@@ -365,13 +370,8 @@ public class ProtoApp extends Application {
             float[][] queryEmbedding = new float[1][outputArr.length];
             queryEmbedding[0] = outputArr;
             float[] confidences = pairwiseDistanceLogits(queryEmbedding, meanSupportEmbeddings);
-            if (SHOULD_RECORD_PREDICTION_TIME) {
-                double endTime = System.currentTimeMillis();
-                double elapsedTime = (endTime - startTime) / 1000.0;
-                FileUtils.writeStringToFile(new File(PREDICTION_TIME_FILE), elapsedTime+"\n", StandardCharsets.UTF_8,true);
-            }
 
-            for (int i = 0 ; i < bufferArray.length; i++) {
+            for (int i = 0; i < bufferArray.length; i++) {
                 bufferArray[i] += confidences[i];
             }
             bufferCounter++;
@@ -382,7 +382,7 @@ public class ProtoApp extends Application {
             if (bufferCounter >= BUFFER_SIZE) {
                 int bestIndex = 0;
                 float bestConfidence = -Float.MAX_VALUE;
-                float secondBestConfidence  = bestConfidence;
+                float secondBestConfidence = bestConfidence;
                 for (int i = 0; i < bufferArray.length; i++) {
                     if (Float.compare(bufferArray[i], bestConfidence) > 0) {
                         secondBestConfidence = bestConfidence;
@@ -394,7 +394,7 @@ public class ProtoApp extends Application {
                     ) {
                         secondBestConfidence = bufferArray[i];
                     }
-                    Log.d(TAG, "BUFFER ARRAY ELEMENTS at "+ i +": " + bufferArray[i]);
+                    Log.d(TAG, "BUFFER ARRAY ELEMENTS at " + i + ": " + bufferArray[i]);
                 }
 
                 // Actually no need to divide by BUFFER_SIZE
@@ -409,7 +409,7 @@ public class ProtoApp extends Application {
                     new Handler(Looper.getMainLooper()).post(new Runnable() {
                         @Override
                         public void run() {
-                            Toast.makeText(getApplicationContext(),"No match for query. Try again.", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getApplicationContext(), "No match for query. Try again.", Toast.LENGTH_SHORT).show();
                         }
                     });
                     Log.d(TAG, "Exit due to R= " + ratio + " which is > threshold of " + THRESHOLD);
@@ -427,13 +427,13 @@ public class ProtoApp extends Application {
             return null;
 
 
-
         } catch (Exception e) {
             e.printStackTrace();
         }
 
         return null;
     }
+
     // queryEmbedding shape: [1, 1280]
     // meanSupportEmbedding shape: [5, 1280]
     private float[] pairwiseDistanceLogits(float[][] queryEmbedding, float[][] meanSupportEmbeddings) {
@@ -459,7 +459,7 @@ public class ProtoApp extends Application {
             for (int i = 0; i < Array.getLength(object); ++i)
                 flatten(Array.get(object, i), list);
         else
-            list.add((float)object);
+            list.add((float) object);
     }
 
     static float[] flatten(Object object) {
@@ -473,7 +473,7 @@ public class ProtoApp extends Application {
     }
 
 
-    private  double[] addBackgroundNoise(double[] inputData, double[] noiseData) {
+    private double[] addBackgroundNoise(double[] inputData, double[] noiseData) {
         double noiseRatio = 0.25;
         double[] output = new double[inputData.length];
         for (int i = 0; i < output.length; i++) {
@@ -484,30 +484,79 @@ public class ProtoApp extends Application {
 
     public void submitLocation(String loc) {
         this.location = loc;
-        Log.d(TAG, "Received location "+ location);
+        Log.d(TAG, "Received location " + location);
     }
+
+    public List<String> getUserSoundsForLoc() {
+        List<String> sounds = new ArrayList<>();
+        String path = USER_LIBRARY_PATH + "/" + location;
+        File dir = new File(path);
+        if (!dir.exists()) return sounds;
+        String[] userSoundLabels = dir.list();
+        assert userSoundLabels != null;
+        sounds.addAll(Arrays.asList(userSoundLabels));
+        Collections.sort(sounds);
+        return sounds;
+    }
+
+    public boolean saveLocation(String loc) {
+        List<String> savedLocations = getSavedLocations();
+        for (int i = 0; i < savedLocations.size(); i++) {
+            if (savedLocations.get(i).toString().toLowerCase().equals(loc)) {
+                Toast.makeText(this, "Location already exists.", Toast.LENGTH_SHORT).show();
+                return false;
+            }
+        }
+        try {
+            BufferedWriter writer = new BufferedWriter(new FileWriter(USER_LOCATION_FILE, true));
+            writer.append(loc + "\n");
+            writer.close();
+            return true;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public List<String> getSavedLocations() {
+        List<String> locations = new ArrayList<>();
+        try {
+            BufferedReader reader = new BufferedReader(new FileReader(USER_LOCATION_FILE));
+
+            String line = reader.readLine();
+            while (line != null) {
+                locations.add(line);
+                line = reader.readLine();
+            }
+            reader.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return locations;
+    }
+
 
     @Override
     public void onCreate() {
         super.onCreate();
         Log.d(TAG, "ProtoApp initialized.");
         INTERNAL_STORAGE = getApplicationContext().getFilesDir().getAbsolutePath();
+
         LIBRARY_DATA_PATH = makeDir(INTERNAL_STORAGE + "/library");
         moveAssetToStorage(this, "library");
 
-        //DATA_PATH = INTERNAL_STORAGE + "/example/meta-test-data";
-        //DATA_CSV_PATH = INTERNAL_STORAGE + "/example/meta-test-data/dj_test_data_2.csv";
-        DATA_PATH = makeDir(INTERNAL_STORAGE + "/meta-test-data");
-        QUERY_PATH = makeDir(INTERNAL_STORAGE + "/meta-test-query");
+        USER_LIBRARY_PATH = makeDir(INTERNAL_STORAGE + "/user_library");
 
         DATA_CSV_PATH = INTERNAL_STORAGE + "/user_data.csv";
-        moveAssetToStorage(this, "user_data.csv");
-        USER_FEEDBACK_FILE = INTERNAL_STORAGE + "/user_feedback.csv";
-        moveAssetToStorage(this, "user_feedback.csv");
-        TRAINING_TIME_FILE = INTERNAL_STORAGE + "/training_time.csv";
-        moveAssetToStorage(this, "training_time.csv");
-        PREDICTION_TIME_FILE = INTERNAL_STORAGE + "/model_prediction_time.csv";
-        moveAssetToStorage(this, "model_prediction_time.csv");
+        File user_data_csv = new File(DATA_CSV_PATH);
+        USER_LOCATION_FILE = INTERNAL_STORAGE + "/user_location.txt";
+        File user_location_file = new File(USER_LOCATION_FILE);
+        try {
+            user_data_csv.createNewFile();
+            user_location_file.createNewFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         String moduleFileAbsoluteFilePath = "";
         if (mModuleEncoder == null) {
@@ -515,12 +564,14 @@ public class ProtoApp extends Application {
             moveAssetToStorage(this, "protosound_10_classes_scripted.pt");
             mModuleEncoder = Module.load(moduleFileAbsoluteFilePath);	// Have a ScriptModule now
         }
+        appRunFirstTime = false;
     }
 
     private String makeDir(String dirName) {
         File dir = new File(dirName);
         if (!dir.exists()) {
             dir.mkdir();
+            appRunFirstTime = true;
         }
         return dirName;
     }
@@ -531,7 +582,11 @@ public class ProtoApp extends Application {
     // If assetName is a folder, this method only accommodates the structure
     // of folder "library" (can use recursion to support other folder structures)
     // Otherwise, it supports files normally
-    private void moveAssetToStorage(Context context, String assetName) {
+    public void moveAssetToStorage(Context context, String assetName) {
+        if (!appRunFirstTime) {
+            Log.d(TAG, "ALREADY CREATED");
+            return;
+        }
         try {
             String[] numFiles = context.getAssets().list(assetName);   // list out library
             if (numFiles.length > 0) {  // A folder. Only library folder in assets
@@ -543,16 +598,17 @@ public class ProtoApp extends Application {
                     for (String wavFile : wavFiles) {
                         String inFile = assetName + "/" + file + "/" + wavFile;
                         String outFile = path + "/" + wavFile;
-                        writeAssetFileToStorage(context, inFile , outFile);
+                        writeAssetFileToStorage(context, inFile, outFile);
                     }
                 }
             } else {    // Otherwise, other csv files and protosound.pt
-                writeAssetFileToStorage(context, assetName, INTERNAL_STORAGE + "/" + assetName );
+                writeAssetFileToStorage(context, assetName, INTERNAL_STORAGE + "/" + assetName);
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
+
 
     private void writeAssetFileToStorage(Context context, String inFile, String outFile){
         File file = new File(outFile);
