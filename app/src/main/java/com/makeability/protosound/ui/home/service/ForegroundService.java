@@ -11,16 +11,14 @@ import android.os.CountDownTimer;
 import android.os.IBinder;
 import android.util.Log;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
-
 import androidx.core.app.NotificationCompat;
 
 import com.makeability.protosound.MainActivity;
 import com.makeability.protosound.R;
-import com.makeability.protosound.utils.SoundRecorder;
 import com.makeability.protosound.utils.StreamingSoundRecorder;
+
+import java.util.HashSet;
+import java.util.Set;
 
 import static com.makeability.protosound.utils.Constants.CHANNEL_ID;
 import static com.makeability.protosound.utils.Constants.VOICE_FILE_NAME;

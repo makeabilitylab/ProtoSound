@@ -2,9 +2,6 @@ package com.makeability.protosound.ui.tutorial;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.transition.Explode;
-import android.transition.Slide;
-import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;

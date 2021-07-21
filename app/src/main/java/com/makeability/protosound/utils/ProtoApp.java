@@ -58,7 +58,7 @@ public class ProtoApp extends Application {
     private final int RATE = 44100;
     private final int WAYS = 5;
     private final int SHOTS = 5;
-    private final int BUFFER_SIZE = 3;          // originally 4
+    private final int BUFFER_SIZE = 4;          // originally 4
     private final float THRESHOLD = 0.75f;      // originally 0.6
     private String INTERNAL_STORAGE;
     private String LIBRARY_DATA_PATH;
@@ -339,7 +339,6 @@ public class ProtoApp extends Application {
             }
             data = Arrays.copyOfRange(data, 0, RATE);
             String queryFile = INTERNAL_STORAGE + "/query.wav";
-            //String queryFile = INTERNAL_STORAGE + "/example/meta-test-query/living_dog-bark_5ft_sample5_195_chunk0_011.wav";
 
             int numFrames = data.length;
             WavFile wavFile = WavFile.newWavFile(new File(queryFile), 1, numFrames, 16, RATE);
@@ -443,11 +442,6 @@ public class ProtoApp extends Application {
             float sum = 0;
             for (int j = 0; j < cols; j++) {
                 sum += Math.pow((queryEmbedding[0][j] - meanSupportEmbeddings[i][j]), 2);
-                if (j < 25 && i == 0) {
-//                    Log.d(TAG, "LOGITS CHECKING");
-//                    Log.d(TAG, "queryEmbedding " + queryEmbedding[0][j] + " meanSupportEmbeddings " + meanSupportEmbeddings[i][j]);
-
-                }
             }
             logits[i] = -sum;
         }
@@ -491,7 +485,10 @@ public class ProtoApp extends Application {
         List<String> sounds = new ArrayList<>();
         String path = USER_LIBRARY_PATH + "/" + location;
         File dir = new File(path);
-        if (!dir.exists()) return sounds;
+        if (!dir.exists()) {
+            dir.mkdir();
+            return sounds;
+        }
         String[] userSoundLabels = dir.list();
         assert userSoundLabels != null;
         sounds.addAll(Arrays.asList(userSoundLabels));
@@ -532,6 +529,7 @@ public class ProtoApp extends Application {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        Collections.sort(locations);
         return locations;
     }
 

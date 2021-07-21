@@ -20,30 +20,17 @@ import android.content.Context;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.AsyncTask;
-import android.os.Handler;
-import android.os.Looper;
 import android.util.Log;
-import android.widget.Toast;
-
-import com.makeability.protosound.MainActivity;
 
 import org.greenrobot.eventbus.EventBus;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
-import static com.makeability.protosound.MainActivity.TEST_END_TO_END_PREDICTION_LATENCY_MODE;
 import static com.makeability.protosound.utils.HelperUtils.convertByteArrayToShortArray;
 import static com.makeability.protosound.utils.HelperUtils.db;
 
@@ -63,16 +50,10 @@ public class StreamingSoundRecorder {
 	private final String mOutputFileName;
 	private List<String> labels = new ArrayList<String>();
 
-	private static final int RECORDER_SAMPLERATE = 16000;
-	private static final float PREDICTION_THRES = 0.5F;
-	private static final String CHANNEL_ID = "SOUNDWATCH";
 	private final Context mContext;
 	private State mState = State.IDLE;
 
 	private AsyncTask<Void, Void, Void> mRecordingAsyncTask;
-
-	private Set<String> connectedHostIds;
-	private int ONE_SECOND_SOUND_COUNTER = 0;
 	private ProtoApp model;
 
 	enum State {
@@ -192,40 +173,13 @@ public class StreamingSoundRecorder {
 		 * @param recordTime
 		 */
 		private void sendRawAudioToServer(List<Short> soundBuffer, long recordTime, double db) {
-			try {
-				final StreamingSoundRecorder soundRecorder = mSoundRecorderWeakReference.get();
-				ConnectivityManager cm =
-						(ConnectivityManager)soundRecorder.mContext.getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+			List<String> result = model.handleSource(soundBuffer, db);
 
-				NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
-				boolean isConnected = activeNetwork != null &&
-						activeNetwork.isConnectedOrConnecting();
-				if (!isConnected) {
-					new Handler(Looper.getMainLooper()).post(() -> {
-						Toast.makeText(soundRecorder.mContext.getApplicationContext(), "Please check your internet connection and try again", Toast.LENGTH_LONG).show();
-
-					});
-					return;
-				}
-				JSONObject jsonObject = new JSONObject();
-				jsonObject.put("data", new JSONArray(soundBuffer));
-				if (MainActivity.currentMode == TEST_END_TO_END_PREDICTION_LATENCY_MODE) {
-					jsonObject.put("recordTime", "" + System.currentTimeMillis());
-				}
-				jsonObject.put("db", db);
-				Log.i(TAG, "Sending audio data: " + soundBuffer.size());
-
-
-				List<String> result = model.handleSource(soundBuffer, db);
-
-				if (result != null) {
-					this.label = result.get(0);
-					this.confidence = result.get(1);
-					this.db = result.get(2);
-					EventBus.getDefault().post(this);
-				}
-			} catch (JSONException e) {
-				e.printStackTrace();
+			if (result != null) {
+				this.label = result.get(0);
+				this.confidence = result.get(1);
+				this.db = result.get(2);
+				EventBus.getDefault().post(this);
 			}
 		}
 

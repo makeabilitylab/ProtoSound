@@ -20,7 +20,7 @@
     <string name="reset">Reset</string>
     <string name="record_11">Record 11</string>
     <string name="record_12">Record 12</string>
-    <string name="tutorial_1"><b>1. Select the current location</b></string>
+    <string name="tutorial_1"><b>1. Choose a location</b></string>
     <string name="tutorial_2a"><b>2. Select the sounds to recognize</b></string>
 <!--    <string name="tutorial_2b"><b>YOUR CHOICE:</b> Record 5 samples and provide a name. Each sample is 1 second long. (Scroll right to see all 5 "Record" boxes) \n\n<b>PRE-DEFINED:</b> Choose a sound from a list of 9 provided sounds.</string>-->
     <string name="tutorial_3"><b>3. Record background noise</b></string>
@@ -98,25 +98,26 @@
     <string name="faq">FAQ</string>
     <string name="about">About</string>
     <string name="train">Train</string>
-    <string name="about_1">"SoundWatch is an Android-based app designed for commercially available smartwatches to provide glanceable, always-available, and private sound feedback in multiple contexts.
-        \nIt began on ..., and is led by a hard of hearing University of Washington doctoral student who wanted to build for his community. Thus, SoundWatch has involved the DHH communities at many stages of its development, along with faculty advisors, student developers, programmers, and UI/UX designers.
-        \nSoundWatch informs users about three key sound properties: sound identity, loudness, and time of occurrence through customizable sound alerts using visual and vibrational feedback. We use a deep learning-based sound classification engine (running on either the watch or on the paired phone or cloud) to continually sense and process sound events in real-time. SoundWatch supports four different architectural configurations: watch-only, watch+phone, watch+phone+cloud, and watch+cloud.
-        \n\nThank you for using SoundWatch!
-        \nThis is a beta release, so always feel free to connect with us to provide feedback so we can improve or to just say Hi!
+    <string name="about_1">"ProtoSound is an Android-based application for commercial smartphones that allows users to customize their sound recognition models and receive private sound feedback in a different contexts.
+\nProtoSound makes two technical innovations: first, we adapt prototypical networks, a commonly used algorithm for few-shot image classification, to the domain of sound classification. Second, we extend the traditional training pipeline to incorporate several features for end-user deployment—such as accommodating contextual soundscape variations (e.g., homes vs. outdoors) and supporting training for difficult-to-produce sounds (e.g., fire alarms, sirens).
+\nThe project is inspired by previous sound awareness work with DHH users, our DHH lead author's experiences, and a survey of 472 DHH participants. According to field evaluations with a real-life dataset and an interactive mobile application, ProtoSound can be used to build sound recognition systems that support highly personalized and fine-grained sound categories, can train on-device in real-time, and can handle contextual variations in a variety of real-world contexts using few custom recordings.
 
+\nThank you for using ProtoSound!
     </string>
     <string name="email">protosound@cs.uw.edu</string>
     <string name="website">protosound.cs.uw.edu</string>
     <string name="finish">Finish</string>
 
 
-    <string name="qa1"><b>How does the option "Your Choice" work?</b>
+    <string name="qa1"><b>How does the option "New" in step 2 work?</b>
         \n\nYou are prompted to enter a name for your sound and record the sound 5 times. Each recording is 1-second long, which means there are 5 1-second samples. You can play the recording back to see if it is the sound that you want. You can also record again for the same slot when you tap on the "Recorded" button.
     </string>
 
-    <string name="qa2"><b>If I already submitted my location, can I resubmit it?</b>
-        \n\nYou can re-enter the location as many times as you would like. Once you press the "Train Model" button, the final location is saved.
+    <string name="qa2"><b>Will my submitted locations and self-recorded sounds be saved?</b>
+        \n\nYes. Once you submit a location in step 1, the location is saved and you can access it again when you choose <b>Existing</b> for step 1. As for your recorded sounds, once you train the model, the sounds will be saved with the associated location for later access.
+        \nFor example, if you save "talking" with your location "bedroom". If you select "bedroom" from step 1, "talking" will be in the list of sounds when you choose EXISTING in step 2.
     </string>
+
 
     <string name="qa3"><b>Why does Predict not return any result for my sound?</b>
         \n\nThere are a couple of reasons. You might not have trained the sounds yet or the app simply does not recognize your untrained sound.
@@ -127,7 +128,7 @@
     </string>
 
     <string name="qa5"><b>After training 5 sounds, can I train different sounds?</b>
-        \n\nYes. After training 5 sounds, you can make necessary changes then tap on "TRAIN MODEL" to train the sounds again.
+        \n\nYes. After training 5 sounds, you can make necessary changes on the <b>Train</b>then tap on "TRAIN" to train the sounds again.
     </string>
     <string name="user_location_hint">Saved locations</string>
     <string name="reset_all">Clear all</string>

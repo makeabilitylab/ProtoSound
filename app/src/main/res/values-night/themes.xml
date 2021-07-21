@@ -17,7 +17,6 @@
 <!--        <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>-->
         <!-- Customize your theme here. -->
         <item name="android:textColor">#DADADA</item>
-<!--        <item name="android:background">@color/black</item>-->
     </style>
 
 </resources>

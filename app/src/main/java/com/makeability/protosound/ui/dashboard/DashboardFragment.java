@@ -4,8 +4,6 @@ import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
-import android.graphics.drawable.GradientDrawable;
-import android.media.AudioFormat;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -35,7 +33,6 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.google.android.material.textfield.TextInputEditText;
-import com.makeability.protosound.MainActivity;
 import com.makeability.protosound.R;
 import com.makeability.protosound.ui.SharedViewModel;
 import com.makeability.protosound.utils.ProtoApp;
@@ -52,7 +49,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -65,7 +61,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import static com.makeability.protosound.MainActivity.TEST_END_TO_END_TRAINING_LATENCY_MODE;
 
 public class DashboardFragment extends Fragment {
     private String TAG = "Dashboard";
@@ -78,17 +73,10 @@ public class DashboardFragment extends Fragment {
     private int BACKGROUND_COLOR;
     private int THEME_COLOR;
 
-    private static final boolean TEST = true;
     private SharedViewModel sharedViewModel;
-    private static final int RECORDER_SAMPLE_RATE = 44100;
-    private static final int RECORDER_CHANNELS = AudioFormat.CHANNEL_IN_MONO;
-    private static final int RECORDER_AUDIO_ENCODING = AudioFormat.ENCODING_PCM_16BIT;
     private static final int PERMISSIONS_REQUEST_CODE = 100;
     public static final String VOICE_FILE_NAME = "audiorecord_";
     SoundRecorder.OnVoicePlaybackStateChangedListener mListener;
-    private Thread recordingThread = null;
-    private boolean isRecording = false;
-    private String portNumber;
     private String testingLocation = "";
     private String[] labelList = {"", "", "", "", ""};
     private final List<String> givenPredefinedLabels = new ArrayList<String>(Arrays.asList(
@@ -551,7 +539,13 @@ public class DashboardFragment extends Fragment {
 
         locationExistingBtn.setOnClickListener(v-> {
             displayLocationExistingUI();
-
+            savedLocations = model.getSavedLocations();
+            locationAdapter = new ArrayAdapter(requireActivity(), android.R.layout.simple_spinner_dropdown_item, savedLocations);
+            for (int i = 0; i < 5; i++) {
+                AutoCompleteTextView locSpinner = requireActivity().findViewById(R.id.location_menu);
+                locSpinner.setAdapter(locationAdapter);
+                setOnClickUserLocationSelection(locSpinner);
+            }
         });
     }
 
@@ -667,7 +661,11 @@ public class DashboardFragment extends Fragment {
         step2.setVisibility(View.GONE);
         step3.setVisibility(View.GONE);
 
-        savedLocations.add(location);
+        if (location != null) {
+            savedLocations.add(location);
+            Collections.sort(savedLocations);
+        }
+
         AutoCompleteTextView locationSpinner = requireActivity().findViewById(R.id.location_menu);
         locationSpinner.setText("");
         locationSubmitted = false;
@@ -882,10 +880,14 @@ public class DashboardFragment extends Fragment {
                     LinearLayout step3 = requireActivity().findViewById((R.id.step3));
                     step3.setVisibility(View.VISIBLE);
 
-                    for (int i = 0; i < menuList.length; i++) {
-                        AutoCompleteTextView spinner = requireActivity().findViewById(menuList[i]);
-                        spinner.setText(null);
-                    }
+                    adapter.clear();
+                    adapter.addAll(givenPredefinedLabels);
+//                    for (int i = 0; i < menuList.length; i++) {
+//                        AutoCompleteTextView spinner = requireActivity().findViewById(menuList[i]);
+//                        spinner.setText(null);
+//                        setSelectItemList(spinner, i);
+//                    }
+
 
                     // Save data
                     sharedViewModel.setMLocationSubmitted(true);
@@ -1132,6 +1134,7 @@ public class DashboardFragment extends Fragment {
             sampleRecorded[order] = false;
             // Save data
             sharedViewModel.setMSampleRecorded(sampleRecorded);
+            checkUserChoiceComplete(order / 5);
         });
     }
 
@@ -1149,7 +1152,7 @@ public class DashboardFragment extends Fragment {
                 return;
             }
             trainingComplete = true;
-            Log.d(TAG, "Submit to Server");
+            Log.d(TAG, "Training model...");
 
             btn.setBackgroundColor(Color.GRAY);
             btn.setText(R.string.training_data);
@@ -1176,12 +1179,7 @@ public class DashboardFragment extends Fragment {
                 soundPackage.put("label", new JSONArray(labels));
                 //Log.d(TAG, "Socket connect:" + MainActivity.mSocket.connected());
 
-                if (MainActivity.currentMode == TEST_END_TO_END_TRAINING_LATENCY_MODE) {
-                    // If test end to end training time, need to start recording the time when the submit audio starts
-                    soundPackage.put("submitAudioTime", "" + System.currentTimeMillis());
-                } else {
-                    soundPackage.put("submitAudioTime", 0);
-                }
+
                 soundPackage.put("predefinedSamples", new JSONArray(predefinedSamples));
 
                 model.submitData(soundPackage, map);
@@ -1217,13 +1215,6 @@ public class DashboardFragment extends Fragment {
             return false;
         }
 
-        for (int i = 0; i < labelList.length; i++) {
-            if (labelList[i].isEmpty()) {
-                Log.d(TAG, "Label not exist: " + i);
-                Toast.makeText(requireActivity(), "Missing sound label from Step 2 for sound " + (i + 1), Toast.LENGTH_SHORT).show();
-                return false;
-            }
-        }
 
         for (int i = 0; i < sampleRecorded.length; i++) {
             if (!sampleRecorded[i]) {
@@ -1233,6 +1224,13 @@ public class DashboardFragment extends Fragment {
                     Toast.makeText(requireActivity(), "Missing recording for Step 3.", Toast.LENGTH_SHORT).show();
                 }
 
+                return false;
+            }
+        }
+        for (int i = 0; i < labelList.length; i++) {
+            if (labelList[i].isEmpty()) {
+                Log.d(TAG, "Label not exist: " + i);
+                Toast.makeText(requireActivity(), "Missing sound label from Step 2 for sound " + (i + 1), Toast.LENGTH_SHORT).show();
                 return false;
             }
         }

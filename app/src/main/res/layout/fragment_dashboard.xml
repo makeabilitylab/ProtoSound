@@ -24,6 +24,7 @@
         android:layout_height="wrap_content"
         android:paddingStart="@dimen/_5sdp"
         android:paddingEnd="@dimen/_5sdp"
+
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
@@ -38,28 +39,6 @@
             android:paddingStart="@dimen/_5sdp"
             android:paddingEnd="@dimen/_5sdp"
             tools:ignore="RtlSymmetry">
-
-            <!--            <LinearLayout-->
-            <!--                android:layout_width="wrap_content"-->
-            <!--                android:layout_height="wrap_content"-->
-            <!--                android:orientation="horizontal">-->
-            <!--                <Button-->
-            <!--                    android:id="@+id/confirm_port"-->
-            <!--                    android:layout_width="wrap_content"-->
-            <!--                    android:layout_height="wrap_content"-->
-            <!--                    android:text="@string/confirm"/>-->
-
-            <!--                <TextView-->
-            <!--                    android:id="@+id/tick"-->
-            <!--                    android:layout_width="@dimen/_200sdp"-->
-            <!--                    android:layout_height="@dimen/_25sdp"-->
-            <!--                    android:gravity="center_vertical"-->
-            <!--                    android:paddingStart="@dimen/_5sdp"-->
-            <!--                    android:scaleType="fitXY"-->
-            <!--                    android:text=""-->
-            <!--                    android:textSize="@dimen/_12ssp"/>-->
-
-            <!--            </LinearLayout>-->
 
             <TextView
                 android:id="@+id/title_dashboard"
@@ -142,8 +121,8 @@
                 android:layout_width="@dimen/_85sdp"
                 android:layout_height="wrap_content"
                 style="@style/Widget.MaterialComponents.Button.TextButton"
-                app:icon="@drawable/outline_arrow_back_24"
-                app:iconSize="@dimen/_30sdp"/>
+                app:icon="@drawable/outline_arrow_back_ios_new_24"
+                app:iconSize="@dimen/_24sdp"/>
             </LinearLayout>
 
             <LinearLayout
@@ -171,8 +150,8 @@
                         android:layout_width="@dimen/_85sdp"
                         android:layout_height="wrap_content"
                         style="@style/Widget.MaterialComponents.Button.TextButton"
-                        app:icon="@drawable/outline_arrow_back_24"
-                        app:iconSize="@dimen/_30sdp"/>
+                        app:icon="@drawable/outline_arrow_back_ios_new_24"
+                        app:iconSize="@dimen/_24sdp"/>
 
 
                 </com.google.android.material.textfield.TextInputLayout>
@@ -287,8 +266,8 @@
                                     android:layout_width="@dimen/_85sdp"
                                     android:layout_height="wrap_content"
                                     style="@style/Widget.MaterialComponents.Button.TextButton"
-                                    app:icon="@drawable/outline_arrow_back_24"
-                                    app:iconSize="@dimen/_30sdp"/>
+                                    app:icon="@drawable/outline_arrow_back_ios_new_24"
+                                    app:iconSize="@dimen/_24sdp"/>
 
 
                             </com.google.android.material.textfield.TextInputLayout>
@@ -438,8 +417,8 @@
                                 android:layout_width="@dimen/_85sdp"
                                 android:layout_height="wrap_content"
                                 style="@style/Widget.MaterialComponents.Button.TextButton"
-                                app:icon="@drawable/outline_arrow_back_24"
-                                app:iconSize="@dimen/_30sdp"/>
+                                app:icon="@drawable/outline_arrow_back_ios_new_24"
+                                app:iconSize="@dimen/_24sdp"/>
                         </LinearLayout>
                     </LinearLayout>
 
@@ -520,8 +499,8 @@
                                     android:layout_width="@dimen/_85sdp"
                                     android:layout_height="wrap_content"
                                     style="@style/Widget.MaterialComponents.Button.TextButton"
-                                    app:icon="@drawable/outline_arrow_back_24"
-                                    app:iconSize="@dimen/_30sdp"/>
+                                    app:icon="@drawable/outline_arrow_back_ios_new_24"
+                                    app:iconSize="@dimen/_24sdp"/>
 
 
                             </com.google.android.material.textfield.TextInputLayout>
@@ -672,8 +651,8 @@
                                 android:layout_width="@dimen/_85sdp"
                                 android:layout_height="wrap_content"
                                 style="@style/Widget.MaterialComponents.Button.TextButton"
-                                app:icon="@drawable/outline_arrow_back_24"
-                                app:iconSize="@dimen/_30sdp"/>
+                                app:icon="@drawable/outline_arrow_back_ios_new_24"
+                                app:iconSize="@dimen/_24sdp"/>
                         </LinearLayout>
                     </LinearLayout>
 
@@ -755,8 +734,8 @@
                                     android:layout_width="@dimen/_85sdp"
                                     android:layout_height="wrap_content"
                                     style="@style/Widget.MaterialComponents.Button.TextButton"
-                                    app:icon="@drawable/outline_arrow_back_24"
-                                    app:iconSize="@dimen/_30sdp"/>
+                                    app:icon="@drawable/outline_arrow_back_ios_new_24"
+                                    app:iconSize="@dimen/_24sdp"/>
 
 
                             </com.google.android.material.textfield.TextInputLayout>
@@ -907,8 +886,8 @@
                                 android:layout_width="@dimen/_85sdp"
                                 android:layout_height="wrap_content"
                                 style="@style/Widget.MaterialComponents.Button.TextButton"
-                                app:icon="@drawable/outline_arrow_back_24"
-                                app:iconSize="@dimen/_30sdp"/>
+                                app:icon="@drawable/outline_arrow_back_ios_new_24"
+                                app:iconSize="@dimen/_24sdp"/>
                         </LinearLayout>
                     </LinearLayout>
 
@@ -989,8 +968,8 @@
                                     android:layout_width="@dimen/_85sdp"
                                     android:layout_height="wrap_content"
                                     style="@style/Widget.MaterialComponents.Button.TextButton"
-                                    app:icon="@drawable/outline_arrow_back_24"
-                                    app:iconSize="@dimen/_30sdp"/>
+                                    app:icon="@drawable/outline_arrow_back_ios_new_24"
+                                    app:iconSize="@dimen/_24sdp"/>
 
 
                             </com.google.android.material.textfield.TextInputLayout>
@@ -1141,8 +1120,8 @@
                                 android:layout_width="@dimen/_85sdp"
                                 android:layout_height="wrap_content"
                                 style="@style/Widget.MaterialComponents.Button.TextButton"
-                                app:icon="@drawable/outline_arrow_back_24"
-                                app:iconSize="@dimen/_30sdp"/>
+                                app:icon="@drawable/outline_arrow_back_ios_new_24"
+                                app:iconSize="@dimen/_24sdp"/>
                         </LinearLayout>
                     </LinearLayout>
 
@@ -1223,8 +1202,8 @@
                                     android:layout_width="@dimen/_85sdp"
                                     android:layout_height="wrap_content"
                                     style="@style/Widget.MaterialComponents.Button.TextButton"
-                                    app:icon="@drawable/outline_arrow_back_24"
-                                    app:iconSize="@dimen/_30sdp" />
+                                    app:icon="@drawable/outline_arrow_back_ios_new_24"
+                                    app:iconSize="@dimen/_24sdp"/>
 
 
                             </com.google.android.material.textfield.TextInputLayout>
@@ -1375,8 +1354,8 @@
                                 android:layout_width="@dimen/_85sdp"
                                 android:layout_height="wrap_content"
                                 style="@style/Widget.MaterialComponents.Button.TextButton"
-                                app:icon="@drawable/outline_arrow_back_24"
-                                app:iconSize="@dimen/_30sdp"/>
+                                app:icon="@drawable/outline_arrow_back_ios_new_24"
+                                app:iconSize="@dimen/_24sdp"/>
                         </LinearLayout>
                     </LinearLayout>
 
