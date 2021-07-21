@@ -37,9 +37,8 @@ The project is inspired by previous sound awareness work with DHH users, our DHH
   
 ## Screenshots ##  
 -------------
-<img src="images/mockup1_v2.png" width="950" height="600" />
-<br/><br/>
-<img src="images/mockup2_v2.png" width="950" height="600" />
+<img src="images/mockup1_v2.png" width="1189" height="600"/>
+<img src="images/mockup2_v2.png" width="1189" height="600"/>
 
   
 
