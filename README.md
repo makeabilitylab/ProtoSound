@@ -36,9 +36,11 @@ The project is inspired by previous sound awareness work with DHH users, our DHH
 - Get the sound classification Tensorflow lite model and the label files that are open sourced [here](https://www.dropbox.com/sh/wngu1kuufwdk8nr/AAC1rm5QR-amL_HBzTOgsZnca?dl=0)  
   
 ## Screenshots ##  
--------------  
-TODO
-  
+-------------
+<img src="images/mockup1_v2.png" width="950" height="600" />
+<br/><br/>
+<img src="images/mockup2_v2.png" width="950" height="600" />
+
   
 
   
@@ -76,7 +78,7 @@ Configuration
 - Developed with [Dhruv Jain](https://homes.cs.washington.edu/~djain/) and collaborators at [MakeabilityLab](https://makeabilitylab.cs.washington.edu/)  
 - Contact [Khoa Nguyen](https://www.linkedin.com/in/akka/) @MakeabilityLab through email `akhoa99` at cs.washington.edu  
 - Contact [Quan Dang](https://www.linkedin.com/in/quangary/) @MakeabilityLab through email `quangary` at cs.washington.edu  
-- Contact [Hung V Ngo](www.hungvngo.com) @MakeabilityLab through email `hvn297` at cs.washington.edu  
+- Contact [Hung V Ngo](https://www.hungvngo.com) @MakeabilityLab through email `hvn297` at cs.washington.edu
   
   
   
