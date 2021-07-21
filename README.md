@@ -37,10 +37,8 @@ The project is inspired by previous sound awareness work with DHH users, our DHH
   
 ## Screenshots ##  
 -------------
-<img src="images/mockup1_v2.png" width="1189" height="600"/>
-<img src="images/mockup2_v2.png" width="1189" height="600"/>
-
-  
+![ProtoSound system mockup](images/mockup1_v2.png "Title")
+![ProtoSound system mockup 2](images/mockup2_v2.png "Title")
 
   
 Configuration  
