@@ -47,8 +47,6 @@ Configuration
 - Let gradle configure and install dependencies for the `app` project.   
 - On top toolbar of Android Studio, make sure `app` is chosen and click `Run` button.
   
-  
-    
 ## Frequently Asked Questions ##  
 -------  
 
@@ -77,8 +75,6 @@ Configuration
 - Contact [Quan Dang](https://www.linkedin.com/in/quangary/) @MakeabilityLab through email `quangary` at cs.washington.edu  
 - Contact [Hung V Ngo](https://www.hungvngo.com) @MakeabilityLab through email `hvn297` at cs.washington.edu
   
-  
-  
 Drop us a note if you are using or plan to use ProtoSound for research purposes. We are also happy to help with any questions or issues.  
   
 ## Acknowledgement ##  
@@ -89,6 +85,4 @@ Drop us a note if you are using or plan to use ProtoSound for research purposes.
 ## Related Work ##  
 --------  
 - [SoundWatch](https://makeabilitylab.cs.washington.edu/project/soundwatch/): SoundWatch: Exploring Smartwatch-based Deep Learning Approaches to Support Sound Awareness for Deaf and Hard of Hearing Users
-{"mode":"full","isActive":false}
 - [HomeSound](https://makeabilitylab.cs.washington.edu/project/smarthomedhh/): An Iterative Field Deployment of an In-Home Sound Awareness System for Deaf or Hard of Hearing Users  
-{"mode":"full","isActive":false}
