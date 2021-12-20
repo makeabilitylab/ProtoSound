@@ -7,7 +7,7 @@
 Introduction  
 ------------  
 
-ProtoSound is a mobile application for Androis smartphones that allows users to customize their sound recognition models and receive private sound feedback in a different contexts.
+ProtoSound is a mobile application for Android smartphones that allows users to customize their sound recognition models and receive private sound feedback in a different contexts.
 
 It adapts prototypical networks, a commonly used algorithm for few-shot image classification, to the sound classification domain while extending the traditional training pipeline to incorporate additional user-centric features for real-world deployment.
 
