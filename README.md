@@ -1,8 +1,7 @@
   
 # ProtoSound #  
   
-![Status](https://img.shields.io/badge/Version-1.0-brightgreen)  
-[![License](https://img.shields.io/badge/license-MIT-blue)](https://opensource.org/licenses/MIT)  
+![Status](https://img.shields.io/badge/Version-1.0-brightgreen) [![License](https://img.shields.io/badge/license-MIT-blue)](https://opensource.org/licenses/MIT)  
   
 Introduction
 ------------  
