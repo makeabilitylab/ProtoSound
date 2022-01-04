@@ -52,7 +52,6 @@ import java.util.Set;
 
 public class ProtoApp extends Application {
     private static final String TAG = "ProtoApp";
-    private boolean appRunFirstTime = false;
     private Module mModuleEncoder;
 
     private final int RATE = 44100;
@@ -562,17 +561,16 @@ public class ProtoApp extends Application {
             moveAssetToStorage(this, "protosound_10_classes_scripted.pt");
             mModuleEncoder = Module.load(moduleFileAbsoluteFilePath);	// Have a ScriptModule now
         }
-        appRunFirstTime = false;
     }
 
     private String makeDir(String dirName) {
         File dir = new File(dirName);
         if (!dir.exists()) {
             dir.mkdir();
-            appRunFirstTime = true;
         }
         return dirName;
     }
+
     public Module getModule() {
         return mModuleEncoder;
     }
@@ -581,10 +579,6 @@ public class ProtoApp extends Application {
     // of folder "library" (can use recursion to support other folder structures)
     // Otherwise, it supports files normally
     public void moveAssetToStorage(Context context, String assetName) {
-        if (!appRunFirstTime) {
-            Log.d(TAG, "ALREADY CREATED");
-            return;
-        }
         try {
             String[] numFiles = context.getAssets().list(assetName);   // list out library
             if (numFiles.length > 0) {  // A folder. Only library folder in assets

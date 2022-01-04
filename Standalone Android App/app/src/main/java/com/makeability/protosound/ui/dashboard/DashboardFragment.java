@@ -80,7 +80,7 @@ public class DashboardFragment extends Fragment {
     private String testingLocation = "";
     private String[] labelList = {"", "", "", "", ""};
     private final List<String> givenPredefinedLabels = new ArrayList<String>(Arrays.asList(
-            "Appliances", "Baby Cry", "Cat Meow", "Dog Bark", "Doorbell",
+            "Appliances", "Baby Cry", "Car Honk", "Cat Meow", "Dog Bark", "Doorbell",
             "Fire Alarm", "Knocking", "Siren", "Water Running"));
     SoundRecorder recorder;
 
