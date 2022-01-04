@@ -42,6 +42,7 @@
     <string-array name="sound_array">
         <item>Appliances</item>
         <item>Baby Cry</item>
+        <item>Car Honk</item>
         <item>Cat Meow</item>
         <item>Dog Bark</item>
         <item>Doorbell</item>
