@@ -4,9 +4,8 @@
 Note: This repository is work-in-progress. Stay tuned for our first release.
   
 ![Status](https://img.shields.io/badge/Version-Experimental-brightgreen.svg) [![License](https://img.shields.io/badge/license-MIT-blue)](https://opensource.org/licenses/MIT)  
-  
-Introduction
-------------  
+
+## Introduction ##
 
 ProtoSound is a mobile application for Android smartphones that allows users to customize their sound recognition models and receive private sound feedback in a different contexts.
 
@@ -18,7 +17,7 @@ The project is inspired by previous sound awareness work with DHH users, our DHH
 [[Paper PDF](https://homes.cs.washington.edu/~djain/img/portfolio/Jain_SoundWatch_ASSETS2020.pdf)]  
   
   
-## Table Of Contents ##  
+## Table Of Contents  
   
 0. [Prerequisite](#prerequisites)  
 1. [Screenshots](#screenshots)  
@@ -29,7 +28,7 @@ The project is inspired by previous sound awareness work with DHH users, our DHH
 6. [Related Work](#related-work)
   
 ## Prerequisites ##  
---------------  
+
 - Latest Android Studio (The project is developed with Android Studio 4.0)  
 - Android SDK 28  
 - Android Build Tools v28.0.3  
@@ -37,19 +36,18 @@ The project is inspired by previous sound awareness work with DHH users, our DHH
 - Get the sound classification Tensorflow lite model and the label files that are open sourced [here](https://www.dropbox.com/sh/wngu1kuufwdk8nr/AAC1rm5QR-amL_HBzTOgsZnca?dl=0)  
   
 ## Screenshots ##  
--------------
+
 ![ProtoSound system mockup](images/mockup1.png "Title")
 ![ProtoSound system mockup 2](images/mockup2.png "Title")
 
-  
-Configuration  
--------------  
+
+## Configuration ##  
+
   
 - Let gradle configure and install dependencies for the `app` project.   
 - On top toolbar of Android Studio, make sure `app` is chosen and click `Run` button.
   
-## Frequently Asked Questions ##  
--------  
+## Frequently Asked Questions ##
 
 <b>How does the option "New" in step 2 work?</b>  
 - You are prompted to enter a name for your sound and record the sound 5 times. Each recording is 1-second long, which means there are 5 1-second samples. You can play the recording back to see if it is the sound that you want. You can also record again for the same slot when you tap on the "Recorded" button.  
@@ -70,7 +68,7 @@ Configuration
 - Yes. After training 5 sounds, you can make necessary changes on the <b>Train</b> tab then tap on "TRAIN" to train the sounds again.  
 
 ## Support ##  
--------  
+
 - Developed with [Dhruv Jain](https://homes.cs.washington.edu/~djain/) and collaborators at [MakeabilityLab](https://makeabilitylab.cs.washington.edu/)  
 - Contact [Khoa Nguyen](https://www.linkedin.com/in/akka/) @MakeabilityLab through email `akhoa99` at cs.washington.edu  
 - Contact [Quan Dang](https://www.linkedin.com/in/quangary/) @MakeabilityLab through email `quangary` at cs.washington.edu  
@@ -79,11 +77,11 @@ Configuration
 Drop us a note if you are using or plan to use ProtoSound for research purposes. We are also happy to help with any questions or issues.  
   
 ## Acknowledgement ##  
--------  
+
 - Audio bytes are written to and read from .wav files with the use of [Wav Files - The Lab Book Pages](http://www.labbookpages.co.uk/audio/wavFiles.html).
 - The ML model depends on [JLibrosa](https://github.com/Subtitle-Synchronizer/jlibrosa) to convert raw audio sounds to MFCC features.
   
 ## Related Work ##  
---------  
+
 - [SoundWatch](https://makeabilitylab.cs.washington.edu/project/soundwatch/): SoundWatch: Exploring Smartwatch-based Deep Learning Approaches to Support Sound Awareness for Deaf and Hard of Hearing Users
 - [HomeSound](https://makeabilitylab.cs.washington.edu/project/smarthomedhh/): An Iterative Field Deployment of an In-Home Sound Awareness System for Deaf or Hard of Hearing Users  
