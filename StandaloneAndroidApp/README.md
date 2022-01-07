@@ -45,7 +45,6 @@ This is an android-based implementation of ProtoSound with our pre-trained Mobil
 - Yes. Once you submit a location in step 1, the location is saved and you can access it again when you choose <b>Existing</b> for step 1. As for your recorded sounds, once you train the model, the sounds will be saved with the associated location for later access.  
   For example, if you save "talking" with your location "bedroom". If you select "bedroom" from step 1, "talking" will be in the list of sounds when you choose EXISTING in step 2.
 
-
 <b>Why does Predict not return any result for my sound?</b>
 - There are a couple of reasons. You might not have trained the sounds yet or the app simply does not recognize your untrained sound.
 
@@ -56,21 +55,8 @@ This is an android-based implementation of ProtoSound with our pre-trained Mobil
 <b>After training 5 sounds, can I train different sounds?</b>
 - Yes. After training 5 sounds, you can make necessary changes on the <b>Train</b> tab then tap on "TRAIN" to train the sounds again.
 
-## Support ##  
-
-- Developed with [Dhruv Jain](https://homes.cs.washington.edu/~djain/) and collaborators at [MakeabilityLab](https://makeabilitylab.cs.washington.edu/)
-- Contact [Khoa Nguyen](https://www.linkedin.com/in/akka/) @MakeabilityLab through email `akhoa99` at cs.washington.edu
-- Contact [Quan Dang](https://www.linkedin.com/in/quangary/) @MakeabilityLab through email `quangary` at cs.washington.edu
-- Contact [Hung V Ngo](https://www.hungvngo.com) @MakeabilityLab through email `hvn297` at cs.washington.edu
-
-Drop us a note if you are using or plan to use ProtoSound for research purposes. We are also happy to help with any questions or issues.
-
 ## Acknowledgement ##  
 
 - Audio bytes are written to and read from .wav files with the use of [Wav Files - The Lab Book Pages](http://www.labbookpages.co.uk/audio/wavFiles.html).
 - The ML model depends on [JLibrosa](https://github.com/Subtitle-Synchronizer/jlibrosa) to convert raw audio sounds to MFCC features.
 
-## Related Work ##  
-
-- [SoundWatch](https://makeabilitylab.cs.washington.edu/project/soundwatch/): SoundWatch: Exploring Smartwatch-based Deep Learning Approaches to Support Sound Awareness for Deaf and Hard of Hearing Users
-- [HomeSound](https://makeabilitylab.cs.washington.edu/project/smarthomedhh/): An Iterative Field Deployment of an In-Home Sound Awareness System for Deaf or Hard of Hearing Users  
