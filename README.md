@@ -15,7 +15,7 @@ The project is inspired by previous sound awareness work with DHH users, our DHH
 
 The **DeployablePythonCode** folder contains the python-based implementation of ProtoSound which can be run on any python-enabled devices.
 
-The **StandaloneAndroidApp** folder contains the android-based implementation of ProtoSound which can be run on android development platforms that meet the prerequisites specified.
+The **StandaloneAndroidApp** folder contains the android-based implementation of ProtoSound which can be run on android development platforms that meet the prerequisites specified in the folder.
 
 This repository also contains samples of 10 sound categories preferred by DHH people (e.g, fire alarm, knocking, baby crying), procured from a high-quality online library, FreeSound, and manually cleaned by our research team. Navigate to **StandaloneAndroidApp/app/src/main/assets/library** for the full library of sounds.
 
@@ -23,4 +23,16 @@ This repository also contains samples of 10 sound categories preferred by DHH pe
 [[Paper PDF](https://homes.cs.washington.edu/~djain/img/portfolio/Jain_ProtoSound_CHI2022.pdf)] 
 [[Video](https://homes.cs.washington.edu/~djain/img/portfolio/protosound-video.mp4)]  
 
+## Support ##  
 
+- Developed with [Dhruv Jain](https://homes.cs.washington.edu/~djain/) and collaborators at [MakeabilityLab](https://makeabilitylab.cs.washington.edu/)
+- Contact [Khoa Nguyen](https://www.linkedin.com/in/akka/) @MakeabilityLab through email `akhoa99` at cs.washington.edu
+- Contact [Quan Dang](https://www.linkedin.com/in/quangary/) @MakeabilityLab through email `quangary` at cs.washington.edu
+- Contact [Hung V Ngo](https://www.hungvngo.com) @MakeabilityLab through email `hvn297` at cs.washington.edu
+
+Drop us a note if you are using or plan to use ProtoSound for research purposes. We are also happy to help with any questions or issues.
+
+## Related Work ##  
+
+- [SoundWatch](https://makeabilitylab.cs.washington.edu/project/soundwatch/): SoundWatch: Exploring Smartwatch-based Deep Learning Approaches to Support Sound Awareness for Deaf and Hard of Hearing Users
+- [HomeSound](https://makeabilitylab.cs.washington.edu/project/smarthomedhh/): An Iterative Field Deployment of an In-Home Sound Awareness System for Deaf or Hard of Hearing Users
