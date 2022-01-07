@@ -1,8 +1,7 @@
 
 # ProtoSound #  
 
-![Status](https://img.shields.io/badge/Version-Experimental-brightgreen.svg)  
-[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+![Status](https://img.shields.io/badge/Version-Experimental-brightgreen.svg) [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
 Introduction
 ------------  
