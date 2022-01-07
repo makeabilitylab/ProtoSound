@@ -55,7 +55,7 @@ This is an android-based implementation of ProtoSound with our pre-trained Mobil
 <b>After training 5 sounds, can I train different sounds?</b>
 - Yes. After training 5 sounds, you can make necessary changes on the <b>Train</b> tab then tap on "TRAIN" to train the sounds again.
 
-## Acknowledgement ##  
+## Acknowledgements ##  
 
 - Audio bytes are written to and read from .wav files with the use of [Wav Files - The Lab Book Pages](http://www.labbookpages.co.uk/audio/wavFiles.html).
 - The ML model depends on [JLibrosa](https://github.com/Subtitle-Synchronizer/jlibrosa) to convert raw audio sounds to MFCC features.
