@@ -21,6 +21,7 @@ public class EntranceActivity extends AppCompatActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_entrace2);
 
+		
 		Button button1 = (Button) findViewById(R.id.normal);
 		button1.setOnClickListener(new View.OnClickListener() {
 			@Override
